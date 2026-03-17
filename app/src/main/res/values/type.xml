@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="display_lg_regular">
+        <item name="android:fontFamily">@font/nunitosans_regular</item>
+        <item name="android:textSize">57sp</item>
+        <item name="android:lineSpacingMultiplier">0.89</item>
+        <item name="android:lineSpacingExtra">7sp</item>
+    </style>
+    <style name="display_lg_bold">
+        <item name="android:fontFamily">@font/nunito_sans_bold</item>
+        <item name="android:textSize">57sp</item>
+        <item name="android:lineSpacingMultiplier">0.89</item>
+        <item name="android:lineSpacingExtra">7sp</item>
+    </style>
+    <style name="display_md_regular">
+        <item name="android:fontFamily">@font/nunitosans_regular</item>
+        <item name="android:textSize">45sp</item>
+        <item name="android:lineSpacingMultiplier">0.87</item>
+        <item name="android:lineSpacingExtra">7sp</item>
+
+    </style>
+    <style name="display_md_bold">
+        <item name="android:fontFamily">@font/nunito_sans_bold</item>
+        <item name="android:textSize">45sp</item>
+        <item name="android:lineSpacingMultiplier">0.87</item>
+        <item name="android:lineSpacingExtra">7sp</item>
+    </style>
+    <style name="display_sm_regular">
+        <item name="android:fontFamily">@font/nunitosans_regular</item>
+        <item name="android:textSize">36sp</item>
+        <item name="android:lineSpacingMultiplier">0.81</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+
+    </style>
+    <style name="display_sm_bold">
+        <item name="android:fontFamily">@font/nunito_sans_bold</item>
+        <item name="android:textSize">36sp</item>
+        <item name="android:lineSpacingMultiplier">0.81</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+    </style>
+    <style name="heading_lg_regular">
+        <item name="android:fontFamily">@font/nunitosans_regular</item>
+        <item name="android:textSize">32sp</item>
+        <item name="android:lineSpacingMultiplier">0.8</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+    </style>
+    <style name="heading_lg_bold">
+        <item name="android:fontFamily">@font/nunito_sans_bold</item>
+        <item name="android:textSize">32sp</item>
+        <item name="android:lineSpacingMultiplier">0.8</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+    </style>
+    <style name="heading_md_regular">
+        <item name="android:fontFamily">@font/nunitosans_regular</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:lineSpacingMultiplier">0.78</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+    </style>
+    <style name="heading_md_bold">
+        <item name="android:fontFamily">@font/nunito_sans_bold</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:lineSpacingMultiplier">0.78</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+    </style>
+    <style name="heading_sm_regular">
+        <item name="android:fontFamily">@font/nunitosans_regular</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:lineSpacingMultiplier">0.75</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+    </style>
+    <style name="heading_sm_bold">
+        <item name="android:fontFamily">@font/nunito_sans_bold</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:lineSpacingMultiplier">0.75</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+    </style>
+    <style name="title_lg_regular">
+        <item name="android:fontFamily">@font/nunitosans_regular</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:lineSpacingMultiplier">0.55</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+    </style>
+    <style name="title_lg_bold">
+        <item name="android:fontFamily">@font/nunito_sans_bold</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:lineSpacingMultiplier">0.55</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+    </style>
+    <style name="title_md_regular">
+        <item name="android:fontFamily">@font/nunitosans_regular</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:lineSpacingMultiplier">0.44</item>
+        <item name="android:lineSpacingExtra">10sp</item>
+    </style>
+    <style name="title_md_bold">
+        <item name="android:fontFamily">@font/nunito_sans_bold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:lineSpacingMultiplier">0.44</item>
+        <item name="android:lineSpacingExtra">10sp</item>
+    </style>
+    <style name="title_sm_regular">
+        <item name="android:fontFamily">@font/nunitosans_regular</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingMultiplier">0.43</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+    </style>
+    <style name="title_sm_bold">
+        <item name="android:fontFamily">@font/nunito_sans_bold</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingMultiplier">0.43</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+    </style>
+    <style name="label_lg_regular">
+        <item name="android:fontFamily">@font/nunitosans_regular</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingMultiplier">0.7</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+    </style>
+    <style name="label_lg_bold">
+        <item name="android:fontFamily">@font/nunito_sans_bold</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingMultiplier">0.7</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+    </style>
+    <style name="label_md_regular">
+        <item name="android:fontFamily">@font/nunitosans_regular</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:lineSpacingMultiplier">0.75</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+    </style>
+    <style name="label_md_bold">
+        <item name="android:fontFamily">@font/nunito_sans_bold</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:lineSpacingMultiplier">0.75</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+    </style>
+    <style name="label_sm_regular">
+        <item name="android:fontFamily">@font/nunitosans_regular</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:lineSpacingMultiplier">0.68</item>
+        <item name="android:lineSpacingExtra">5sp</item>
+    </style>
+    <style name="label_sm_bold">
+        <item name="android:fontFamily">@font/nunito_sans_bold</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:lineSpacingMultiplier">0.68</item>
+        <item name="android:lineSpacingExtra">5sp</item>
+    </style>
+    <style name="body_lg_regular">
+        <item name="android:fontFamily">@font/nunitosans_regular</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:lineSpacingMultiplier">0.8</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+    </style>
+    <style name="body_lg_bold">
+        <item name="android:fontFamily">@font/nunito_sans_bold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:lineSpacingMultiplier">0.8</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+    </style>
+    <style name="body_md_regular">
+        <item name="android:fontFamily">@font/nunitosans_regular</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingMultiplier">0.87</item>
+        <item name="android:lineSpacingExtra">2sp</item>
+    </style>
+    <style name="body_md_medium">
+        <item name="android:fontFamily">@font/nunitosans_regular</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingMultiplier">0.8</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+        <item name="android:layout_weight">800</item>
+        <item name="lineHeight">16px</item>
+    </style>
+    <style name="body_md_bold">
+        <item name="android:fontFamily">@font/nunito_sans_bold</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingMultiplier">0.87</item>
+        <item name="android:lineSpacingExtra">2sp</item>
+    </style>
+
+    <style name="body_sm_regular">
+        <item name="android:fontFamily">@font/nunitosans_regular</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:lineSpacingMultiplier">0.75</item>
+        <item name="android:lineSpacingExtra">2sp</item>
+    </style>
+    <style name="body_sm_bold">
+        <item name="android:fontFamily">@font/nunito_sans_bold</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:lineSpacingMultiplier">0.86</item>
+        <item name="android:lineSpacingExtra">2sp</item>
+    </style>
+</resources>

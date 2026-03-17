@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".views.RegisterActivity"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/white"
+        android:elevation="2dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/arrow_back"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/back_button"/>
+
+        <TextView
+            android:id="@+id/toolbar_title"
+            style="@style/title_md_bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text=""
+            android:textColor="@color/text_primary"/>
+    </androidx.appcompat.widget.Toolbar>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:max="100"
+            android:progress="25"
+            android:scaleY="0.75"
+            android:progressDrawable="@drawable/greenprogress"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginHorizontal="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/heading_sm_bold"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="32dp"
+            android:text="Lengkapi data berikut!"
+            android:textColor="@color/black"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/label_lg_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Nama Lengkap"
+                    android:textColor="@color/black" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/label_md_bold"
+                    android:text="@string/mandatory"
+                    android:textColor="@color/text_error"
+                    android:textSize="12sp"/>
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/editTextUserName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/body_lg_regular"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/rounded_normal_edittext"
+                android:hint="@string/name_hint"
+                android:autofillHints="name"
+                android:inputType="text"
+                android:padding="14dp"
+                android:textColor="@color/black" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    style="@style/label_lg_bold"
+                    android:text="Email"
+                    android:textColor="@color/black"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/label_md_bold"
+                    android:text="@string/mandatory"
+                    android:textColor="@color/red"/>
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/editTextEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/body_lg_regular"
+                android:layout_marginTop="4dp"
+                android:autofillHints="emailAddress"
+                android:background="@drawable/rounded_normal_edittext"
+                android:hint="@string/email_hint"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:padding="14dp"
+                android:textColor="@color/black"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/label_lg_bold"
+                    android:text="@string/make_password"
+                    android:textColor="@color/black"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/label_md_bold"
+                    android:text="@string/mandatory"
+                    android:textColor="@color/red"/>
+            </LinearLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp">
+
+                <EditText
+                    android:id="@+id/editTextPasswordRegister2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/body_lg_regular"
+                    android:autofillHints="password"
+                    android:background="@drawable/rounded_normal_edittext"
+                    android:hint="@string/hint_make_password"
+                    android:inputType="textPassword"
+                    android:padding="14dp"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/gray_500"/>
+
+                <TextView
+                    android:id="@+id/textViewShowPassword2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/label_lg_regular"
+                    android:layout_alignBaseline="@id/editTextPasswordRegister2"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="3dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="10dp"
+                    android:text="@string/lihat"
+                    android:textColor="@color/text_secondary"/>
+            </RelativeLayout>
+        </LinearLayout>
+
+        <!--    <LinearLayout-->
+        <!--        android:layout_width="match_parent"-->
+        <!--        android:layout_height="wrap_content"-->
+        <!--        android:orientation="vertical"-->
+        <!--        android:layout_marginTop="20dp">-->
+
+        <!--        <TextView-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:text="Jenis Kelamin*"-->
+        <!--            android:textColor="@color/black"-->
+        <!--            android:fontFamily="@font/nunitosans_regular"-->
+        <!--            android:textSize="12sp"/>-->
+        <!--        <com.google.android.material.textfield.TextInputLayout-->
+        <!--            android:id="@+id/textInputLayout"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            app:endIconDrawable="@drawable/baseline_arrow_drop_down_24"-->
+        <!--            android:theme="@style/Theme.Florist"-->
+        <!--            app:boxStrokeWidth="0dp"-->
+        <!--            app:boxStrokeWidthFocused="0dp"-->
+        <!--            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">-->
+        <!--            <AutoCompleteTextView-->
+        <!--                android:id="@+id/autoCompleteText"-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:padding="15dp"-->
+        <!--                android:text="@string/male"-->
+        <!--                android:fontFamily="@font/nunitosans_regular"-->
+        <!--                android:textSize="14sp"-->
+        <!--                android:inputType="none"-->
+        <!--                android:textColor="@color/grey_text_color"-->
+        <!--                android:background="@drawable/rouded_error_edittext2"/>-->
+        <!--        </com.google.android.material.textfield.TextInputLayout>-->
+        <!--    </LinearLayout>-->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/body_md_regular"
+                android:text="@string/kata_sandi_harus_terdiri_atas"
+                android:textColor="@color/gray_500"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/minimumCharPasswordCheck"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/normal_check"
+                    android:layout_gravity="center_vertical"/>
+                <TextView
+                    android:id="@+id/minimumCharPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/body_md_regular"
+                    android:layout_marginStart="9dp"
+                    android:text="Setidaknya 8 karakter"
+                    android:textColor="@color/gray_500"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <ImageView
+                    android:id="@+id/uppercaseCharPasswordCheck"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/normal_check"
+                    android:layout_gravity="center_vertical"/>
+                <TextView
+                    android:id="@+id/uppercaseCharPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/body_md_regular"
+                    android:layout_marginStart="9dp"
+                    android:text="@string/_1_huruf_besar_a_z"
+                    android:textColor="@color/gray_500"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <ImageView
+                    android:id="@+id/minimumNumberPasswordCheck"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/normal_check"
+                    android:layout_gravity="center_vertical"/>
+
+                <TextView
+                    android:id="@+id/minimumNumberPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/body_md_regular"
+                    android:layout_marginStart="9dp"
+                    android:text="@string/_1_angka_1_9"
+                    android:textColor="@color/gray_500"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/label_lg_bold"
+                    android:text="@string/confirm_password"
+                    android:textColor="@color/black"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/nunito_sans_bold"
+                    android:text="@string/mandatory"
+                    android:textColor="@color/red"
+                    android:textSize="12sp"/>
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp">
+                <EditText
+                    android:id="@+id/editTextPasswordRegister"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/body_lg_regular"
+                    android:padding="14dp"
+                    android:hint="@string/hint_confirm_password"
+                    android:autofillHints="password"
+                    android:textColorHint="@color/gray_500"
+                    android:textColor="@color/black"
+                    android:inputType="textPassword"
+                    android:background="@drawable/rounded_normal_edittext">
+                </EditText>
+
+                <TextView
+                    android:id="@+id/textViewShowPassword"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/label_lg_regular"
+                    android:layout_alignBaseline="@id/editTextPasswordRegister"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="3dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="10dp"
+                    android:text="@string/lihat"
+                    android:textColor="@color/text_secondary"/>
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical|bottom">
+            <Button
+                android:id="@+id/btnRegister"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/label_lg_bold"
+                android:paddingVertical="10dip"
+                android:layout_marginBottom="16dp"
+                android:text="@string/daftar"
+                android:textColor="@color/text_tertiary"
+                android:textAllCaps="false"
+                android:background="@drawable/selector_btn_save"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

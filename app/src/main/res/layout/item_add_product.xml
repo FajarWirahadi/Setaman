@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <RelativeLayout
+        android:id="@+id/addMediaLayout"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="@drawable/dotted_line"
+        android:gravity="center"
+        android:layout_margin="4dp">
+        <ImageView
+            android:id="@+id/addIcon"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:src="@drawable/icon_add" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@id/addIcon">
+            <TextView
+                android:id="@+id/currentCountMedia"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="@color/bg_accent"
+                android:textSize="11sp"
+                style="@style/label_sm_regular"/>
+            <TextView
+                android:id="@+id/dash"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="/"
+                android:textColor="@color/bg_accent"
+                android:textSize="11sp"
+                style="@style/label_sm_regular"/>
+            <TextView
+                android:id="@+id/maximumCountMedia"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="8"
+                android:textColor="@color/bg_accent"
+                android:textSize="11sp"
+                style="@style/label_sm_regular"/>
+
+        </LinearLayout>
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".views.seller.createshop.MapsActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/white"
+        android:elevation="2dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/arrow_back"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/back_button"/>
+
+        <TextView
+            android:id="@+id/toolbar_title"
+            style="@style/title_md_bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Pilih Lokasi"
+            android:textColor="@color/text_primary"/>
+    </androidx.appcompat.widget.Toolbar>
+
+    <RelativeLayout
+        android:id="@+id/mapsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar"
+        android:layout_above="@id/bottomLayout">
+
+        <com.mapbox.maps.MapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:mapbox_cameraTargetLat="-7.2575"
+            app:mapbox_cameraTargetLng="112.7521"
+            app:mapbox_cameraZoom="14.0" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btn_search_trigger"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <TextView
+                android:id="@+id/tv_search_hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:text="Cari alamat di sini..."
+                android:textColor="@color/text_secondary"
+                android:drawablePadding="12dp"
+                app:drawableStartCompat="@drawable/search" />
+        </androidx.cardview.widget.CardView>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_my_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/baseline_my_location_24"
+            app:backgroundTint="@color/white"
+            app:tint="@color/text_primary" />
+
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="20dp"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/location" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/bottomLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        android:background="@drawable/rounded_gray_layout"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/tvKnownName"
+                style="@style/body_md_bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Memuat lokasi..."
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/tvAddress"
+                style="@style/body_md_regular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Geser peta untuk menyesuaikan"
+                android:textColor="@color/text_secondary"
+                android:maxLines="2"
+                android:ellipsize="end"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnNext"
+            style="@style/label_lg_bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/selector_btn_save"
+            android:paddingVertical="12dp"
+            android:text="@string/lanjut"
+            android:textAllCaps="false"
+            android:enabled="false"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+</RelativeLayout>

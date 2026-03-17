@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "26148451467",
+    "project_id": "florist-9a390",
+    "storage_bucket": "florist-9a390.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:26148451467:android:d74a729235d012853c108e",
+        "android_client_info": {
+          "package_name": "com.example.florist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "26148451467-2qfak3ollj9sog3qbo5er0ig8ovshc90.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.florist",
+            "certificate_hash": "d9deb26df3b525a0f208b550917e63eb897935c8"
+          }
+        },
+        {
+          "client_id": "26148451467-m28vsps3r6vfr24v5ffi1qk7oejdkvq1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9iloy5pxDQPm9g9xU-U4tcHoNqT6RfN0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "26148451467-3het38n66ftbgi9q696kp1kpmvlcfcms.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

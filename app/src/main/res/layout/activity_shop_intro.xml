@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg_secondary"
+    tools:context=".views.seller.createshop.ShopIntroActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/white"
+        android:elevation="2dp">
+
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@drawable/arrow_back"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/back_button"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_marginRight="34dp">
+            <TextView
+                android:id="@+id/toolbar_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|fill_horizontal"
+                style="@style/title_md_bold"
+                android:textColor="@color/text_primary"/>
+        </LinearLayout>
+    </androidx.appcompat.widget.Toolbar>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginHorizontal="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Membuka Jendela Baru!"
+            style="@style/heading_sm_bold"
+            android:textColor="@color/text_primary"
+            android:textAlignment="center"
+            android:layout_marginTop="16dp"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/bergabunglah_dengan_setaman"
+            android:textAlignment="center"
+            style="@style/body_md_regular"
+            android:textColor="@color/text_primary"
+            android:layout_marginVertical="16dp"/>
+
+<!--CREATE SHOP BUTTON-->
+        <Button
+            android:id="@+id/btnCreateShop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_success_button"
+            android:text="Buka Toko Sekarang"
+            android:textColor="@color/text_tertiary"
+            android:textAllCaps="false"
+            android:padding="16dp"
+            android:layout_marginVertical="16dp"/>
+    </LinearLayout>
+
+
+</LinearLayout>

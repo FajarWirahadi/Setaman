@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="24dp"
+    android:background="@color/white">
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Produk Berhasil diterbitkan"
+        android:textSize="22sp"
+        android:textColor="@color/gray_900"
+        style="@style/heading_sm_bold"
+        android:layout_marginTop="32dp"
+        android:textAlignment="center"/>
+
+    <LinearLayout
+        android:id="@+id/layoutGif"
+        android:layout_width="wrap_content"
+        android:layout_height="250dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:background="@color/black">
+        <pl.droidsonroids.gif.GifImageView
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:src="@drawable/success"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <Button
+        android:id="@+id/btn_see_product"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Lihat Produk"
+        android:background="@drawable/selector_btn_save"
+        android:layout_marginBottom="24dp"
+        android:textColor="@color/text_tertiary"/>
+
+</LinearLayout>

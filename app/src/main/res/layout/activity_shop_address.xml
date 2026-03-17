@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".views.seller.createshop.ShopAddressActivity">
+
+<!--TOOLBAR-->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/white"
+        android:elevation="2dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@drawable/arrow_back"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/back_button"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_marginRight="34dp">
+            <TextView
+                android:id="@+id/toolbar_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|fill_horizontal"
+                style="@style/title_md_bold"
+                android:textColor="@color/text_primary"/>
+        </LinearLayout>
+    </androidx.appcompat.widget.Toolbar>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="16dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/heading_sm_bold"
+            android:layout_marginBottom="16dp"
+            android:text="@string/lengkapi_alamat_toko_anda"
+            android:textColor="@color/black"/>
+
+        <!--ALAMAT-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/label_lg_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Nama Toko"
+                    android:textColor="@color/black" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/label_md_bold"
+                    android:text="@string/mandatory"
+                    android:textColor="@color/text_error"
+                    android:textSize="12sp"/>
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/etShopName"
+                style="@style/body_lg_regular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:autofillHints="name"
+                android:background="@drawable/rounded_normal_edittext"
+                android:gravity="top|start"
+                android:hint="Nama toko anda"
+                android:inputType="textMultiLine"
+                android:padding="12dp"
+                android:textColor="@color/black" />
+
+
+        </LinearLayout>
+
+        <!--NOMOR HP-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="8dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/label_lg_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/nomor_hp"
+                    android:textColor="@color/black" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/label_md_bold"
+                    android:text="@string/mandatory"
+                    android:textColor="@color/text_error"
+                    android:textSize="12sp"/>
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/editTextPhoneNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/rounded_normal_edittext"
+                    android:hint="@string/hint_phone_number"
+                    style="@style/body_md_regular"
+                    android:textColorHint="@color/gray_400"
+                    android:paddingStart="48dp"
+                    android:paddingVertical="12dp"
+                    android:paddingEnd="18dp"
+                    android:textColor="@color/text_primary"
+                    android:inputType="number"
+                    android:clickable="true"
+                    android:focusable="true"/>
+                <TextView
+                    android:id="@+id/textViewHintPhoneNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/_62"
+                    android:layout_alignBaseline="@id/editTextPhoneNumber"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="15dp"
+                    style="@style/body_md_regular"
+                    android:textColor="@color/text_primary"/>
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/label_lg_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/alamat"
+                    android:textColor="@color/black" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/label_md_bold"
+                    android:text="@string/mandatory"
+                    android:textColor="@color/text_error"
+                    android:textSize="12sp"/>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnLocation"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:background="@drawable/rounded_white_button"
+                android:text="Pilih lokasi di Peta"
+                android:textAllCaps="false" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardMapPreview"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:layout_marginTop="12dp"
+                app:cardCornerRadius="8dp"
+                android:visibility="gone">
+
+                <com.mapbox.maps.MapView
+                    android:id="@+id/mapViewPreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:mapbox_cameraZoom="15.0" />
+            </androidx.cardview.widget.CardView>
+
+            <EditText
+                android:id="@+id/etAddressDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/body_lg_regular"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/rounded_normal_edittext"
+                android:hint="@string/alamat_toko_anda"
+                android:autofillHints="name"
+                android:inputType="textMultiLine"
+                android:padding="12dp"
+                android:textColor="@color/black"
+                android:lines="2"
+                android:minLines="2"
+                android:maxLines="3"
+                android:gravity="top|start"/>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:gravity="center_vertical|bottom"
+        android:layout_margin="16dp">
+        <Button
+            android:id="@+id/btnSaveAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_gray_button"
+            android:padding="4dp"
+            android:text="Simpan Alamat"
+            android:textColor="@color/text_tertiary"
+            android:textAllCaps="false"
+            style="@style/label_lg_bold"/>
+    </LinearLayout>
+</LinearLayout>

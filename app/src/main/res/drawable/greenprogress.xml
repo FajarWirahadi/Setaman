@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape>
+<!--            <corners android:topRightRadius="50dp"-->
+<!--                android:topLeftRadius="50dp"-->
+<!--                android:bottomRightRadius="50dp"-->
+<!--                android:bottomLeftRadius="50dp"/>-->
+            <solid  android:color="@color/neutral"/>
+<!--            <gradient-->
+<!--                android:angle="270"-->
+<!--                android:centerColor="@color/ne"-->
+<!--                android:centerY="0.75"-->
+<!--                android:endColor="@color/grey"-->
+<!--                android:startColor="@color/grey" />-->
+        </shape>
+    </item>
+
+<!--    <item android:id="@android:id/secondaryProgress">-->
+<!--        <clip>-->
+<!--            <shape>-->
+<!--                <solid android:color="@color/black"/>-->
+<!--                <corners android:topRightRadius="100dp"-->
+<!--                    android:bottomRightRadius="100dp"/>-->
+<!--&lt;!&ndash;                <gradient&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:angle="270"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:centerColor="#80ffb600"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:centerY="0.75"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:endColor="@color/main_color"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:startColor="@color/main_color" />&ndash;&gt;-->
+<!--            </shape>-->
+<!--        </clip>-->
+<!--    </item>-->
+    <item android:id="@android:id/progress">
+        <scale
+            android:scaleWidth="100%">
+            <shape>
+                <solid android:color="@color/olive_500"/>
+                <corners
+                    android:topRightRadius="50dp"
+                    android:bottomRightRadius="50dp"/>
+                <!--                <gradient-->
+                <!--                    android:angle="270"-->
+                <!--                    android:endColor="@color/main_color"-->
+                <!--                    android:startColor="@color/main_color" />-->
+            </shape>
+        </scale>
+    </item>
+
+</layer-list>

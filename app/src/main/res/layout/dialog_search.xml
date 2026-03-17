@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/white">
+
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:background="#E0E0E0"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cari Lokasi"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/et_search_query"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Ketik nama jalan / gedung..."
+        android:background="@drawable/rounded_normal_edittext"
+        android:padding="12dp"
+        android:inputType="textPostalAddress"
+        android:imeOptions="actionSearch"
+        android:maxLines="1"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_search_results"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="12dp"/>
+
+</LinearLayout>

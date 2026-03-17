@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/rounded_gray_layout">
+    <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/tv_sheet_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Judul"
+        android:textSize="18sp"
+        style="@style/label_lg_bold"
+        android:textColor="@color/black"/>
+
+    <ImageView
+        android:id="@+id/btn_close_sheet"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_close"
+        android:layout_alignParentEnd="true"/>
+</RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_input_duration"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Masukkan jumlah dan pilih satuan waktu"
+            style="@style/label_lg_regular"
+            android:textColor="@color/text_secondary" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <EditText
+                android:id="@+id/et_duration_amount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_normal_edittext"
+                android:hint="1"
+                android:inputType="number"
+                android:padding="14dp"
+                style="@style/body_md_regular"
+                android:textSize="14sp"
+                android:textColor="@color/black" />
+
+            <RadioGroup
+                android:id="@+id/rg_duration_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="16dp">
+
+                <RadioButton
+                    android:id="@+id/rb_hari"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:text="Hari"
+                    android:checked="true"/>
+
+                <RadioButton
+                    android:id="@+id/rb_minggu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="12dp"
+                    android:text="Minggu"/>
+
+                <RadioButton
+                    android:id="@+id/rb_bulan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="12dp"
+                    android:text="Bulan"/>
+            </RadioGroup>
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/layout_input_schedule"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Seberapa sering tanaman perlu disiram/dirawat?"
+            android:textColor="@color/text_secondary"
+            android:layout_marginBottom="12dp"/>
+
+        <RadioGroup
+            android:id="@+id/rg_schedule_options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/rb_sched_daily"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Setiap Hari (Pagi/Sore)"
+                android:paddingVertical="8dp"/>
+
+            <RadioButton
+                android:id="@+id/rb_sched_2days"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="2 Hari Sekali"
+                android:paddingVertical="8dp"/>
+
+            <RadioButton
+                android:id="@+id/rb_sched_weekly"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="1 Minggu Sekali"
+                android:paddingVertical="8dp"/>
+        </RadioGroup>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_save_generic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Simpan Durasi"
+        android:layout_marginTop="24dp"
+        style="@style/label_lg_bold"
+        android:background="@drawable/selector_btn_save"
+        android:textColor="@color/text_tertiary"
+        android:textAllCaps="false"
+        android:enabled="false"/>
+
+</LinearLayout>

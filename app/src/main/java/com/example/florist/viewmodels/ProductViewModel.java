@@ -1,0 +1,68 @@
+package com.example.florist.viewmodels;
+
+import android.net.Uri;
+
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+
+import com.example.florist.model.Product;
+import com.example.florist.model.ProductRepository;
+
+import java.util.List;
+
+public class ProductViewModel extends ViewModel {
+    private ProductRepository repository;
+    private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
+    private MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isSuccess = new MutableLiveData<>();
+
+    public ProductViewModel() {
+        repository = new ProductRepository();
+    }
+
+    public LiveData<Boolean> getIsLoading() {return isLoading;}
+    public LiveData<String> getErrorMessage() {return errorMessage;}
+    public LiveData<Boolean> getIsSuccess() {return isSuccess;}
+
+
+    public void addProduct(Product product, Uri imageUri) {
+        isLoading.setValue(true);
+
+        repository.addProduct(product, imageUri, new ProductRepository.ProductCallback() {
+            @Override
+            public void onSuccess() {
+                isLoading.setValue(false);
+                isSuccess.setValue(true);
+            }
+
+            @Override
+            public void onError(String message) {
+                isLoading.setValue(false);
+                errorMessage.setValue(message);
+            }
+        });
+    }
+
+    // Di dalam ProductViewModel.java
+
+    public void updateProductMultiple(Product product, List<Uri> newImages, List<String> oldImages) {
+        isLoading.setValue(true);
+
+        repository.updateProductWithMultipleImages(product, newImages, oldImages, new ProductRepository.ProductCallback() {
+            @Override
+            public void onSuccess() {
+                isLoading.setValue(false);
+                isSuccess.setValue(true);
+            }
+
+            @Override
+            public void onError(String message) {
+                isLoading.setValue(false);
+                errorMessage.setValue(message);
+            }
+        });
+    }
+
+
+}
