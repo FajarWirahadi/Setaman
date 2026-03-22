@@ -25,11 +25,6 @@ public class OnboardingActivity extends AppCompatActivity {
         btnRegister = findViewById(R.id.btnRegister);
         btnLogin = findViewById(R.id.btnlogin);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#ffffff")));
-        actionBar.setElevation(0);
-
-
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

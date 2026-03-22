@@ -215,8 +215,18 @@ public class ProductRepository {
                 .addOnFailureListener(e -> {callback.onError("Gagal mengubah status: " + e.getMessage());});
     }
 
-    public void deleteProduct(String productId, ProductCallback callback) {
-        firestore.collection("products").document(productId)
+    public void deleteProduct(Product product, ProductCallback callback) {
+        if (product.getImageUrl() != null) {
+            deleteImageFromCloudinary(product.getImageUrl());
+        }
+
+        if (product.getGallery() != null && !product.getGallery().isEmpty()) {
+            for (String url: product.getGallery()) {
+                deleteImageFromCloudinary(url);
+            }
+        }
+
+        firestore.collection("products").document(product.getId())
                 .delete()
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
                 .addOnFailureListener(e -> callback.onError("Gagal menghapus produk: " + e.getMessage()));
@@ -236,11 +246,41 @@ public class ProductRepository {
     public void getProductsByOwner(String ownerId, ProductListcallback callback) {
         firestore.collection("products")
                 .whereEqualTo("ownerId", ownerId)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<Product> productList = queryDocumentSnapshots.toObjects(Product.class);
-                    callback.onSuccess(productList);
-                })
-                .addOnFailureListener(e -> callback.onError("Gagal mengambil data produk: " + e.getMessage()));
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        callback.onError("Gagal mendapatkan data: " + error.getMessage());
+                        return;
+                    }
+                    if (value != null) {
+                        List<Product> productList = value.toObjects(Product.class);
+                        callback.onSuccess(productList);
+                    }
+                });
+    }
+
+    private void deleteImageFromCloudinary(String imageUrl) {
+        if (imageUrl == null || imageUrl.isEmpty()) return;
+
+        java.util.concurrent.Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                java.net.URL url = new java.net.URL("http://192.168.1.55:3000/api/delete-image");
+                java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json; utf-8");
+                conn.setRequestProperty("Accept", "application.json");
+                conn.setDoOutput(true);
+
+                String jsonInputString = "{\"imageUrl\": \"" + imageUrl + "\"}";
+
+                try(java.io.OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+                int responCode = conn.getResponseCode();
+                android.util.Log.d("Setaman", "Respon harus gambar " + imageUrl + ": " + responCode);
+            } catch (Exception e) {
+                android.util.Log.e("Setaman", "Gagal menghubungi server", e);
+            }
+        });
     }
 }

@@ -67,16 +67,12 @@ public class MyProductActivity extends AppCompatActivity {
                 }
             });
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
 
         if (viewModel != null) {
             viewModel.fetchMyProducts();
         }
     }
+
 
     private void setupViewPagerAndTabs() {
        pagerAdapter = new ProductPagerAdapter(this);

@@ -101,37 +101,30 @@ public class ProductListFragment extends Fragment {
         });
     }
     private void showDeleteConfirmation(Product product) {
-        // 1. Buat Bottom Sheet Dialog
         com.google.android.material.bottomsheet.BottomSheetDialog bottomSheet =
                 new com.google.android.material.bottomsheet.BottomSheetDialog(requireContext());
 
-        // 2. Pasang layout konfirmasi yang baru dibuat
         bottomSheet.setContentView(R.layout.dialog_delete_confirmation);
 
-        // 3. Hubungkan komponen-komponennya
         android.widget.TextView tvMessage = bottomSheet.findViewById(R.id.tvDeleteMessage);
         com.google.android.material.button.MaterialButton btnCancel = bottomSheet.findViewById(R.id.btnCancelDelete);
         com.google.android.material.button.MaterialButton btnConfirm = bottomSheet.findViewById(R.id.btnConfirmDelete);
 
-        // 4. Set teks agar nama produknya dinamis
         if (tvMessage != null) {
             tvMessage.setText("Apakah Anda yakin ingin menghapus '" + product.getName() + "'? Tindakan ini permanen dan tidak dapat dibatalkan.");
         }
 
-        // 5. Aksi Tombol Batal
         if (btnCancel != null) {
-            btnCancel.setOnClickListener(v -> bottomSheet.dismiss()); // Tutup saja panelnya
+            btnCancel.setOnClickListener(v -> bottomSheet.dismiss());
         }
 
-        // 6. Aksi Tombol Hapus (Merah)
+
         if (btnConfirm != null) {
             btnConfirm.setOnClickListener(v -> {
-                bottomSheet.dismiss(); // Tutup panelnya dulu
-                viewModel.deleteProduct(product.getId()); // EKSEKUSI PEMUSNAHAN DARI VIEWMODEL!
+                bottomSheet.dismiss();
+                viewModel.deleteProduct(product);
             });
         }
-
-        // 7. Tampilkan ke layar!
         bottomSheet.show();
     }
 

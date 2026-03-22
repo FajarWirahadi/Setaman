@@ -76,11 +76,20 @@
                     app:tint="#FFC107"/>
 
                 <TextView
-                    android:id="@+id/tvRatingSold"
+                    android:id="@+id/tvRating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:text="4.8 | 50 tersewa"
+                    android:text="4.8 |"
+                    android:textColor="@color/text_secondary"
+                    style="@style/label_sm_regular"
+                    android:textSize="11sp"/>
+                <TextView
+                    android:id="@+id/tvSold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="50 tersewa"
                     android:textColor="@color/text_secondary"
                     style="@style/label_sm_regular"
                     android:textSize="11sp"/>

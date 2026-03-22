@@ -51,9 +51,6 @@ public class LoginActivity extends AppCompatActivity {
         setupObservers();
         setupListeners();
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#ffffff")));
-        actionBar.setElevation(0);
 
     }
 

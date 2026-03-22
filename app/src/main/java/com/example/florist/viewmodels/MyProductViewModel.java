@@ -147,9 +147,9 @@ public class MyProductViewModel extends ViewModel {
         });
     }
 
-    public void deleteProduct(String productId) {
+    public void deleteProduct(Product product) {
         isLoading.setValue(true);
-        productRepository.deleteProduct(productId, new ProductRepository.ProductCallback() {
+        productRepository.deleteProduct(product, new ProductRepository.ProductCallback() {
             @Override
             public void onSuccess() {
                 isLoading.setValue(false);

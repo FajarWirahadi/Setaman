@@ -16,7 +16,7 @@ public class MyApplication extends Application {
 
 
         config.put("cloud_name", "dhkjds1yu");
-        config.put("api_key", "323741875367468");
+            config.put("api_key", "323741875367468");
         config.put("api_secret", "LT1RcQQGoP2EEncCuK0aj_aL5EE");
 
         // Inisialisasi MediaManager

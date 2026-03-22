@@ -6,6 +6,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/gray_50"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     tools:context=".views.seller.addproduct.AddProductActivity">
 
     <androidx.appcompat.widget.Toolbar

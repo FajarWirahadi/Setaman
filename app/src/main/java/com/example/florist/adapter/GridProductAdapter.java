@@ -89,7 +89,6 @@ public class GridProductAdapter extends RecyclerView.Adapter<GridProductAdapter.
             tvName = itemView.findViewById(R.id.tvProductName);
             tvCategory = itemView.findViewById(R.id.tvCategoryTag);
             tvPrice = itemView.findViewById(R.id.tvPrice);
-            tvRatingSold = itemView.findViewById(R.id.tvRatingSold);
             imgProduct = itemView.findViewById(R.id.imgProduct);
         }
     }

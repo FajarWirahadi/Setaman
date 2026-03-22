@@ -1,7 +1,8 @@
 package com.example.florist.views.homepage;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,32 +12,27 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.example.florist.adapter.GridProductAdapter;
+import com.example.florist.adapter.BuyerProductAdapter;
 import com.example.florist.databinding.FragmentHomeBinding;
 import com.example.florist.model.Product;
-import com.example.florist.views.seller.ProductDetailActivity;
-import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class HomeFragment extends Fragment {
 
+    // 1. Deklarasi ViewBinding
     private FragmentHomeBinding binding;
+
+    private BuyerProductAdapter adapter;
+    private List<Product> allActiveProducts = new ArrayList<>();
     private FirebaseFirestore firestore;
 
-    private GridProductAdapter popularAdapter;
-    private GridProductAdapter allProductsAdapter;
-    private List<Product> fullProductList = new ArrayList<>();
-
-    public HomeFragment() {}
-
+    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -47,67 +43,67 @@ public class HomeFragment extends Fragment {
 
         firestore = FirebaseFirestore.getInstance();
 
-        setupRecyclerViews();
-        setupTabs();
-        loadProducts();
+        setupRecyclerView();
+        setupSearch();
+        fetchActiveProducts();
     }
 
-    private void setupRecyclerViews() {
-        popularAdapter = new GridProductAdapter(requireContext(), product -> navigateToDetail(product));
-        binding.rvPopular.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
-        binding.rvPopular.setAdapter(popularAdapter);
+    private void setupRecyclerView() {
+        binding.rvBuyerProducts.setLayoutManager(new GridLayoutManager(requireContext(), 2));
 
-        allProductsAdapter = new GridProductAdapter(requireContext(), product -> navigateToDetail(product));
-        binding.rvAllProducts.setLayoutManager(new GridLayoutManager(requireContext(), 2));
-        binding.rvAllProducts.setAdapter(allProductsAdapter);
+        adapter = new BuyerProductAdapter(requireContext(), new ArrayList<>(), product -> {
+            Toast.makeText(requireContext(), "Membuka detail: " + product.getName(), Toast.LENGTH_SHORT).show();
+        });
+
+        binding.rvBuyerProducts.setAdapter(adapter);
     }
 
-    private void navigateToDetail(Product product) {
-        Intent intent = new Intent(requireContext(), ProductDetailActivity.class);
-        intent.putExtra("EXTRA_PRODUCT", product);
-        startActivity(intent);
+    private void fetchActiveProducts() {
+        binding.progressBar.setVisibility(View.VISIBLE);
+
+
+        firestore.collection("products")
+                .whereEqualTo("active", true)
+                .whereGreaterThan("stock", 0)
+                .addSnapshotListener((value, error) -> {
+                    binding.progressBar.setVisibility(View.GONE);
+
+                    if (error != null) {
+                        Toast.makeText(requireContext(), "Gagal memuat etalase: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    if (value != null) {
+                        allActiveProducts = value.toObjects(Product.class);
+                        // Tampilkan semua produk ke layar
+                        adapter.updateList(allActiveProducts);
+                    }
+                });
     }
 
-    private void setupTabs() {
-        binding.tabLayoutHome.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+    private void setupSearch() {
+        binding.etSearch.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onTabSelected(TabLayout.Tab tab) { filterProducts(tab.getPosition()); }
-            @Override public void onTabUnselected(TabLayout.Tab tab) {}
-            @Override public void onTabReselected(TabLayout.Tab tab) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterProducts(s.toString().toLowerCase().trim());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
         });
     }
 
-    private void loadProducts() {
-        firestore.collection("products")
-                .orderBy("createdAt", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        fullProductList = queryDocumentSnapshots.toObjects(Product.class);
-                        if (fullProductList.size() > 5) {
-                            popularAdapter.setProductList(fullProductList.subList(0, 5));
-                        } else {
-                            popularAdapter.setProductList(fullProductList);
-                        }
-                        allProductsAdapter.setProductList(fullProductList);
-                    }
-                })
-                .addOnFailureListener(e -> Toast.makeText(requireContext(), "Gagal: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-    }
-
-    private void filterProducts(int tabPosition) {
+    private void filterProducts(String query) {
         List<Product> filteredList = new ArrayList<>();
-        if (tabPosition == 0) {
-            filteredList.addAll(fullProductList);
-        } else {
-            String keyword = tabPosition == 1 ? "Indoor" : "Outdoor";
-            for (Product p : fullProductList) {
-                if (p.getCategory() != null && p.getCategory().contains(keyword)) {
-                    filteredList.add(p);
-                }
+        for (Product p : allActiveProducts) {
+            if (p.getName().toLowerCase().contains(query)) {
+                filteredList.add(p);
             }
         }
-        allProductsAdapter.setProductList(filteredList);
+        adapter.updateList(filteredList);
     }
 
     @Override

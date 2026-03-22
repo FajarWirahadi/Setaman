@@ -18,6 +18,7 @@
 
     <application
         android:name=".MyApplication"
+        android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:enableOnBackInvokedCallback="true"
@@ -27,7 +28,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Florist"
         android:icon="@mipmap/ic_setaman_round"
-        android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
