@@ -156,11 +156,13 @@ public class MapsActivity extends AppCompatActivity {
         binding.btnNext.setOnClickListener(v-> {
             Point point = viewModel.getSelectedPoint().getValue();
             String address = viewModel.getAddressDetail().getValue();
+            String city = viewModel.getCityName().getValue();
             if (point != null) {
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("LATITUDE", point.latitude());
                 resultIntent.putExtra("LONGITUDE", point.longitude());
                 resultIntent.putExtra("ADDRESS", address);
+                resultIntent.putExtra("CITY", city);
                 setResult(Activity.RESULT_OK, resultIntent);
                 finish();
             }
@@ -344,9 +346,15 @@ public class MapsActivity extends AppCompatActivity {
 
                         // B. Alamat Lengkap
                         String fullAddress = googleAddress.getAddressLine(0);
-
+                        String city = googleAddress.getSubAdminArea();
+                        if (city == null || city.isEmpty()) {
+                            city = googleAddress.getLocality();
+                        }
+                        if (city == null || city.isEmpty()) {
+                            city = googleAddress.getAdminArea();
+                        }
                         // --- KIRIM KE VIEWMODEL ---
-                        viewModel.setLocationDetail(point, streetName, fullAddress);
+                        viewModel.setLocationDetail(point, streetName, fullAddress,city);
 
                     } else {
                         binding.tvKnownName.setText("Lokasi tidak dikenal");

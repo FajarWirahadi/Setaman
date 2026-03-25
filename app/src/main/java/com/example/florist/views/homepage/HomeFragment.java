@@ -1,5 +1,6 @@
 package com.example.florist.views.homepage;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,10 +13,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.florist.adapter.BuyerProductAdapter;
 import com.example.florist.databinding.FragmentHomeBinding;
 import com.example.florist.model.Product;
+import com.example.florist.views.buyer.BuyerDetailActivity;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -23,11 +27,18 @@ import java.util.List;
 
 public class HomeFragment extends Fragment {
 
-    // 1. Deklarasi ViewBinding
     private FragmentHomeBinding binding;
 
-    private BuyerProductAdapter adapter;
+    private BuyerProductAdapter mainAdapter;
+    private BuyerProductAdapter categoryAdapter;
     private List<Product> allActiveProducts = new ArrayList<>();
+    private List<Product> allPlantList = new ArrayList<>();
+    private List<Product> outdoorPlantList = new ArrayList<>();
+    private List<Product> indoorPlantList = new ArrayList<>();
+    private List<Product> ornamentalPlantList = new ArrayList<>();
+    private List<Product> tablePlantList = new ArrayList<>();
+
+
     private FirebaseFirestore firestore;
 
     @Nullable
@@ -45,17 +56,72 @@ public class HomeFragment extends Fragment {
 
         setupRecyclerView();
         setupSearch();
+        setupTabLayout();
         fetchActiveProducts();
     }
 
-    private void setupRecyclerView() {
-        binding.rvBuyerProducts.setLayoutManager(new GridLayoutManager(requireContext(), 2));
+    private void setupTabLayout() {
+        binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Semua"));
+        binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Tanaman Indoor"));
+        binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Tanaman Outdoor"));
+        binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Tanaman Ornamental"));
+        binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Tanaman Meja"));
+        binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Lainnya"));
 
-        adapter = new BuyerProductAdapter(requireContext(), new ArrayList<>(), product -> {
-            Toast.makeText(requireContext(), "Membuka detail: " + product.getName(), Toast.LENGTH_SHORT).show();
+
+        binding.tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                String selectedCategory = tab.getText().toString();
+                filterByCategory(selectedCategory);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+    }
+
+    private void filterByCategory(String selectedCategory) {
+        if (selectedCategory.equals("Semua")) {
+            categoryAdapter.updateList(allActiveProducts);
+            return;
+        }
+
+        List<Product> filteredList = new ArrayList<>();
+        for (Product p : allActiveProducts) {
+            if (p.getCategory() != null && p.getCategory().equalsIgnoreCase(selectedCategory)) {
+                filteredList.add(p);
+            }
+        }
+        categoryAdapter.updateList(filteredList);
+    }
+
+    private void setupRecyclerView() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
+        binding.rvBuyerProducts.setLayoutManager(layoutManager);
+
+        mainAdapter = new BuyerProductAdapter(requireContext(), new ArrayList<>(),false, product -> {
+            Intent intent = new Intent(requireContext(), BuyerDetailActivity.class);
+            intent.putExtra("EXTRA_PRODUCT", product);
+            startActivity(intent);
         });
 
-        binding.rvBuyerProducts.setAdapter(adapter);
+        binding.rvBuyerProducts.setAdapter(mainAdapter);
+
+        binding.rvCategoryProducts.setLayoutManager(new GridLayoutManager(requireContext(), 2));
+        categoryAdapter = new BuyerProductAdapter(requireContext(), new ArrayList<>(), true, product -> {
+            Intent intent = new Intent(requireContext(), BuyerDetailActivity.class);
+            intent.putExtra("EXTRA_PRODUCT", product);
+            startActivity(intent);
+        });
+        binding.rvCategoryProducts.setAdapter(categoryAdapter);
     }
 
     private void fetchActiveProducts() {
@@ -75,8 +141,8 @@ public class HomeFragment extends Fragment {
 
                     if (value != null) {
                         allActiveProducts = value.toObjects(Product.class);
-                        // Tampilkan semua produk ke layar
-                        adapter.updateList(allActiveProducts);
+                        mainAdapter.updateList(allActiveProducts);
+                        categoryAdapter.updateList(allActiveProducts);
                     }
                 });
     }
@@ -103,7 +169,7 @@ public class HomeFragment extends Fragment {
                 filteredList.add(p);
             }
         }
-        adapter.updateList(filteredList);
+        mainAdapter.updateList(filteredList);
     }
 
     @Override

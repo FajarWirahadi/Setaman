@@ -52,6 +52,7 @@ public class ShopAddressActivity extends AppCompatActivity {
                     finalLat = result.getData().getDoubleExtra("LATITUDE", 0.0);
                     finalLng = result.getData().getDoubleExtra("LONGITUDE", 0.0);
                     String address = result.getData().getStringExtra("ADDRESS");
+                    String city = result.getData().getStringExtra("CITY");
 
                     binding.etAddressDetail.setText(address);
 

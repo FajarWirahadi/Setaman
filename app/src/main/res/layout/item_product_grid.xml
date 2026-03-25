@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="160dp"
-    android:layout_height="wrap_content"
+    android:layout_width="130dp"
+    android:layout_height="260dp"
     android:layout_margin="8dp"
     app:cardCornerRadius="12dp"
     app:cardElevation="2dp"
@@ -22,12 +22,12 @@
             android:scaleType="centerCrop"
             android:background="@color/gray_100"/>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="10dp"
-            android:paddingTop="10dp">
+            android:paddingHorizontal="8dp"
+            android:paddingTop="4dp">
 
             <TextView
                 android:id="@+id/tvProductName"
@@ -51,7 +51,8 @@
                 android:background="@drawable/bg_category_tag"
                 style="@style/body_sm_regular"
                 android:paddingHorizontal="4dp"
-                android:paddingVertical="2dp"/>
+                android:paddingVertical="2dp"
+                android:layout_below="@id/tvProductName"/>
             <TextView
                 android:id="@+id/tvPrice"
                 android:layout_width="wrap_content"
@@ -60,14 +61,17 @@
                 android:text="Rp 1.500/hari"
                 android:textColor="@color/bg_accent"
                 android:textSize="13sp"
-                style="@style/body_md_medium"/>
+                style="@style/body_md_medium"
+                android:layout_above="@+id/layoutRatingAndRentCount"/>
 
             <LinearLayout
+                android:id="@+id/layoutRatingAndRentCount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:layout_marginTop="4dp">
+                android:layout_marginTop="4dp"
+                android:layout_alignParentBottom="true">
 
                 <ImageView
                     android:layout_width="12dp"
@@ -96,6 +100,6 @@
 
             </LinearLayout>
 
-        </LinearLayout>
+        </RelativeLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

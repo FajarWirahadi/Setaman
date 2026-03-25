@@ -55,9 +55,6 @@ public class DurationBottomSheetFragment extends BottomSheetDialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // requireActivity untuk terhubung dgn MyShop_AddProduct1
-//        viewModel = new ProductFormViewModel(requireActivity().get(ProductFormViewModel.class));
-
         // --- KODE BARU (FIX) ---
         // Kita tambahkan parameter kedua: getDefaultViewModelProviderFactory()
         // Ini memberi tahu ViewModelProvider cara membuat ViewModel tersebut.

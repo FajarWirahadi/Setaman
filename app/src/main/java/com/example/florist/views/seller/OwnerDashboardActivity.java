@@ -28,7 +28,6 @@ public class OwnerDashboardActivity extends AppCompatActivity {
     private OwnerDashboardViewModel viewModel;
     private String currentShopImageUrl = "";
 
-    // PELATUK 2: MENANGKAP HASIL CROP ATAU PEMBATALAN (BACK)
     private final ActivityResultLauncher<Intent> cropLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {

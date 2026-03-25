@@ -18,27 +18,30 @@
 
     <application
         android:name=".MyApplication"
-        android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_setaman_round"
         android:label=""
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.Florist"
-        android:icon="@mipmap/ic_setaman_round"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".views.buyer.BuyerDetailActivity"
+            android:exported="false" />
+        <activity
             android:name="com.yalantis.ucrop.UCropActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".views.seller.ProductDetailActivity"
             android:exported="false" />
         <activity
             android:name=".views.seller.EditProductActivity"
             android:exported="false"
-            android:theme="@style/Theme.Florist"/>
+            android:theme="@style/Theme.Florist" />
         <activity
             android:name=".views.seller.MyProductActivity"
             android:exported="false" />
@@ -51,20 +54,19 @@
         <activity
             android:name=".views.seller.addproduct.SelectCategoryActivity"
             android:exported="false" />
-        <activity
-            android:name=".views.seller.addproduct.MediaPreviewActivity" />
+        <activity android:name=".views.seller.addproduct.MediaPreviewActivity" />
         <activity
             android:name=".views.seller.addproduct.AddProductActivity"
             android:exported="true" />
         <activity
             android:name=".views.seller.OwnerDashboardActivity"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name=".views.seller.createshop.CreateShopSuccess"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name=".views.seller.createshop.MapsActivity"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name=".views.seller.createshop.ShopAddressActivity"
             android:exported="true">
@@ -74,13 +76,13 @@
         </activity>
         <activity
             android:name=".views.seller.createshop.ShopGeneralInfoActivity"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name=".views.seller.createshop.ShopIntroActivity"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name=".views.RegisterSuccessActivity"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name=".views.homepage.HomepageActivity"
             android:exported="true">
@@ -100,28 +102,25 @@
         </activity>
         <activity
             android:name=".views.reset_password.NewPasswordActivity"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name=".views.reset_password.ResetPasswordActivity"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name=".views.RegisterVerificationActivity"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name=".views.RegisterSelectVerificationActivity"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name=".views.RegisterPhoneActivity"
-            android:exported="true">
-        </activity>
+            android:exported="true"></activity>
         <activity
             android:name=".views.RegisterActivity"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name=".views.LoginActivity"
-            android:exported="true">
-
-        </activity>
+            android:exported="true"></activity>
         <activity
             android:name=".views.splashscreen.OnboardingActivity"
             android:exported="true" />

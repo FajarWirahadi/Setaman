@@ -1,6 +1,6 @@
 package com.example.florist.model;
 
-import com.google.firebase.Timestamp;
+import java.util.Date;
 import com.google.firebase.firestore.DocumentId;
 
 import java.io.Serializable;
@@ -18,11 +18,17 @@ public class Product implements Serializable {
     private int stock;
     private String category;
     private String imageUrl;
-    private Timestamp createdAt;
+    private Date createdAt;
     private double shipping;
     private String duration;
     private String schedule;
+    private double rating = 0.0;
+    private int rentCount = 0;
+
+
+
     private List<String> gallery = new ArrayList<>();
+    private List<String> videoUrls = new ArrayList<>();
 
 
 
@@ -106,11 +112,11 @@ public class Product implements Serializable {
         this.imageUrl = imageUrl;
     }
 
-    public Timestamp getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Timestamp createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -150,4 +156,19 @@ public class Product implements Serializable {
 
     public void setId(String id) {this.id = id;}
 
+    public double getRating() {return rating;}
+
+    public void setRating(double rating) {this.rating = rating;}
+
+    public int getRentCount() {return rentCount;}
+
+    public void setRentCount(int rentCount) {this.rentCount = rentCount;}
+
+    public List<String> getVideoUrls() {
+        return videoUrls;
+    }
+
+    public void setVideoUrls(List<String> videoUrls) {
+        this.videoUrls = videoUrls;
+    }
 }

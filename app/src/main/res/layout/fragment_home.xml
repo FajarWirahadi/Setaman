@@ -49,7 +49,7 @@
         android:drawablePadding="12dp"
         android:hint="Cari Tanaman"
         android:paddingHorizontal="12dp"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:layout_below="@+id/headerLayout"/>
 
     <TextView
@@ -59,22 +59,52 @@
         android:text="Paling Populer"
         style="@style/title_md_bold"
         android:textColor="@color/gray_900"
+        android:textSize="16sp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="5dp"
         android:layout_below="@id/etSearch"/>
-
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/tvPalingPopuler">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvBuyerProducts"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="8dp"
-            android:paddingHorizontal="10dp"
-            android:paddingBottom="20dp" />
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvPalingPopuler"
+            android:clipToPadding="false"
+            android:requiresFadingEdge="horizontal"
+            android:fadingEdgeLength="20dp"
+            android:scrollbars="horizontal"
+            android:scrollbarThumbHorizontal="@color/olive_500"
+            android:scrollbarSize="2dp" />
 
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:tabIndicatorColor="@color/olive_500"
+        app:tabSelectedTextColor="@color/olive_500"
+        app:tabTextColor="@color/gray_500"
+        app:tabTextAppearance="@style/label_lg_bold"
+        app:tabMode="scrollable"
+        app:tabGravity="fill"
+        android:layout_below="@id/rvBuyerProducts"/>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/svCategoryProducts"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" android:layout_below="@id/tabLayout">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvCategoryProducts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:paddingBottom="20dp"
+            android:scrollbars="vertical"
+            android:scrollbarSize="2dp"
+            android:scrollbarThumbVertical="@color/olive_500" />
     </androidx.core.widget.NestedScrollView>
+
             <ProgressBar
                 android:id="@+id/progressBar"
                 android:layout_width="wrap_content"

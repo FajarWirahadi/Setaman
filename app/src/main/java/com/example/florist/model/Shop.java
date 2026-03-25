@@ -5,6 +5,7 @@ public class Shop {
     private String ownerId;
     private String shopName;
     private String shopAddress;
+    private String shopCity;
     private String shopImageUrl;
     private double rating;
 
@@ -49,6 +50,14 @@ public class Shop {
 
     public void setShopAddress(String shopAddress) {
         this.shopAddress = shopAddress;
+    }
+
+    public String getShopCity() {
+        return shopCity;
+    }
+
+    public void setShopCity(String shopCity) {
+        this.shopCity = shopCity;
     }
 
     public String getShopImageUrl() {

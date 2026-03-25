@@ -22,19 +22,31 @@ public class BuyerProductAdapter extends RecyclerView.Adapter<BuyerProductAdapte
     private List<Product> productList;
     private OnItemClickListener listener;
 
+    private boolean isGrid;
+
     public interface OnItemClickListener {
         void onProductClick(Product product);
     }
-    public BuyerProductAdapter(Context context, List<Product> productlist, OnItemClickListener listener) {
+    public BuyerProductAdapter(Context context, List<Product> productlist, boolean isGrid, OnItemClickListener listener) {
         this.context = context;
         this.productList = productlist;
         this.listener = listener;
+        this.isGrid = isGrid;
     }
 
     @NonNull
     @Override
     public BuyerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         ItemProductGridBinding binding = ItemProductGridBinding.inflate(LayoutInflater.from(context), parent, false);
+
+        ViewGroup.LayoutParams layoutParams = binding.getRoot().getLayoutParams();
+        if (isGrid) {
+            layoutParams.width = (int) (160 * context.getResources().getDisplayMetrics().density);
+        } else {
+            layoutParams.width = (int) (130 * context.getResources().getDisplayMetrics().density);
+        }
+        binding.getRoot().setLayoutParams(layoutParams);
+
         return new BuyerViewHolder(binding);
     }
 
@@ -65,6 +77,9 @@ public class BuyerProductAdapter extends RecyclerView.Adapter<BuyerProductAdapte
         @SuppressLint("SetTextI18n")
         public void bind(Product product, OnItemClickListener listener) {
             binding.tvProductName.setText(product.getName());
+            binding.tvRating.setText(String.valueOf(product.getRating()) + " |");
+            binding.tvSold.setText(product.getRentCount() + " disewa");
+            binding.tvCategoryTag.setText(product.getCategory());
 
             NumberFormat formatRupiah = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
             binding.tvPrice.setText(formatRupiah.format(product.getPrice()));
