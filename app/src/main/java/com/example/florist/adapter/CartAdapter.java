@@ -45,8 +45,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     public void onBindViewHolder(@NonNull CartAdapter.CartViewHolder holder, int position) {
         CartItem item = cartList.get(position);
 
-        String rentLabel = " (" + item.getDurationValue() + " " + item.getDurationType() + ")";
-        holder.binding.tvCartName.setText(item.getName() + rentLabel);
+        String rentLabel =+ item.getDurationValue() + " " + item.getDurationType();
+        if (item.getShopName() != null && !item.getShopName().isEmpty()) {
+            holder.binding.tvCartShopName.setText(item.getShopName());
+        }
+        holder.binding.tvCartName.setText(item.getName());
+        holder.binding.tvDurationLabel.setText(rentLabel);
 
         // 2. Set Jumlah
         holder.binding.tvQuantity.setText(String.valueOf(item.getQuantity()));

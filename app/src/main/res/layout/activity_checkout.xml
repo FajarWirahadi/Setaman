@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_primary"> <RelativeLayout
+    android:id="@+id/headerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@color/white"
+    android:elevation="4dp"
+    android:paddingHorizontal="12dp">
+
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="8dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/arrow_back"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/circle_background"
+        android:backgroundTint="@color/white"
+        app:tint="@color/gray_900"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pengiriman &amp; Pembayaran"
+        android:textColor="@color/gray_900"
+        style="@style/title_md_bold"
+        android:layout_centerInParent="true"/>
+</RelativeLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/headerLayout"
+        android:layout_above="@id/bottomCheckoutBar"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/white"
+                android:padding="16dp"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Alamat Pengiriman"
+                    android:textColor="@color/gray_900"
+                    style="@style/title_md_bold"
+                    android:layout_marginBottom="8dp"/>
+
+                <EditText
+                    android:id="@+id/etDeliveryAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:background="@drawable/rounded_normal_edittext"
+                    android:hint="Tulis alamat lengkap pengirimanmu di sini (Jalan, RT/RW, Kecamatan, Patokan...)"
+                    android:gravity="top|start"
+                    android:padding="12dp"
+                    android:textSize="14sp"
+                    android:textColor="@color/gray_900"
+                    android:inputType="textMultiLine"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/white"
+                android:padding="16dp"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ringkasan Pesanan"
+                    android:textColor="@color/gray_900"
+                    style="@style/title_md_bold"
+                    android:layout_marginBottom="8dp"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvCheckoutItems"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:layout_marginBottom="8dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/white"
+                android:padding="16dp"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Metode Pembayaran"
+                    android:textColor="@color/gray_900"
+                    style="@style/title_md_bold"
+                    android:layout_marginBottom="8dp"/>
+
+                <RadioGroup
+                    android:id="@+id/rgPaymentMethod"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <RadioButton
+                        android:id="@+id/rbTransfer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Transfer Bank (Virtual Account)"
+                        android:textColor="@color/gray_900"
+                        android:buttonTint="@color/olive_500"
+                        android:padding="12dp"
+                        android:checked="true"/> <RadioButton
+                    android:id="@+id/rbCOD"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Bayar di Tempat (COD)"
+                    android:textColor="@color/gray_900"
+                    android:buttonTint="@color/olive_500"
+                    android:padding="12dp"/>
+                </RadioGroup>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/white"
+                android:padding="16dp"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Rincian Pembayaran"
+                    android:textColor="@color/gray_900"
+                    style="@style/title_md_bold"
+                    android:layout_marginBottom="12dp"/>
+
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Subtotal Produk" android:textColor="@color/gray_700"/>
+                    <TextView android:id="@+id/tvCheckoutSubtotal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp 0" android:textColor="@color/gray_900" android:layout_alignParentEnd="true" style="@style/body_md_bold"/>
+                </RelativeLayout>
+
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ongkos Kirim" android:textColor="@color/gray_700"/>
+                    <TextView android:id="@+id/tvCheckoutShipping" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp 15.000" android:textColor="@color/gray_900" android:layout_alignParentEnd="true" style="@style/body_md_bold"/>
+                </RelativeLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/gray_300" android:layout_marginBottom="12dp"/>
+
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Pembayaran" android:textColor="@color/gray_900" style="@style/title_md_bold"/>
+                    <TextView android:id="@+id/tvCheckoutFinalTotal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp 0" android:textColor="@color/olive_500" android:layout_alignParentEnd="true" style="@style/title_lg_bold"/>
+                </RelativeLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/bottomCheckoutBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@color/white"
+        android:elevation="16dp">
+
+        <Button
+            android:id="@+id/btnPlaceOrder"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Buat Pesanan"
+            android:textColor="@color/white"
+            android:background="@drawable/rounded_success_button"
+            style="@style/label_lg_bold"
+            android:textAllCaps="false"/>
+    </LinearLayout>
+
+</RelativeLayout>

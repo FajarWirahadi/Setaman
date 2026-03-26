@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -68,15 +69,10 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartC
             if (cartList.isEmpty()) {
                 Toast.makeText(this, "Keranjangmu masih kosong!", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "Menuju Meja Kasir...", Toast.LENGTH_SHORT).show();
-                // TODO: Pindah ke CheckoutActivity
+                startActivity(new Intent(this, CheckoutActivity.class));
             }
         });
     }
-
-    // ==========================================
-    // OPERASI AWAN: MENGAMBIL DATA KERANJANG
-    // ==========================================
     private void loadCartData() {
         db.collection("users").document(currentUserId).collection("cart")
                 .addSnapshotListener((value, error) -> {
@@ -99,9 +95,6 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartC
                 });
     }
 
-    // ==========================================
-    // MESIN PENGHITUNG TOTAL HARGA
-    // ==========================================
     private void updateTotalPrice() {
         long grandTotal = 0;
         for (CartItem item : cartList) {
@@ -130,10 +123,6 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartC
             binding.btnCheckout.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.olive_500));
         }
     }
-
-    // ==========================================
-    // IMPLEMENTASI INTERFACE DARI ADAPTER
-    // ==========================================
     @Override
     public void onPlusClick(CartItem item, int position) {
         int newQty = item.getQuantity() + 1;

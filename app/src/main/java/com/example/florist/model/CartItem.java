@@ -1,13 +1,15 @@
 package com.example.florist.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class CartItem {
+public class CartItem implements Serializable {
     private String productId;
     private String name;
     private double price;
     private String imageUrl;
     private String ownerId;
+    private String shopName;
     private String durationType;
     private int durationValue;
     private int quantity;
@@ -16,7 +18,8 @@ public class CartItem {
     public CartItem() {
     }
 
-    public CartItem(String productId, String name, double price, String imageUrl, String ownerId, int quantity, String durationType, int durationValue, Date addedAt) {
+    public CartItem(String productId, String name, double price, String imageUrl, String ownerId, String shopName,
+                    int quantity, String durationType, int durationValue, Date addedAt) {
         this.productId = productId;
         this.name = name;
         this.price = price;
@@ -26,6 +29,7 @@ public class CartItem {
         this.durationType = durationType;
         this.durationValue = durationValue;
         this.addedAt = addedAt;
+        this.shopName = shopName;
     }
 
     public String getProductId() { return productId; }
@@ -60,6 +64,14 @@ public class CartItem {
 
     public void setDurationValue(int durationValue) {
         this.durationValue = durationValue;
+    }
+
+    public String getShopName() {
+        return shopName;
+    }
+
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
     }
 
     public Date getAddedAt() { return addedAt; }

@@ -9,6 +9,7 @@ public class User implements Serializable {
     private String password;
     private String phoneNumber;
     private boolean hasShop;
+    private String address;
 
     // 1. Konstruktor Kosong (Wajib untuk Firebase Data Snapshot)
     public User() {
@@ -70,4 +71,12 @@ public class User implements Serializable {
     public String getShopId() {return shopId;}
 
     public void setShopId(String shopId) {this.shopId = shopId;}
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 }

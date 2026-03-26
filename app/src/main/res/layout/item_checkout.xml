@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginBottom="12dp"
+    android:background="@drawable/rounded_white_button"
+    android:padding="12dp"
+    android:elevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/building"
+            app:tint="@color/gray_700"/>
+
+        <TextView
+            android:id="@+id/tvCheckoutShopName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Nama Toko"
+            android:textColor="@color/gray_900"
+            android:textSize="14sp"
+            style="@style/label_lg_bold" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray_200"
+        android:layout_marginBottom="12dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/imgCheckoutProduct"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/rounded_gray_layout"
+            android:clipToOutline="true"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="12dp">
+
+            <TextView
+                android:id="@+id/tvCheckoutName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nama Bunga"
+                android:textColor="@color/gray_900"
+                style="@style/body_md_bold"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+
+            <TextView
+                android:id="@+id/tvCheckoutDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Durasi: 1 Mingguan"
+                android:textSize="12sp"
+                android:textColor="@color/gray_500"
+                android:layout_below="@id/tvCheckoutName"/>
+
+            <TextView
+                android:id="@+id/tvCheckoutQty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2x"
+                android:textColor="@color/gray_700"
+                style="@style/label_lg_regular"
+                android:layout_alignParentBottom="true"/>
+
+            <TextView
+                android:id="@+id/tvCheckoutPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rp 150.000"
+                android:textColor="@color/olive_500"
+                style="@style/label_lg_bold"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

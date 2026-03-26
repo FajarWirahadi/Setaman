@@ -161,7 +161,10 @@ public class BuyerDetailActivity extends AppCompatActivity {
         });
 
         binding.btnAddToCart.setOnClickListener(v -> {
-            showAddToCartDialog();
+            showAddToCartDialog(false);
+        });
+        binding.btnDirectBuy.setOnClickListener(v -> {
+            showAddToCartDialog(true);
         });
     }
 
@@ -207,7 +210,7 @@ public class BuyerDetailActivity extends AppCompatActivity {
             }
         }
 
-    private void showAddToCartDialog() {
+    private void showAddToCartDialog(boolean isDirectBuy) {
         BottomSheetDialog dialog = new BottomSheetDialog(this);
 
         DialogAddToCartBinding dialogBinding = DialogAddToCartBinding.inflate(getLayoutInflater());
@@ -267,18 +270,31 @@ public class BuyerDetailActivity extends AppCompatActivity {
 
         dialogBinding.btnClose.setOnClickListener(v -> dialog.dismiss());
 
+        if (isDirectBuy) {
+            dialogBinding.btnSubmitCart.setText("Lanjut ke Pembayaran");
+        } else {
+            dialogBinding.btnSubmitCart.setText("Masukkan Keranjang");
+        }
+
         dialogBinding.btnSubmitCart.setOnClickListener(v -> {
-            int[] startLocation = new int[2];
-            dialogBinding.imgDialogProduct.getLocationOnScreen(startLocation);
-            int imgWidth = dialogBinding.imgDialogProduct.getWidth();
-            int imgHeight = dialogBinding.imgDialogProduct.getHeight();
-            flyToCartAnimation(startLocation, imgWidth, imgHeight);
-            dialog.dismiss();
             int finalQty = viewModel.getQuantity().getValue() != null ? viewModel.getQuantity().getValue() : 1;
             int finalDurValue = viewModel.getDurationValue().getValue() != null ? viewModel.getDurationValue().getValue() : 1;
             String finalDurType = viewModel.getDurationType().getValue() != null ? viewModel.getDurationType().getValue() : "Harian";
 
-            executeAddToCartToFirestore(finalQty, finalDurType, finalDurValue);
+            if (isDirectBuy) {
+                // JIKA BELI LANGSUNG: Buka CheckoutActivity dengan membawa data produk ini
+                executeDirectBuy(finalQty, finalDurType, finalDurValue);
+                dialog.dismiss();
+            } else {
+                // JIKA KERANJANG: Lakukan animasi dan simpan ke Firestore (Kode lama)
+                int[] startLocation = new int[2];
+                dialogBinding.imgDialogProduct.getLocationOnScreen(startLocation);
+                int imgWidth = dialogBinding.imgDialogProduct.getWidth();
+                int imgHeight = dialogBinding.imgDialogProduct.getHeight();
+                flyToCartAnimation(startLocation, imgWidth, imgHeight);
+                executeAddToCartToFirestore(finalQty, finalDurType, finalDurValue);
+                dialog.dismiss();
+            }
         });
         dialog.show();
         }
@@ -296,12 +312,14 @@ public class BuyerDetailActivity extends AppCompatActivity {
             cartImageUrl = product.getGallery().get(0);
         }
 
+        String currentShopName = binding.tvShopName.getText().toString();
         CartItem newCartItem = new CartItem(
                 product.getProductId(),
                 product.getName(),
                 product.getPrice(),
                 cartImageUrl,
                 product.getOwnerId(),
+                currentShopName,
                 selectedQty,
                 selectedDurType,
                 selectedDurValue,
@@ -368,6 +386,36 @@ public class BuyerDetailActivity extends AppCompatActivity {
                                 binding.btnMyCart.animate().scaleX(1f).scaleY(1f).setDuration(150).start();
                             }).start();
                 }).start();
+    }
+    private void executeDirectBuy(int selectedQty, String selectedDurType, int selectedDurValue) {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            Toast.makeText(this, "Silahkan login terlebih dahulu!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String cartImageUrl = product.getImageUrl();
+        if (product.getGallery() != null && !product.getGallery().isEmpty()){
+            cartImageUrl = product.getGallery().get(0);
+        }
+
+        // Kita bungkus data produk menjadi objek CartItem palsu untuk dikirim via Intent
+        CartItem directBuyItem = new CartItem(
+                product.getProductId(),
+                product.getName(),
+                product.getPrice(),
+                cartImageUrl,
+                product.getOwnerId(),
+                binding.tvShopName.getText().toString(), // Ambil nama toko dari UI
+                selectedQty,
+                selectedDurType,
+                selectedDurValue,
+                new java.util.Date()
+        );
+
+        Intent intent = new Intent(this, CheckoutActivity.class);
+        intent.putExtra("EXTRA_DIRECT_BUY_ITEM", directBuyItem);
+        startActivity(intent);
     }
 
 }
