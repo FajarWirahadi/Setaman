@@ -30,6 +30,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".views.buyer.CartActivity"
+            android:exported="false" />
+        <activity
             android:name=".views.buyer.BuyerDetailActivity"
             android:exported="false" />
         <activity
@@ -114,13 +117,13 @@
             android:exported="true" />
         <activity
             android:name=".views.RegisterPhoneActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".views.RegisterActivity"
             android:exported="true" />
         <activity
             android:name=".views.LoginActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".views.splashscreen.OnboardingActivity"
             android:exported="true" />

@@ -2,7 +2,9 @@ package com.example.florist.views.buyer;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -10,17 +12,25 @@ import com.bumptech.glide.Glide;
 import com.example.florist.R;
 import com.example.florist.adapter.BuyerImageSliderAdapter;
 import com.example.florist.databinding.ActivityBuyerDetailBinding;
+import com.example.florist.databinding.DialogAddToCartBinding;
+import com.example.florist.model.CartItem;
 import com.example.florist.model.Product;
 import com.example.florist.model.Shop;
+import com.example.florist.viewmodels.BuyerDetailViewModel;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class BuyerDetailActivity extends AppCompatActivity {
     private ActivityBuyerDetailBinding binding;
+    private BuyerDetailViewModel viewModel;
     private Product product;
     private boolean isFavorite = false;
 
@@ -31,6 +41,8 @@ public class BuyerDetailActivity extends AppCompatActivity {
 
             binding = ActivityBuyerDetailBinding.inflate(getLayoutInflater());
             setContentView(binding.getRoot());
+
+            viewModel = new ViewModelProvider(this).get(BuyerDetailViewModel.class);
 
             product = (Product) getIntent().getSerializableExtra("EXTRA_PRODUCT");
 
@@ -56,6 +68,7 @@ public class BuyerDetailActivity extends AppCompatActivity {
                         if (shop != null) {
                             binding.tvShopName.setText(shop.getShopName());
                             binding.tvLocation.setText("Kota " + shop.getShopCity());
+                            binding.etSearch.setHint("Cari " + product.getName());
 
                             Glide.with(this)
                                     .load(shop.getShopImageUrl())
@@ -143,10 +156,12 @@ public class BuyerDetailActivity extends AppCompatActivity {
         binding.btnChat.setOnClickListener(v -> {
             Toast.makeText(this, "Membuka obrolan dengan penjual...", Toast.LENGTH_SHORT).show();
         });
+        binding.btnMyCart.setOnClickListener(v -> {
+            startActivity(new Intent(this, CartActivity.class));
+        });
 
         binding.btnAddToCart.setOnClickListener(v -> {
-            // NANTI KITA KERJAKAN: Logika menyimpan ke database keranjang!
-            Toast.makeText(this, product.getName() + " berhasil dimasukkan ke keranjang!", Toast.LENGTH_SHORT).show();
+            showAddToCartDialog();
         });
     }
 
@@ -192,4 +207,167 @@ public class BuyerDetailActivity extends AppCompatActivity {
             }
         }
 
+    private void showAddToCartDialog() {
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+
+        DialogAddToCartBinding dialogBinding = DialogAddToCartBinding.inflate(getLayoutInflater());
+        dialog.setContentView(dialogBinding.getRoot());
+
+
+        viewModel.setProductData(product.getPrice(), product.getStock());
+
+        dialogBinding.tvDialogName.setText(product.getName());
+        dialogBinding.tvDialogStock.setText("Stok: " + product.getStock());
+        dialogBinding.tvDialogTotalPrice.setText("Rp " + String.valueOf(product.getPrice()));
+
+        NumberFormat formatRupiah = java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("in", "ID"));
+        formatRupiah.setMaximumFractionDigits(0);
+        dialogBinding.tvDialogPrice.setText(formatRupiah.format(product.getPrice()) + " /hari");
+
+        String imageUrl = product.getImageUrl();
+        if (product.getGallery() != null && !product.getGallery().isEmpty()) {
+            imageUrl = product.getGallery().get(0);
+        }
+        Glide.with(this).load(imageUrl).into(dialogBinding.imgDialogProduct);
+
+        viewModel.getQuantity().observe(this, qty -> dialogBinding.tvQtyValue.setText(String.valueOf(qty)));
+        viewModel.getDurationValue().observe(this, dur -> dialogBinding.tvDurationValue.setText(String.valueOf(dur)));
+        viewModel.getTotalPrice().observe(this, total -> dialogBinding.tvDialogTotalPrice.setText(formatRupiah.format(total)));
+
+        viewModel.getDurationType().observe(this, type -> {
+            dialogBinding.btnTypeHarian.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.white));
+            dialogBinding.btnTypeHarian.setTextColor(ContextCompat.getColor(this, R.color.gray_700));
+            dialogBinding.btnTypeMingguan.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.white));
+            dialogBinding.btnTypeMingguan.setTextColor(ContextCompat.getColor(this, R.color.gray_700));
+            dialogBinding.btnTypeBulanan.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.white));
+            dialogBinding.btnTypeBulanan.setTextColor(ContextCompat.getColor(this, R.color.gray_700));
+
+            // Warnai yang aktif jadi Olive
+            if (type.equals("Harian")) {
+                dialogBinding.btnTypeHarian.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.olive_500));
+                dialogBinding.btnTypeHarian.setTextColor(ContextCompat.getColor(this, R.color.white));
+            } else if (type.equals("Mingguan")) {
+                dialogBinding.btnTypeMingguan.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.olive_500));
+                dialogBinding.btnTypeMingguan.setTextColor(ContextCompat.getColor(this, R.color.white));
+            } else if (type.equals("Bulanan")) {
+                dialogBinding.btnTypeBulanan.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.olive_500));
+                dialogBinding.btnTypeBulanan.setTextColor(ContextCompat.getColor(this, R.color.white));
+            }
+        });
+
+        dialogBinding.btnMinQty.setOnClickListener(v -> viewModel.decrementQuantity());
+        dialogBinding.btnAddQty.setOnClickListener(v -> viewModel.incrementQuantity());
+
+        dialogBinding.btnMinDuration.setOnClickListener(v -> viewModel.decrementDuration());
+        dialogBinding.btnAddDuration.setOnClickListener(v -> viewModel.incrementDuration());
+
+        dialogBinding.btnTypeHarian.setOnClickListener(v -> viewModel.setDurationType("Harian", 1));
+        dialogBinding.btnTypeMingguan.setOnClickListener(v -> viewModel.setDurationType("Mingguan", 7));
+        dialogBinding.btnTypeBulanan.setOnClickListener(v -> viewModel.setDurationType("Bulanan", 30));
+
+        dialogBinding.btnClose.setOnClickListener(v -> dialog.dismiss());
+
+        dialogBinding.btnSubmitCart.setOnClickListener(v -> {
+            int[] startLocation = new int[2];
+            dialogBinding.imgDialogProduct.getLocationOnScreen(startLocation);
+            int imgWidth = dialogBinding.imgDialogProduct.getWidth();
+            int imgHeight = dialogBinding.imgDialogProduct.getHeight();
+            flyToCartAnimation(startLocation, imgWidth, imgHeight);
+            dialog.dismiss();
+            int finalQty = viewModel.getQuantity().getValue() != null ? viewModel.getQuantity().getValue() : 1;
+            int finalDurValue = viewModel.getDurationValue().getValue() != null ? viewModel.getDurationValue().getValue() : 1;
+            String finalDurType = viewModel.getDurationType().getValue() != null ? viewModel.getDurationType().getValue() : "Harian";
+
+            executeAddToCartToFirestore(finalQty, finalDurType, finalDurValue);
+        });
+        dialog.show();
+        }
+
+    private void executeAddToCartToFirestore(int selectedQty, String selectedDurType, int selectedDurValue) {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (currentUser == null) {
+            Toast.makeText(this, "Silahkan login terlebih dahulu!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String buyerId = currentUser.getUid();
+        String cartImageUrl = product.getImageUrl();
+        if (product.getGallery() != null && !product.getGallery().isEmpty()){
+            cartImageUrl = product.getGallery().get(0);
+        }
+
+        CartItem newCartItem = new CartItem(
+                product.getProductId(),
+                product.getName(),
+                product.getPrice(),
+                cartImageUrl,
+                product.getOwnerId(),
+                selectedQty,
+                selectedDurType,
+                selectedDurValue,
+                new java.util.Date()
+        );
+
+        FirebaseFirestore.getInstance()
+                .collection("users").document(buyerId)
+                .collection("cart").document(product.getProductId())
+                .set(newCartItem)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Berhasil ditambahkan ke keranjang", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Gagal menambahkan " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+
     }
+
+    private void flyToCartAnimation(int[] startLocation, int imgWidth, int imgHeight) {
+        android.widget.ImageView flyingImage = new android.widget.ImageView(this);
+        String cartImageUrl = product.getImageUrl();
+        if (product.getGallery() != null && !product.getGallery().isEmpty()){
+            cartImageUrl = product.getGallery().get(0);
+        }
+
+        Glide.with(this).load(cartImageUrl).circleCrop().into(flyingImage);
+
+        int[] rootLocation = new int[2];
+        binding.getRoot().getLocationOnScreen(rootLocation);
+
+        float startX = startLocation[0] - rootLocation[0];
+        float startY = startLocation[1] - rootLocation[1];
+
+        android.widget.RelativeLayout.LayoutParams params = new android.widget.RelativeLayout.LayoutParams(imgWidth, imgHeight);
+        flyingImage.setLayoutParams(params);
+        flyingImage.setX(startX);
+        flyingImage.setY(startY);
+        flyingImage.setElevation(100f);
+
+        binding.getRoot().addView(flyingImage);
+
+        int[] targetLocation = new int[2];
+        binding.btnMyCart.getLocationOnScreen(targetLocation);
+
+        float targetX = targetLocation[0] - rootLocation[0] + (binding.btnMyCart.getWidth() / 2f) - (imgWidth / 2f);
+        float targetY = targetLocation[1] - rootLocation[1] + (binding.btnMyCart.getHeight() / 2f) - (imgHeight / 2f);
+
+        flyingImage.animate()
+                .x(targetX)
+                .y(targetY)
+                .scaleX(0.1f)
+                .scaleY(0.1f)
+                .alpha(0.5f)
+                .setDuration(1000)
+                .setInterpolator(new android.view.animation.AccelerateInterpolator())
+                .withEndAction(() -> {
+                    binding.getRoot().removeView(flyingImage);
+
+                    binding.btnMyCart.animate()
+                            .scaleX(1.3f).scaleY(1.3f)
+                            .setDuration(150)
+                            .withEndAction(() -> {
+                                binding.btnMyCart.animate().scaleX(1f).scaleY(1f).setDuration(150).start();
+                            }).start();
+                }).start();
+    }
+
+}

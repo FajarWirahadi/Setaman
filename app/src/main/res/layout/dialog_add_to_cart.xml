@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/white">
+
+    <ImageButton
+        android:id="@+id/btnClose"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/ic_close"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="@color/gray_700"
+        android:layout_marginBottom="12dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <ImageView
+            android:id="@+id/imgDialogProduct"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/rounded_gray_layout"
+            android:clipToOutline="true"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
+
+            <TextView
+                android:id="@+id/tvDialogName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nama Tanaman"
+                android:textColor="@color/gray_900"
+                android:textSize="16sp"
+                style="@style/body_lg_bold" />
+
+            <TextView
+                android:id="@+id/tvDialogPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rp 0 /hari"
+                android:textColor="@color/gray_900"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp"/>
+
+            <TextView
+                android:id="@+id/tvDialogStock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stok: 0"
+                android:textColor="@color/gray_500"
+                android:textSize="12sp"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/gray_300" android:layout_marginBottom="16dp"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Jumlah"
+            android:textColor="@color/gray_900"
+            android:layout_centerVertical="true"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentEnd="true"
+            android:padding="2dp"
+            android:background="@drawable/item_cart_quantity">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnMinQty"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:text="-"
+                android:textSize="20sp"
+                android:textColor="@color/black"
+                android:padding="0dp"
+                android:layout_marginBottom="0dp"
+                android:background="@drawable/circle_background"
+                app:backgroundTint="@color/white"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"/>
+            <TextView
+                android:id="@+id/tvQtyValue"
+                android:layout_width="35dp"
+                android:layout_height="match_parent"
+                android:text="1"
+                android:gravity="center"
+                android:textColor="@color/olive_500"
+                style="@style/label_lg_bold"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddQty"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:text="+"
+                android:textSize="20sp"
+                android:background="@drawable/circle_background"
+                app:backgroundTint="@color/olive_500"
+                android:textColor="@color/white"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"/>
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray_300"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Durasi Sewa"
+        android:textColor="@color/gray_900"
+        android:layout_marginBottom="8dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        android:layout_marginBottom="8dp">
+
+        <Button
+            android:id="@+id/btnTypeHarian"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="Harian"
+            android:backgroundTint="@color/olive_500"
+            android:textColor="@color/white"
+            android:textAllCaps="false"/>
+        <Button
+            android:id="@+id/btnTypeMingguan"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="Mingguan"
+            android:backgroundTint="@color/white"
+            android:textColor="@color/gray_700"
+            android:layout_marginHorizontal="8dp"
+            android:textAllCaps="false"/>
+        <Button
+            android:id="@+id/btnTypeBulanan"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="Bulanan"
+            android:backgroundTint="@color/white"
+            android:textColor="@color/gray_700"
+            android:textAllCaps="false"/>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="150dp"
+        android:layout_height="45dp"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal"
+        android:padding="2dp"
+        android:background="@drawable/item_cart_quantity">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnMinDuration"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:text="-"
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            android:layout_marginBottom="0dp"
+            android:background="@drawable/circle_background"
+            app:backgroundTint="@color/white"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="0dp"/>
+
+        <TextView
+            android:id="@+id/tvDurationValue"
+            style="@style/label_lg_bold"
+            android:layout_width="35dp"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:text="1"
+            android:textAlignment="center"
+            android:textColor="@color/olive_500"
+            android:textSize="16sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddDuration"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:text="+"
+            android:textSize="20sp"
+            android:padding="0dp"
+            android:background="@drawable/circle_background"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            app:backgroundTint="@color/olive_500"
+            android:textColor="@color/white"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Total Harga"
+            android:textColor="@color/gray_500"/>
+        <TextView
+            android:id="@+id/tvDialogTotalPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rp 0"
+            android:textColor="@color/gray_900"
+            style="@style/title_md_bold"
+            android:layout_alignParentEnd="true"/>
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/btnSubmitCart"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Masukkan ke Keranjang"
+        android:background="@drawable/rounded_success_button"
+        android:textColor="@color/white"
+        android:textAllCaps="false"
+        style="@style/label_lg_bold"/>
+
+</LinearLayout>

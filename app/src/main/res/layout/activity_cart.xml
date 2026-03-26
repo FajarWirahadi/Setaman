@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_primary"> <RelativeLayout
+    android:id="@+id/headerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@color/white"
+    android:elevation="4dp"
+    android:paddingHorizontal="12dp">
+
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="8dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/arrow_back"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/circle_background"
+        android:backgroundTint="@color/white"
+        app:tint="@color/gray_900"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Keranjang Saya"
+        android:textSize="18sp"
+        android:textColor="@color/gray_900"
+        style="@style/title_md_bold"
+        android:layout_centerInParent="true"/>
+</RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvCartItems"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/headerLayout"
+        android:layout_above="@id/bottomCheckoutBar"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="16dp"/>
+
+    <LinearLayout
+        android:id="@+id/layoutEmptyCart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_cart"
+            app:tint="@color/gray_300"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Keranjangmu masih kosong"
+            android:textColor="@color/gray_500"
+            style="@style/body_lg_bold"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bottomCheckoutBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:background="@color/white"
+        android:elevation="16dp"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total Harga"
+                android:textSize="12sp"
+                android:textColor="@color/gray_500"
+                style="@style/label_lg_regular"/>
+
+            <TextView
+                android:id="@+id/tvTotalPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rp 0"
+                android:textSize="18sp"
+                android:textColor="@color/olive_500"
+                style="@style/title_lg_bold"
+                android:includeFontPadding="false"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnCheckout"
+            android:layout_width="140dp"
+            android:layout_height="48dp"
+            android:text="Checkout"
+            android:textColor="@color/white"
+            android:background="@drawable/rounded_success_button"
+            style="@style/label_lg_bold"
+            android:textAllCaps="false"/>
+    </LinearLayout>
+
+</RelativeLayout>
