@@ -1,9 +1,11 @@
 package com.example.florist.views.buyer;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.RadioButton;
 import android.widget.Toast;
@@ -11,6 +13,7 @@ import android.widget.Toast;
 import com.example.florist.adapter.CheckoutAdapter;
 import com.example.florist.databinding.ActivityCheckoutBinding;
 import com.example.florist.model.CartItem;
+import com.example.florist.model.DeliveryAddress;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -36,8 +39,22 @@ public class CheckoutActivity extends AppCompatActivity {
     private boolean isDirectBuy = false;
 
     private long subTotal = 0;
-    private final long ONGKOS_KIRIM = 15000; // Hardcode ongkir untuk sementara
+    private final long ONGKOS_KIRIM = 15000;
     private long grandTotal = 0;
+
+    private DeliveryAddress finalDeliveryAddress = null;
+
+    private final ActivityResultLauncher<Intent> addressLauncher =
+            registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                            DeliveryAddress selected = (DeliveryAddress) result.getData().getSerializableExtra("SELECTED_ADDRESS");
+                            if (selected != null) {
+                                finalDeliveryAddress = selected;
+                                updateAddressUI(selected);
+                            }
+                        }
+                    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +75,7 @@ public class CheckoutActivity extends AppCompatActivity {
 
         setupUI();
         loadCheckoutData();
-        loadUserProfile();
+        loadMainAddress();
     }
 
     private void setupUI() {
@@ -70,12 +87,42 @@ public class CheckoutActivity extends AppCompatActivity {
         binding.rvCheckoutItems.setAdapter(adapter);
 
         binding.btnPlaceOrder.setOnClickListener(v -> processOrder());
+
+        binding.layoutAddressSelection.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AddressSelectionActivity.class);
+            addressLauncher.launch(intent);
+        });
     }
+
+    private void loadMainAddress() {
+        db.collection("users").document(currentUserId).collection("addresses")
+                .whereEqualTo("mainAddress", true)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        DeliveryAddress mainAddress = queryDocumentSnapshots.getDocuments().get(0).toObject(DeliveryAddress.class);
+                        if (mainAddress != null) {
+                            finalDeliveryAddress = mainAddress;
+                            updateAddressUI(mainAddress);
+                        }
+                    } else {
+                        // Jika tidak ada alamat utama
+                        binding.tvReceiverInfo.setText("Belum ada alamat");
+                        binding.tvDeliveryAddress.setText("Klik di sini untuk memilih atau menambahkan alamat pengiriman.");
+                    }
+                });
+    }
+
+    private void updateAddressUI(DeliveryAddress address) {
+        binding.tvReceiverInfo.setText(address.getReceiverName() + " (" + address.getPhoneNumber() + ")");
+        binding.tvDeliveryAddress.setText(address.getFullAddress());
+    }
+
     private void loadCheckoutData() {
         checkoutList.clear();
         subTotal = 0;
 
-        // Cek apakah ada barang direct buy yang dilempar dari BuyerDetailActivity
         if (getIntent().hasExtra("EXTRA_DIRECT_BUY_ITEM")) {
             isDirectBuy = true;
             CartItem singleItem = (CartItem) getIntent().getSerializableExtra("EXTRA_DIRECT_BUY_ITEM");
@@ -83,7 +130,6 @@ public class CheckoutActivity extends AppCompatActivity {
             if (singleItem != null) {
                 checkoutList.add(singleItem);
 
-                // Hitung subtotal untuk satu barang ini
                 int multiplier = 1;
                 if ("Mingguan".equals(singleItem.getDurationType())) multiplier = 7;
                 else if ("Bulanan".equals(singleItem.getDurationType())) multiplier = 30;
@@ -94,7 +140,6 @@ public class CheckoutActivity extends AppCompatActivity {
             updatePriceUI();
 
         } else {
-            // JIKA BUKAN DIRECT BUY: Tarik data dari Keranjang Firestore (Kode lama)
             isDirectBuy = false;
             db.collection("users").document(currentUserId).collection("cart")
                     .get()
@@ -128,39 +173,29 @@ public class CheckoutActivity extends AppCompatActivity {
         binding.tvCheckoutFinalTotal.setText(formatRupiah.format(grandTotal));
     }
 
-    // ==========================================
-    // 2. MESIN INJEKSI PESANAN (WRITE BATCH)
-    // ==========================================
     private void processOrder() {
-        String address = binding.etDeliveryAddress.getText().toString().trim();
-
-        // Validasi Alamat
-        if (address.isEmpty()) {
-            binding.etDeliveryAddress.setError("Alamat pengiriman wajib diisi!");
-            binding.etDeliveryAddress.requestFocus();
-            return;
-        }
-
         if (checkoutList.isEmpty()) {
             Toast.makeText(this, "Pesanan kosong atau belum termuat.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Tentukan Metode Pembayaran
+        // Validasi Alamat Baru
+        if (finalDeliveryAddress == null) {
+            Toast.makeText(this, "Silakan pilih alamat pengirimanmu terlebih dahulu!", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         int selectedPaymentId = binding.rgPaymentMethod.getCheckedRadioButtonId();
         RadioButton selectedRb = findViewById(selectedPaymentId);
         String paymentMethod = selectedRb.getText().toString();
 
-        // Siapkan Progress Dialog agar pembeli tidak klik 2 kali
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Sedang memproses pesananmu...");
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        // Buat ID Pesanan Unik
         String orderId = "ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
-        // Ambil daftar ID penjual (agar nanti penjual bisa memfilter pesanan ini)
         List<String> sellerIds = new ArrayList<>();
         for (CartItem item : checkoutList) {
             if (!sellerIds.contains(item.getOwnerId())) {
@@ -168,29 +203,26 @@ public class CheckoutActivity extends AppCompatActivity {
             }
         }
 
-        // Kumpulkan data ke dalam "Koper Pesanan" (HashMap)
         Map<String, Object> orderData = new HashMap<>();
         orderData.put("orderId", orderId);
         orderData.put("buyerId", currentUserId);
-        orderData.put("sellerIds", sellerIds); // Daftar penjual yang terlibat
-        orderData.put("items", checkoutList); // Seluruh isi keranjang dimasukkan ke pesanan
-        orderData.put("deliveryAddress", address);
+        orderData.put("sellerIds", sellerIds);
+        orderData.put("items", checkoutList);
         orderData.put("paymentMethod", paymentMethod);
         orderData.put("subTotal", subTotal);
         orderData.put("shippingCost", ONGKOS_KIRIM);
         orderData.put("grandTotal", grandTotal);
-        orderData.put("status", "Menunggu Konfirmasi"); // Status Awal
+        orderData.put("status", "Menunggu Konfirmasi");
         orderData.put("orderDate", new Date());
 
-        // Mulai Transaksi Batch
+        orderData.put("deliveryAddress", finalDeliveryAddress.getFullAddress());
+        orderData.put("receiverName", finalDeliveryAddress.getReceiverName());
+        orderData.put("receiverPhone", finalDeliveryAddress.getPhoneNumber());
+
         WriteBatch batch = db.batch();
 
-        // 1. Masukkan dokumen pesanan baru ke koleksi "orders"
         batch.set(db.collection("orders").document(orderId), orderData);
 
-        batch.update(db.collection("users").document(currentUserId), "address", address);
-
-        // 2. Hapus satu per satu item di keranjang pembeli
         if (!isDirectBuy) {
             for (CartItem item : checkoutList) {
                 batch.delete(db.collection("users").document(currentUserId)
@@ -198,33 +230,13 @@ public class CheckoutActivity extends AppCompatActivity {
             }
         }
 
-        // 3. Eksekusi Batch
         batch.commit().addOnSuccessListener(aVoid -> {
             progressDialog.dismiss();
             Toast.makeText(this, "Hore! Pesanan Berhasil Dibuat \uD83C\uDF89", Toast.LENGTH_LONG).show();
-
-            // Tutup halaman ini dan (opsional) kembali ke Beranda
             finish();
         }).addOnFailureListener(e -> {
             progressDialog.dismiss();
             Toast.makeText(this, "Gagal membuat pesanan: " + e.getMessage(), Toast.LENGTH_LONG).show();
         });
-    }
-
-    // ==========================================
-    // SUNTIKAN BARU: Tarik Alamat Saat Halaman Dibuka
-    // ==========================================
-    private void loadUserProfile() {
-        db.collection("users").document(currentUserId)
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        com.example.florist.model.User userProfile = documentSnapshot.toObject(com.example.florist.model.User.class);
-
-                        if (userProfile != null && userProfile.getAddress() != null && !userProfile.getAddress().isEmpty()) {
-                            binding.etDeliveryAddress.setText(userProfile.getAddress());
-                        }
-                    }
-                });
     }
 }

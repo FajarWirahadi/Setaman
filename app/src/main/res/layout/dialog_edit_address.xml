@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@color/white">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ubah Alamat Pengiriman"
+        android:textColor="@color/gray_900"
+        android:textSize="18sp"
+        style="@style/title_md_bold"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/etBottomSheetAddress"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:background="@drawable/rounded_normal_edittext"
+        android:hint="Tulis alamat lengkapmu di sini (Jalan, RT/RW, Kecamatan, Patokan...)"
+        android:gravity="top|start"
+        android:padding="16dp"
+        android:textSize="14sp"
+        android:textColor="@color/gray_900"
+        android:inputType="textMultiLine"
+        android:layout_marginBottom="24dp"/>
+
+    <Button
+        android:id="@+id/btnSaveAddress"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Simpan Alamat"
+        android:textColor="@color/white"
+        android:background="@drawable/rounded_success_button"
+        style="@style/label_lg_bold"
+        android:textAllCaps="false"/>
+</LinearLayout>

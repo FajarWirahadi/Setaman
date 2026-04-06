@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardAddress"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginBottom="12dp"
+    android:background="@drawable/rounded_white_button"
+    android:padding="16dp"
+    android:elevation="1dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp">
+
+        <TextView
+            android:id="@+id/tvAddressLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Home"
+            android:textColor="@color/gray_900"
+            style="@style/title_md_bold"
+            android:layout_centerVertical="true"/>
+
+        <TextView
+            android:id="@+id/tvMainBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Main Address"
+            android:textSize="10sp"
+            android:textColor="@color/olive_500"
+            android:background="@drawable/rounded_green_border_button"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="2dp"
+            android:layout_toEndOf="@id/tvAddressLabel"
+            android:layout_marginStart="8dp"
+            android:layout_centerVertical="true"/>
+
+        <ImageView
+            android:id="@+id/btnEditAddress"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ellipsis_vertical"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            app:tint="@color/gray_700"/>
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray_200"
+        android:layout_marginBottom="12dp"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_toStartOf="@id/imgCheckmark"
+            android:layout_marginEnd="12dp">
+
+            <TextView
+                android:id="@+id/tvReceiverInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Andrew Ainsley (+1 111 467...)"
+                android:textColor="@color/gray_900"
+                style="@style/body_md_bold"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/tvFullAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="701 7th Ave, New York, NY 10036, USA"
+                android:textColor="@color/gray_700"
+                android:textSize="13sp"
+                android:lineSpacingExtra="4dp"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/baseline_location_on_24"
+                    app:tint="@color/gray_500"/>
+
+                <TextView
+                    android:id="@+id/tvPinpointStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pinpoint already"
+                    android:textSize="12sp"
+                    android:textColor="@color/gray_500"
+                    android:layout_marginStart="4dp"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/imgCheckmark"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/success_check"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:visibility="visible"/>
+    </RelativeLayout>
+</LinearLayout>
