@@ -24,6 +24,7 @@ import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.concurrent.TimeUnit;
 
@@ -63,14 +64,11 @@ public class AuthRepository {
         void onError(String message);
     }
 
-
-    // Constructor Private (Singleton Pattern)
     private AuthRepository() {
         firebaseAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
     }
 
-    // Mengambil instance respository
     public static AuthRepository getInstance() {
         if (instance == null) {
             instance = new AuthRepository();
@@ -383,6 +381,18 @@ public class AuthRepository {
         } else {
             callback.onError("User tidak ditemukan (Sesi habis)");
         }
+    }
+
+    private void saveDeviceToken(String userId) {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) return;
+
+                    String token = task.getResult();
+                    firestore.collection("users").document(userId)
+                            .update("fcmToken", token)
+                            .addOnSuccessListener(aVoid -> {});
+                });
     }
 
     public void logout(Context context, AuthCallback callback) {

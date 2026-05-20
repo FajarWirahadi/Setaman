@@ -96,6 +96,7 @@
     <string name="beranda">Beranda</string>
     <string name="profil">Profil</string>
     <string name="nama_penerima">Nama Penerima</string>
+    <string name="pesanan_nbaru">Pesanan \nBaru</string>
 
     <plurals name="error_over_count">
         <item quantity="one">You can only select one media file</item>

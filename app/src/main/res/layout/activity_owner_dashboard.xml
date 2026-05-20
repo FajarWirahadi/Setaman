@@ -12,7 +12,8 @@
         android:orientation="vertical"
         android:background="@color/gray_25">
 
-        <include layout="@layout/view_toolbar"/>
+        <include layout="@layout/view_toolbar"
+            android:id="@+id/myToolbar"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -41,7 +42,7 @@
 
                     <LinearLayout
                         android:id="@+id/layoutFloristName"
-                        android:layout_width="wrap_content"
+                        android:layout_width="200dp"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:layout_toEndOf="@id/imgShopProfile"
@@ -59,18 +60,10 @@
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
                             <TextView
+                                android:id="@+id/tvShopCity"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="id : "
-                                android:textSize="14sp"
-                                style="@style/body_md_regular"
-                                android:textColor="@color/text_secondary"
-                                android:layout_weight="2"/>
-                            <TextView
-                                android:id="@+id/tvShopId"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="1234"
+                                android:text="Kota Gresik"
                                 android:textSize="14sp"
                                 style="@style/body_md_regular"
                                 android:textColor="@color/text_secondary"
@@ -83,7 +76,7 @@
                         android:id="@+id/btnVisitShop"
                         style="?android:attr/buttonBarButtonStyle"
                         android:layout_width="wrap_content"
-                        android:layout_height="28dp"
+                        android:layout_height="36dp"
                         android:background="@drawable/rounded_normal_button"
                         android:clickable="false"
                         android:layout_alignParentEnd="true"
@@ -106,7 +99,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginVertical="16dp">
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp">
                     <!--            PERSEWAAN SAYA-->
                     <TextView
                         android:layout_width="wrap_content"
@@ -118,6 +112,7 @@
 
                     <!--            LIHAT SEMUA-->
                     <LinearLayout
+                        android:id="@+id/tvHistory"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
@@ -126,7 +121,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/lihat_semua"
                             style="@style/label_lg_regular"
-                            android:textColor="@color/gray_500"/>
+                            android:textColor="@color/olive_900"/>
                         <ImageView
                             android:layout_width="10dp"
                             android:layout_height="10dp"
@@ -137,50 +132,92 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <!--        STATUS PERSEWAAN LAYOUT-->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:padding="16dp"
-                    android:layout_marginBottom="16dp"
                     android:background="@drawable/rounded_gray_layout"
                     android:elevation="2dp">
-                    <!--BELUM DIBAYAR LAYOUT-->
+
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:id="@+id/menuUnpaid"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:gravity="center"
                         android:layout_weight="1">
-                        <TextView
-                            android:id="@+id/txtBelumDibayar"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:textColor="@color/text_primary"
-                            android:textAlignment="center"/>
+
+                        <RelativeLayout
+                            android:layout_width="36dp"
+                            android:layout_height="wrap_content">
+
+                            <ImageView
+                                android:id="@+id/imgUnpaid"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginStart="4dp"
+                                android:layout_marginTop="4dp"
+                                android:layout_marginEnd="4dp"
+                                android:src="@drawable/belum_dibayar" />
+
+                            <TextView
+                                android:id="@+id/badgeUnpaid"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_alignParentTop="true"
+                                android:layout_alignParentEnd="true"
+                                android:background="@drawable/circle_background"
+                                android:backgroundTint="@color/text_error"
+                                android:textColor="@color/white"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                android:gravity="center"
+                                android:text="0"
+                                android:visibility="gone"/>
+                        </RelativeLayout>
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/belum_ndibayar"
+                            android:text="Menunggu Konfirmasi"
                             style="@style/body_sm_regular"
                             android:textColor="@color/text_primary"
                             android:textAlignment="center"/>
                     </LinearLayout>
 
-                    <!--DALAM PROSES LAYOUT-->
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:id="@+id/menuProcessing"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:gravity="center"
                         android:layout_weight="1">
-                        <TextView
-                            android:id="@+id/txtDalamProses"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:textColor="@color/text_primary"
-                            android:textAlignment="center"/>
+
+                        <RelativeLayout
+                            android:layout_width="36dp"
+                            android:layout_height="wrap_content">
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/dalam_proses"
+                                android:layout_margin="4dp"/>
+                            <TextView
+                                android:id="@+id/badgeProcessing"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_alignParentEnd="true"
+                                android:layout_alignParentTop="true"
+                                android:background="@drawable/circle_background"
+                                android:backgroundTint="@color/text_error"
+                                android:textColor="@color/white"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                android:gravity="center"
+                                android:text="99+"
+                                android:visibility="gone"/>
+                        </RelativeLayout>
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -190,53 +227,160 @@
                             android:textAlignment="center"/>
                     </LinearLayout>
 
-                    <!--DIKIRIM LAYOUT-->
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:id="@+id/menuShipped"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:gravity="center"
                         android:layout_weight="1">
-                        <TextView
-                            android:id="@+id/txtDikirim"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:textColor="@color/text_primary"
-                            android:textAlignment="center"/>
+
+                        <RelativeLayout
+                            android:layout_width="40dp"
+                            android:layout_height="wrap_content">
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/dikirim"
+                                android:layout_margin="4dp"/>
+                            <TextView
+                                android:id="@+id/badgeShipped"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_alignParentEnd="true"
+                                android:layout_alignParentTop="true"
+                                android:background="@drawable/circle_background"
+                                android:backgroundTint="@color/text_error"
+                                android:textColor="@color/white"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                android:gravity="center"
+                                android:text="9"
+                                android:visibility="gone"/>
+                        </RelativeLayout>
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-
                             android:text="@string/dikirim"
                             style="@style/body_sm_regular"
                             android:textColor="@color/text_primary"
                             android:textAlignment="center"/>
                     </LinearLayout>
+                </LinearLayout>
 
-                    <!--DALAM PERAWATAN LAYOUT-->
-                    <LinearLayout
-                        android:layout_width="wrap_content"
+                <!-- JADWAL PERAWATAN SECTION -->
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cvMaintenanceShcedule"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="12dp"
+                    android:clickable="true">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:layout_weight="1">
-                        <TextView
-                            android:id="@+id/txtDalamPerawatan"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:textColor="@color/text_primary"
-                            android:textAlignment="center"/>
+                        android:padding="16dp"
+                        android:background="@drawable/rounded_gray_layout">
+                        <ImageView
+                            android:id="@+id/ic_maintenance_dash"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_centerVertical="true"
+                            android:src="@drawable/dalam_perawatan"
+                            app:tint="@color/main_color"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_toEndOf="@id/ic_maintenance_dash"
+                            android:layout_toStartOf="@id/btnMyMaintenance"
+                            android:layout_marginStart="12dp"
+                            android:layout_centerVertical="true"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Jadwal Perawatan Tanaman"
+                                android:textColor="@color/black"
+                                style="@style/title_md_bold"/>
+
+                            <TextView
+                                android:id="@+id/tvMaintenanceAlert"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="Ada 8 tanaman menunggu perawatan"
+                                android:textColor="#D32F2F"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/btnMyMaintenance"
+                            android:layout_width="12dp"
+                            android:layout_height="12dp"
+                            android:layout_marginTop="20dp"
+                            android:src="@drawable/right_arrow"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:backgroundTint="@color/text_secondary"/>
+                    </RelativeLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cvComplaintAlert"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:visibility="visible"
+                    android:clickable="true"
+                    app:cardCornerRadius="8dp"
+                    app:strokeColor="@color/text_error"
+                    app:strokeWidth="1dp"
+                    app:cardBackgroundColor="#FFF0F0">
+
+                    <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:id="@+id/ic_complaint_dash"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_warning"
+                        app:tint="@color/text_error"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/ic_complaint_dash"
+                        android:layout_marginStart="12dp"
+                        android:layout_centerVertical="true"
+                        android:orientation="vertical">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/dalam_nperawatan"
-                            style="@style/body_sm_regular"
-                            android:textColor="@color/text_primary"
-                            android:textAlignment="center"/>
+                            android:text="Pusat Resolusi Komplain"
+                            android:textColor="@color/text_error"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvComplaintCountText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Terdapat 2 komplain menunggu tanggapan"
+                            android:textColor="@color/text_error"
+                            android:textSize="12sp" />
                     </LinearLayout>
-
-
-                </LinearLayout>
+                </RelativeLayout>
+                </com.google.android.material.card.MaterialCardView>
 
                 <RelativeLayout
                     android:layout_width="match_parent"

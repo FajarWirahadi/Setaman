@@ -234,7 +234,7 @@
             android:id="@+id/btnBack"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:src="@drawable/ic_back"
+            android:src="@drawable/ic_left_arrow"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:background="@drawable/circle_background"
@@ -253,17 +253,40 @@
             android:paddingHorizontal="10dp"
             android:textSize="14sp" />
 
-        <ImageButton
-            android:id="@+id/btnMyCart"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:padding="8dp"
-            android:src="@drawable/ic_cart"
+        <RelativeLayout
+            android:id="@+id/layoutCartBadge"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:background="@drawable/circle_background"
-            android:backgroundTint="@color/white"
-            app:tint="@color/olive_500"/>
+            android:gravity="center"
+            android:background="@drawable/circle_background">
+
+            <ImageView
+                android:id="@+id/btnCart"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_cart"
+                android:layout_marginLeft="8dp"
+                />
+
+            <TextView
+                android:id="@+id/tvCartBadgeCount"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:background="@drawable/circle_background"
+                android:backgroundTint="@color/olive_500"
+                android:gravity="center"
+                android:text="6"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="10dp"/>
+        </RelativeLayout>
+
     </RelativeLayout>
 
 

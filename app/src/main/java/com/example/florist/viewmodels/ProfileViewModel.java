@@ -11,11 +11,20 @@ import com.example.florist.model.AuthRepository;
 import com.example.florist.model.Shop;
 import com.example.florist.model.ShopRepository;
 import com.example.florist.model.User;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.AggregateSource;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ProfileViewModel extends ViewModel {
     private ShopRepository shopRepository;
     private AuthRepository authRepository;
+
+    private MutableLiveData<Integer> countUnpaid = new MutableLiveData<>();
+    private MutableLiveData<Integer> countProcessing = new MutableLiveData<>();
+    private MutableLiveData<Integer> countShipped = new MutableLiveData<>();
+    private MutableLiveData<Integer> countRented = new MutableLiveData<>();
+
     private MutableLiveData<User> userProfile = new MutableLiveData<User>();
     private MutableLiveData<Shop> shopProfile = new MutableLiveData<Shop>();
     private MutableLiveData<String> errorMessage = new MutableLiveData<>();
@@ -28,6 +37,11 @@ public class ProfileViewModel extends ViewModel {
         authRepository = AuthRepository.getInstance();
         shopRepository = new ShopRepository();
     }
+
+    public LiveData<Integer> getCountUnpaid() {return countUnpaid;}
+    public LiveData<Integer> getCountProcessing() {return countProcessing;}
+    public LiveData<Integer> getCountShipped() {return countShipped;}
+    public LiveData<Integer> getCountRented() {return countRented;}
 
     public LiveData<User> getUserProfile() {
         return userProfile;
@@ -51,34 +65,38 @@ public class ProfileViewModel extends ViewModel {
         isLoading.setValue(true);
         FirebaseUser firebaseUser = authRepository.getCurrentUser();
 
-        if(firebaseUser != null) {
-            authRepository.getUserData(firebaseUser.getUid(), new AuthRepository.UserDataCallback() {
-                @Override
-                public void onDataLoaded(User user) {
-                    userProfile.setValue(user);
-                    if (user.isHasShop() && user.getShopId()!= null) {
-                        loadShopData(user.getShopId());
-                    } else {
-                        isLoading.setValue(false);
-                    }
-                }
+        if (firebaseUser != null) {
+            String userId = firebaseUser.getUid();
 
-                @Override
-                public void onError(String e) {
-                    isLoading.setValue(false);
-                    errorMessage.setValue(e);
-                }
-            });
+            FirebaseFirestore.getInstance().collection("users").document(userId)
+                    .addSnapshotListener((documentSnapshot, error) -> {
+                        isLoading.setValue(false);
+
+                        if (error != null) {
+                            errorMessage.setValue("Gagal mendapatkan informasi akun: " + error.getMessage());
+                            return;
+                        }
+
+                        if (documentSnapshot != null && documentSnapshot.exists()) {
+                            User user = documentSnapshot.toObject(User.class);
+                            userProfile.setValue(user);
+
+                            if (user != null && user.isHasShop() && user.getShopId() != null) {
+                                loadShopData(user.getShopId());
+                            }
+                        }
+
+                    });
         } else {
             isLoading.setValue(false);
             navigateToOnboarding.setValue(true);
-            errorMessage.setValue("User tidak ditemukan/belum login");
+            errorMessage.setValue("User tidak ditemukan atau belum login");
         }
 
     }
 
     private void loadShopData(String shopId) {
-        shopRepository.getShopData(shopId, new ShopRepository.ShopDataCallback() {
+        shopRepository.getShopById(shopId, new ShopRepository.ShopDataCallback() {
             @Override
             public void onDataLoaded(Shop shop) {
                 isLoading.setValue(false);
@@ -91,6 +109,54 @@ public class ProfileViewModel extends ViewModel {
                 errorMessage.setValue(message);
             }
         });
+    }
+
+    public void loadOrderCounts() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return;
+        String buyerId = user.getUid();
+
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+
+        firestore.collection("orders")
+                .whereEqualTo("buyerId", buyerId)
+                .whereEqualTo("status", "PENDING")
+                .count()
+                .get(AggregateSource.SERVER).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()){
+                        countUnpaid.setValue((int) task.getResult().getCount());
+                    }
+                });
+
+        firestore.collection("orders")
+                .whereEqualTo("buyerId", buyerId)
+                .whereEqualTo("status","Diproses")
+                .count()
+                .get(AggregateSource.SERVER).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        countProcessing.setValue((int) task.getResult().getCount());
+                    }
+                });
+
+        firestore.collection("orders")
+                .whereEqualTo("buyerId", buyerId)
+                .whereEqualTo("status", "Dikirim")
+                .count()
+                .get(AggregateSource.SERVER).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        countShipped.setValue((int) task.getResult().getCount());
+                    }
+                });
+
+        firestore.collection("orders")
+                .whereEqualTo("buyerId", buyerId)
+                .whereEqualTo("status", "Selesai")
+                .count()
+                .get(AggregateSource.SERVER).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        countRented.setValue((int) task.getResult().getCount());
+                    }
+                });
     }
 
     public void sendVerificationEmail() {

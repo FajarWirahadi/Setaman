@@ -68,6 +68,12 @@ public class CheckoutAdapter extends RecyclerView.Adapter<CheckoutAdapter.Checko
         return checkoutList.size();
     }
 
+    public void updateData(List<CartItem> items) {
+        this.checkoutList.clear();
+        this.checkoutList.addAll(items);
+        notifyDataSetChanged();
+    }
+
     public static class CheckoutViewHolder extends RecyclerView.ViewHolder {
         ItemCheckoutBinding binding;
 

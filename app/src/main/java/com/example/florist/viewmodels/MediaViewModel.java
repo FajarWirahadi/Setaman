@@ -23,27 +23,23 @@ public class MediaViewModel extends ViewModel {
             currentList = new ArrayList<>();
         }
 
-        // Gabungkan list lama + list baru
-        // Tambahkan validasi contains agar tidak duplikat jika user memilih ulang foto yang sama
         for (Object uri : newUris) {
             if (!currentList.contains(uri)) {
                 currentList.add(uri);
             }
         }
 
-        // Update LiveData agar Observer di Activity merespons
         _selectedMedia.setValue(currentList);
     }
 
     public void removeMedia(Object uri) {
         List<Object> currentList = _selectedMedia.getValue();
         if (currentList != null) {
-            // Buat list baru agar LiveData mendeteksi perubahan
             List<Object> updatedList = new ArrayList<>(currentList);
 
-            updatedList.remove(uri); // Hapus item
+            updatedList.remove(uri);
 
-            _selectedMedia.setValue(updatedList); // Update LiveData
+            _selectedMedia.setValue(updatedList);
         }
     }
 
@@ -68,16 +64,15 @@ public class MediaViewModel extends ViewModel {
         return newImages;
     }
 
-    // Cek apakah gambar lama masih ada (tidak dihapus user)
     public String getRemainingOldImageUrl() {
         List<Object> current = _selectedMedia.getValue();
         if (current != null) {
             for (Object item : current) {
                 if (item instanceof String) {
-                    return (String) item; // Kembalikan URL lama pertama yg ditemukan
+                    return (String) item;
                 }
             }
         }
-        return null; // Artinya gambar lama sudah dihapus user
+        return null;
     }
 }

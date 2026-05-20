@@ -11,11 +11,9 @@ public class User implements Serializable {
     private boolean hasShop;
     private String address;
 
-    // 1. Konstruktor Kosong (Wajib untuk Firebase Data Snapshot)
     public User() {
     }
 
-    // 2. Konstruktor Utama
     public User(String username, String email, String password, String phoneNumber) {
         this.username = username;
         this.email = email;

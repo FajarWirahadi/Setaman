@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/bg_primary"
     android:paddingHorizontal="16dp">
 
     <LinearLayout
@@ -33,10 +33,35 @@
             android:layout_marginEnd="12dp"
             android:scaleType="center"/>
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_cart" />
+        <RelativeLayout
+            android:id="@+id/layoutCartBadge"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/btnCart"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_cart" />
+
+            <TextView
+                android:id="@+id/tvCartBadgeCount"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:background="@drawable/circle_background"
+                android:backgroundTint="@color/olive_500"
+                android:gravity="center"
+                android:text="6"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:layout_marginEnd="4dp"
+                android:visibility="gone"/>
+        </RelativeLayout>
+
     </LinearLayout>
 
     <EditText
@@ -109,6 +134,8 @@
                 android:id="@+id/progressBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:elevation="10dp"
                 android:indeterminateTint="@color/olive_500"
                 android:visibility="gone"/>
 

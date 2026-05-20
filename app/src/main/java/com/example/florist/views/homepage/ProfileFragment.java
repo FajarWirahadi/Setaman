@@ -17,6 +17,8 @@ import com.example.florist.databinding.FragmentProfileBinding;
 import com.example.florist.model.User;
 import com.example.florist.viewmodels.ProfileViewModel;
 import com.example.florist.views.LoginActivity;
+import com.example.florist.views.buyer.CartActivity;
+import com.example.florist.views.buyer.MyOrdersActivity;
 import com.example.florist.views.seller.OwnerDashboardActivity;
 import com.example.florist.views.seller.createshop.ShopIntroActivity;
 import com.example.florist.views.splashscreen.OnboardingActivity;
@@ -46,6 +48,7 @@ public class ProfileFragment extends Fragment {
         setupListeners();
 
         viewModel.loadUserProfile();
+        viewModel.loadOrderCounts();
     }
 
     private void setupObservers() {
@@ -61,6 +64,55 @@ public class ProfileFragment extends Fragment {
         viewModel.getShopProfile().observe(getViewLifecycleOwner(), shop -> {
             if (shop != null) {
                 binding.tvShopName.setText(shop.getShopName());
+                if (shop.getShopImageUrl() != null && !shop.getShopImageUrl().isEmpty()) {
+                    binding.imgShop.setPadding(0, 0, 0,0);
+                    binding.imgShop.clearColorFilter();
+
+                    com.bumptech.glide.Glide.with(requireContext())
+                            .load(shop.getShopImageUrl())
+                            .placeholder(R.drawable.building)
+                            .centerCrop()
+                            .into(binding.imgShop);
+                } else {
+                    binding.imgShop.setPadding(30, 30, 30, 30);
+                }
+            }
+        });
+
+        viewModel.getCountUnpaid().observe(getViewLifecycleOwner(), count -> {
+            // PERTAHANAN BERLAPIS: Pastikan tidak null sebelum digunakan!
+            if (count != null && count > 0) {
+                binding.badgeUnpaid.setVisibility(View.VISIBLE);
+                binding.badgeUnpaid.setText(count > 99 ? "99+" : String.valueOf(count));
+            } else {
+                binding.badgeUnpaid.setVisibility(View.GONE);
+            }
+        });
+
+        viewModel.getCountProcessing().observe(getViewLifecycleOwner(), count -> {
+            if (count != null && count > 0) {
+                binding.badgeProcessing.setVisibility(View.VISIBLE);
+                binding.badgeProcessing.setText(count > 99 ? "99+" : String.valueOf(count));
+            } else {
+                binding.badgeProcessing.setVisibility(View.GONE);
+            }
+        });
+
+        viewModel.getCountShipped().observe(getViewLifecycleOwner(), count -> {
+            if (count != null && count > 0) {
+                binding.badgeShipped.setVisibility(View.VISIBLE);
+                binding.badgeShipped.setText(count > 99 ? "99+" : String.valueOf(count));
+            } else {
+                binding.badgeShipped.setVisibility(View.GONE);
+            }
+        });
+
+        viewModel.getCountRented().observe(getViewLifecycleOwner(), count -> {
+            if (count != null && count > 0) {
+                binding.badgeRented.setVisibility(View.VISIBLE);
+                binding.badgeRented.setText(count > 99 ? "99+" : String.valueOf(count));
+            } else {
+                binding.badgeRented.setVisibility(View.GONE);
             }
         });
 
@@ -88,8 +140,25 @@ public class ProfileFragment extends Fragment {
             viewModel.logout(requireContext());
             Intent intent = new Intent(requireContext(), LoginActivity.class);
             startActivity(intent);
-            requireActivity().finish(); // Menutup Activity yang mewadahi Fragment ini
+            requireActivity().finish();
         });
+
+        binding.btnMyOrders.setOnClickListener(v -> {
+            startActivity(new Intent(requireContext(), MyOrdersActivity.class));
+        });
+
+        binding.menuUnpaid.setOnClickListener(v -> openMyOrdersAtTab(0));
+        binding.menuProcessing.setOnClickListener(v -> openMyOrdersAtTab(0));
+        binding.menuShipped.setOnClickListener(v -> openMyOrdersAtTab(0));
+        binding.menuRented.setOnClickListener(v -> openMyOrdersAtTab(0));
+
+
+    }
+
+    private void openMyOrdersAtTab(int tabIndex) {
+        Intent intent = new Intent(requireContext(), MyOrdersActivity.class);
+        intent.putExtra("TAB_INDEX", tabIndex);
+        startActivity(intent);
     }
 
     private void updateUi(User user) {
@@ -100,7 +169,6 @@ public class ProfileFragment extends Fragment {
             binding.tvShopName.setText("Memuat data toko...");
             binding.tvShopId.setText("Kelola toko saya");
 
-            // Mengambil warna di Fragment harus via requireContext()
             binding.iconBackground.setBackgroundTintList(requireContext().getColorStateList(R.color.olive_500));
             binding.imgShop.setColorFilter(requireContext().getColor(R.color.white));
 

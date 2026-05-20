@@ -96,7 +96,7 @@ public class ShopRepository {
                 .addOnFailureListener(e -> callback.onError("Gagal menyimpan data toko: " + e.getMessage()));
     }
 
-    public void getShopData(String shopId, ShopDataCallback callback) {
+    public void getShopById(String shopId, ShopDataCallback callback) {
         firestore.collection("shops").document(shopId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {

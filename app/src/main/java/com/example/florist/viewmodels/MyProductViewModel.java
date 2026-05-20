@@ -70,7 +70,7 @@ public class MyProductViewModel extends ViewModel {
     public MutableLiveData<Integer> getCountInactive() {return countInactive;}
     public MutableLiveData<Boolean> getDeleteSuccess() {return deleteSuccess;}
 
-    public MutableLiveData<Boolean> getUpdateStatusSuceess() {return updateStatusSuceess;}
+    public MutableLiveData<Boolean> getUpdateStatusSuccess() {return updateStatusSuceess;}
 
     public void fetchMyProducts() {
         isLoading.setValue(true);
@@ -82,7 +82,7 @@ public class MyProductViewModel extends ViewModel {
             return;
         }
 
-        productRepository.getProductsByOwner(user.getUid(), new ProductRepository.ProductListcallback() {
+        productRepository.getProductsByOwner(user.getUid(), new ProductRepository.ProductListCallback() {
             @Override
             public void onSuccess(List<Product> product) {
                 isLoading.setValue(false);

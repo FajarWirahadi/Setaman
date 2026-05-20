@@ -56,6 +56,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth'
     implementation("com.google.android.gms:play-services-auth:20.7.0")
     implementation 'com.google.firebase:firebase-storage'
+    implementation("com.google.firebase:firebase-messaging:23.4.1")
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.27'
     implementation 'com.mapbox.maps:android:10.16.1'
     implementation 'com.mapbox.search:mapbox-search-android-ui:1.0.0-rc.6'

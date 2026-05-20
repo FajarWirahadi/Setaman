@@ -1,76 +1,117 @@
 package com.example.florist.model;
 
 import java.io.Serializable;
+import com.google.firebase.Timestamp;
 import java.util.Date;
 import java.util.List;
 
 public class Order implements Serializable {
     private String orderId;
     private String buyerId;
-    private List<String> sellerIds;
-    private List<CartItem> items; // Pesanan bisa berisi banyak barang sekaligus
-    private String deliveryAddress;
-    private String paymentMethod;
-    private long subTotal;
-    private long shippingCost;
-    private long grandTotal;
+    private String sellerId;
+    private List<CartItem> items;
+    private double totalAmount;
     private String status;
-    private Date orderDate;
+    private String snapToken;
+    private Timestamp createdAt;
+    private DeliveryAddress deliveryAddress;
+    private String paymentMethod;
+    private String cancellationReason;
 
-    // 1. Konstruktor Kosong (SANGAT WAJIB UNTUK FIRESTORE)
     public Order() {
     }
 
-    // 2. Konstruktor Penuh
-    public Order(String orderId, String buyerId, List<String> sellerIds, List<CartItem> items,
-                 String deliveryAddress, String paymentMethod, long subTotal,
-                 long shippingCost, long grandTotal, String status, Date orderDate) {
-        this.orderId = orderId;
-        this.buyerId = buyerId;
-        this.sellerIds = sellerIds;
-        this.items = items;
-        this.deliveryAddress = deliveryAddress;
-        this.paymentMethod = paymentMethod;
-        this.subTotal = subTotal;
-        this.shippingCost = shippingCost;
-        this.grandTotal = grandTotal;
-        this.status = status;
-        this.orderDate = orderDate;
+    public double getTotalAmount() {
+        return totalAmount;
     }
 
-    // ==========================================
-    // 3. GETTER DAN SETTER
-    // ==========================================
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    // 2. Konstruktor Penuh
+    public Order(String orderId, String buyerId, String sellerId, List<CartItem> items, double totalAmount, DeliveryAddress deliveryAddress, String paymentMethod) {
+        this.orderId = orderId;
+        this.buyerId = buyerId;
+        this.sellerId = sellerId;
+        this.items = items;
+        this.totalAmount = totalAmount;
+        this.status = "PENDING";
+        this.createdAt = Timestamp.now();
+        this.deliveryAddress = deliveryAddress;
+        this.paymentMethod = paymentMethod;
+    }
+
+    public String getCancellationReason() {
+        return cancellationReason;
+    }
+
+    public void setCancellationReason(String cancellationReason) {
+        this.cancellationReason = cancellationReason;
+    }
+
+    public String getSnapToken() {
+        return snapToken;
+    }
+
+    public void setSnapToken(String snapToken) {
+        this.snapToken = snapToken;
+    }
+
     public String getOrderId() { return orderId; }
     public void setOrderId(String orderId) { this.orderId = orderId; }
 
     public String getBuyerId() { return buyerId; }
     public void setBuyerId(String buyerId) { this.buyerId = buyerId; }
 
-    public List<String> getSellerIds() { return sellerIds; }
-    public void setSellerIds(List<String> sellerIds) { this.sellerIds = sellerIds; }
+    public String getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(String sellerId) {
+        this.sellerId = sellerId;
+    }
+
 
     public List<CartItem> getItems() { return items; }
     public void setItems(List<CartItem> items) { this.items = items; }
 
-    public String getDeliveryAddress() { return deliveryAddress; }
-    public void setDeliveryAddress(String deliveryAddress) { this.deliveryAddress = deliveryAddress; }
+    public DeliveryAddress getDeliveryAddress() { return deliveryAddress; }
+    public void setDeliveryAddress(DeliveryAddress deliveryAddress) { this.deliveryAddress = deliveryAddress; }
 
-    public String getPaymentMethod() { return paymentMethod; }
-    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
-
-    public long getSubTotal() { return subTotal; }
-    public void setSubTotal(long subTotal) { this.subTotal = subTotal; }
-
-    public long getShippingCost() { return shippingCost; }
-    public void setShippingCost(long shippingCost) { this.shippingCost = shippingCost; }
-
-    public long getGrandTotal() { return grandTotal; }
-    public void setGrandTotal(long grandTotal) { this.grandTotal = grandTotal; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public Date getOrderDate() { return orderDate; }
-    public void setOrderDate(Date orderDate) { this.orderDate = orderDate; }
+    public String getReceiverName() {
+        if (deliveryAddress != null) {
+            return deliveryAddress.getReceiverName();
+        }
+        return "Tanpa Nama";
+    }
+
+    public String getFullDeliveryAddress() {
+        if (deliveryAddress != null) {
+            return deliveryAddress.getFullAddress();
+        }
+        return "Alamat tidak ditemukan";
+    }
+
+
 }

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/rounded_gray_layout">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tolak Pesanan"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/gray_900"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pilih alasan mengapa Anda menolak pesanan ini. Pembeli akan melihat alasan ini."
+        android:textColor="@color/gray_500"
+        android:layout_marginBottom="16dp"/>
+
+    <RadioGroup
+        android:id="@+id/radioGroupReason"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp">
+
+        <RadioButton
+            android:id="@+id/radioReason1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Stok Tanaman Habis/Tidak Layak"/>
+
+        <RadioButton
+            android:id="@+id/radioReason2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Lokasi Pengiriman Terlalu Jauh"
+            android:layout_marginTop="8dp"/>
+
+        <RadioButton
+            android:id="@+id/radioReason3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Jadwal Kurir Penuh"
+            android:layout_marginTop="8dp"/>
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/btnConfirmReject"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Konfirmasi Penolakan"
+        android:backgroundTint="@color/text_error"
+        android:textColor="@color/white"
+        android:textAllCaps="false"/>
+
+</LinearLayout>

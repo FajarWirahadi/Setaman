@@ -19,12 +19,15 @@ public class HomepageActivity extends AppCompatActivity {
         binding = ActivityHomepageBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Saat aplikasi pertama kali dibuka, langsung tampilkan HomeFragment
         if (savedInstanceState == null) {
             loadFragment(new HomeFragment());
         }
 
+        setupToolbar();
         setupBottomNav();
+    }
+
+    private void setupToolbar() {
     }
 
     private void setupBottomNav() {
@@ -43,7 +46,6 @@ public class HomepageActivity extends AppCompatActivity {
                 selectedFragment = new ProfileFragment();
             }
 
-            // Ganti isi kotak kosong dengan fragment yang dipilih
             if (selectedFragment != null) {
                 loadFragment(selectedFragment);
             }

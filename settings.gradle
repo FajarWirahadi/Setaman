@@ -17,7 +17,6 @@ dependencyResolutionManagement {
                 basic(BasicAuthentication)
             }
             credentials {
-                // Jangan tulis token langsung, ambil dari gradle.properties
                 username = "mapbox"
                 password = providers.gradleProperty("MAPBOX_DOWNLOADS_TOKEN").get()
             }

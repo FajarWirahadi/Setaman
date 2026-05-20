@@ -5,6 +5,7 @@ import com.cloudinary.android.MediaManager;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class MyApplication extends Application {
 
     @Override
@@ -19,7 +20,7 @@ public class MyApplication extends Application {
             config.put("api_key", "323741875367468");
         config.put("api_secret", "LT1RcQQGoP2EEncCuK0aj_aL5EE");
 
-        // Inisialisasi MediaManager
         MediaManager.init(this, config);
+
     }
 }

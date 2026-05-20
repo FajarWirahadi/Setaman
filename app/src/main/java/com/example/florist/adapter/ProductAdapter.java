@@ -40,7 +40,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     }
 
     public void updateList(List<Product> newList) {
-        this.productList = new ArrayList<>(newList);
+        this.productList.clear();
+        this.productList.addAll(newList);
         notifyDataSetChanged();
     }
 

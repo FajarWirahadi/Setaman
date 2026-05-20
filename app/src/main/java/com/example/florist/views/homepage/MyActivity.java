@@ -25,4 +25,5 @@ public class MyActivity extends Application {
             e.printStackTrace();
         }
     }
+
 }

@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide;
 import com.example.florist.R;
 import com.example.florist.databinding.ActivityOwnerDashboardBinding;
 import com.example.florist.viewmodels.OwnerDashboardViewModel;
+import com.example.florist.views.homepage.ShopProfileActivity;
 import com.example.florist.views.seller.addproduct.AddProductActivity;
 import com.yalantis.ucrop.UCrop;
 
@@ -38,7 +39,7 @@ public class OwnerDashboardActivity extends AppCompatActivity {
                     }
                 }
                 else if (result.getResultCode() == UCrop.RESULT_ERROR && result.getData() != null) {
-                    // KONDISI 2: ERROR UCROP
+
                     Throwable cropError = UCrop.getError(result.getData());
                     Toast.makeText(this, "Crop error: " + (cropError != null ? cropError.getMessage() : "Unknown"), Toast.LENGTH_SHORT).show();
                 }
@@ -53,14 +54,13 @@ public class OwnerDashboardActivity extends AppCompatActivity {
                     UCrop.Options options = new UCrop.Options();
                     options.setCircleDimmedLayer(true);
                     options.setShowCropGrid(false);
-                    // 2. MASUKKAN DUA URI TERSEBUT KE UCROP. BUKAN STRING! BUKAN IMAGEVIEW!
+
                     Intent uCropIntent = UCrop.of(uri, destinationUri)
                             .withAspectRatio(1, 1)
                             .withMaxResultSize(800, 800)
                             .withOptions(options)
                             .getIntent(this);
 
-                    // 3. Panggil layar pemotong gambar
                     cropLauncher.launch(uCropIntent);
                 }
             }
@@ -82,9 +82,9 @@ public class OwnerDashboardActivity extends AppCompatActivity {
         setupObservers();
 
 
-
         viewModel.loadDashboardData();
         viewModel.loadTotalProducts();
+        viewModel.loadSellerOrderCounts();
     }
 
 
@@ -92,12 +92,8 @@ public class OwnerDashboardActivity extends AppCompatActivity {
         viewModel.getShopData().observe(this, shop -> {
             if (shop != null) {
                 binding.tvShopName.setText(shop.getShopName());
-                binding.tvShopId.setText(shop.getShopId());
+                binding.tvShopCity.setText("Kota " + shop.getShopCity());
 
-                binding.txtBelumDibayar.setText("-");
-                binding.txtDalamProses.setText("-");
-                binding.txtDalamPerawatan.setText("-");
-                binding.txtDikirim.setText("-");
 
                 if (shop.getShopImageUrl() != null && !shop.getShopImageUrl().isEmpty()) {
 
@@ -128,6 +124,55 @@ public class OwnerDashboardActivity extends AppCompatActivity {
             }
         });
 
+        viewModel.getCountUnpaid().observe(this, count -> {
+            if (count > 0) {
+                binding.badgeUnpaid.setVisibility(View.VISIBLE);
+                binding.badgeUnpaid.setText(count > 99 ? "99+" : String.valueOf(count));
+            } else {
+                binding.badgeUnpaid.setVisibility(View.GONE);
+            }
+        });
+
+        viewModel.getCountProcessing().observe(this, count -> {
+            if (count > 0) {
+                binding.badgeProcessing.setText(String.valueOf(count));
+                binding.badgeProcessing.setVisibility(View.VISIBLE);
+            } else {
+                binding.badgeProcessing.setVisibility(View.GONE);
+            }
+        });
+
+        viewModel.getCountShipped().observe(this, count -> {
+            if (count > 0) {
+                binding.badgeShipped.setText(String.valueOf(count));
+                binding.badgeShipped.setVisibility(View.VISIBLE);
+            } else {
+                binding.badgeShipped.setVisibility(View.GONE);
+            }
+        });
+
+        viewModel.getCountMaintenance().observe(this, count -> {
+            if (count != null && count > 0) {
+                binding.tvMaintenanceAlert.setText("Ada " + count + "Tanaman menunggu perawatan!");
+                binding.tvMaintenanceAlert.setTextColor(getResources().getColor(R.color.text_error));
+            } else {
+                binding.tvMaintenanceAlert.setText("Tidak ada jadwal perawatan saat ini");
+                binding.tvMaintenanceAlert.setTextColor(getResources().getColor(R.color.text_success));
+            }
+        });
+
+        viewModel.getCountComplaint().observe(this, count -> {
+            if (count != null && count > 0) {
+                binding.tvMaintenanceAlert.setTextColor(getResources().getColor(R.color.text_error));
+                binding.tvComplaintCountText.setText("Terdapat " + count + " komplain menunggu tanggapan");
+            } else {
+
+                binding.tvMaintenanceAlert.setText("Tidak ada komplain untuk saat ini");
+                binding.tvMaintenanceAlert.setTextColor(getResources().getColor(R.color.text_success));
+
+            }
+        });
+
         viewModel.getIsLoading().observe(this, isLoading -> {
             if (isLoading != null && isLoading) {
                 binding.loadingOverlay.setVisibility(View.VISIBLE);
@@ -148,7 +193,15 @@ public class OwnerDashboardActivity extends AppCompatActivity {
         });
 
         binding.btnVisitShop.setOnClickListener(v -> {
-            Toast.makeText(this, "Fitur kunjungi toko (Coming Soon", Toast.LENGTH_SHORT).show();
+            if (viewModel.getShopData().getValue() != null) {
+                String myShopId = viewModel.getShopData().getValue().getShopId();
+
+                Intent intent = new Intent(this, ShopProfileActivity.class);
+                intent.putExtra("EXTRA_SHOP_ID",myShopId);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Data toko sedang dimuat, coba sesaat lagi.", Toast.LENGTH_SHORT).show();
+            }
         });
 
         binding.layoutTotalProducts.setOnClickListener(v -> {
@@ -156,27 +209,50 @@ public class OwnerDashboardActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        binding.tvHistory.setOnClickListener(v -> openSellerAtTab(3));
+
+        binding.menuUnpaid.setOnClickListener(v -> openSellerAtTab(0));
+
+        binding.menuProcessing.setOnClickListener(v -> openSellerAtTab(1));
+
+        binding.menuShipped.setOnClickListener(v -> openSellerAtTab(2));
+
         binding.imgShopProfile.setOnClickListener(v -> {
             showImagePreviewDialog();
         });
+
+        binding.cvMaintenanceShcedule.setOnClickListener(v -> {
+            Toast.makeText(this, "Membuka jadwal perawatan", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, MaintenanceScheduleActivity.class);
+            startActivity(intent);
+        });
+
+        binding.cvComplaintAlert.setOnClickListener(v -> {
+            Toast.makeText(this, "Membuka jadwal perawatan", Toast.LENGTH_SHORT).show();
+//            Intent intent = new Intent(this, SellerComplaintListActivity.class);
+//            startActivity(intent);
+        });
+    }
+
+    private void openSellerAtTab(int tabIndex) {
+        Intent intent = new Intent(OwnerDashboardActivity.this, SellerOrderActivity.class);
+        intent.putExtra("TAB_INDEX", tabIndex);
+        startActivity(intent);
     }
 
     private void showImagePreviewDialog() {
         android.app.Dialog dialog = new android.app.Dialog(this);
         dialog.setContentView(R.layout.dialog_image_preview);
 
-        // Buat agar lebarnya menyesuaikan layar
         dialog.getWindow().setLayout(
                 android.view.ViewGroup.LayoutParams.MATCH_PARENT,
                 android.view.ViewGroup.LayoutParams.WRAP_CONTENT
         );
-        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent); // Hilangkan background bawaan
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
-        // 2. Hubungkan View yang ada di dalam XML Dialog
         android.widget.ImageView imgPreview = dialog.findViewById(R.id.imgPreview);
         android.widget.Button btnChangePhoto = dialog.findViewById(R.id.btnChangePhoto);
 
-        // 3. Muat gambar saat ini ke dalam ImageView Dialog menggunakan Glide
         if (!currentShopImageUrl.isEmpty()) {
             com.bumptech.glide.Glide.with(this)
                     .load(currentShopImageUrl)
@@ -187,17 +263,15 @@ public class OwnerDashboardActivity extends AppCompatActivity {
             Glide.with(this).load(R.drawable.building).circleCrop().into(imgPreview);
         }
 
-        // 4. Aksi saat tombol "Ganti Foto" ditekan di dalam Dialog
         btnChangePhoto.setOnClickListener(v -> {
-            dialog.dismiss(); // Tutup dialognya dulu
-            imagePickerLauncher.launch("image/*"); // Buka galeri!
+            dialog.dismiss();
+            imagePickerLauncher.launch("image/*");
         });
 
-        // 5. Tampilkan Dialog ke layar
         dialog.show();
     }
 
     private void setupToolbar() {
-
+        binding.myToolbar.btnBack.setOnClickListener(v -> onBackPressed());
     }
 }

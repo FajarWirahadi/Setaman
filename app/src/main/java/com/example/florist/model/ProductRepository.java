@@ -10,7 +10,9 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -24,7 +26,6 @@ import io.grpc.Context;
 
 public class ProductRepository {
     private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-//    StorageReference storageReference = FirebaseStorage.getInstance().getReference();
     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
     public interface ProductCallback {
@@ -37,7 +38,7 @@ public class ProductRepository {
         void onError(String message);
     }
 
-    public interface ProductListcallback {
+    public interface ProductListCallback {
         void onSuccess(List<Product> product);
         void onError(String message);
     }
@@ -189,7 +190,6 @@ public class ProductRepository {
                             List<String> finalGallery = new ArrayList<>();
                             if (oldImages!=null) finalGallery.addAll(oldImages);
 
-                            // Perlu synchronized saat membaca hasil upload
                             synchronized (newCloudinaryUrls){
                                 finalGallery.addAll(newCloudinaryUrls);
                             }
@@ -243,7 +243,7 @@ public class ProductRepository {
                 .addOnFailureListener(e -> callback.onError("Gagal menghitung jumlah product " + e.getMessage()));
     }
 
-    public void getProductsByOwner(String ownerId, ProductListcallback callback) {
+    public void getProductsByOwner(String ownerId, ProductListCallback callback) {
         firestore.collection("products")
                 .whereEqualTo("ownerId", ownerId)
                 .addSnapshotListener((value, error) -> {
@@ -256,6 +256,23 @@ public class ProductRepository {
                         callback.onSuccess(productList);
                     }
                 });
+    }
+
+    public void getAllProducts(ProductListCallback callback) {
+        firestore.collection("products")
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Product> productList = new ArrayList<>();
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        Product product = doc.toObject(Product.class);
+                        if (product != null) {
+                            productList.add(product);
+                        }
+                    }
+                    callback.onSuccess(productList);
+                })
+                .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
 
     private void deleteImageFromCloudinary(String imageUrl) {

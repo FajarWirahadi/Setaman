@@ -67,8 +67,6 @@ public class AddProductActivity extends AppCompatActivity {
     private final ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
             registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(MAX_SELECTION), result -> {
                 if (result != null && !result.isEmpty()) {
-                    // Cukup update ViewModel.
-                    // Jangan panggil adapter.appendMediaList(result) di sini!
                     viewModel.updateMediaList(result);
 
                     Toast.makeText(this, result.size() + " media baru dipilih", Toast.LENGTH_SHORT).show();

@@ -13,6 +13,7 @@ import java.util.List;
 
 public class ProductViewModel extends ViewModel {
     private ProductRepository repository;
+    private MutableLiveData<List<Product>> allProducts = new MutableLiveData<>();
     private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     private MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private MutableLiveData<Boolean> isSuccess = new MutableLiveData<>();
@@ -21,6 +22,7 @@ public class ProductViewModel extends ViewModel {
         repository = new ProductRepository();
     }
 
+    public LiveData<List<Product>> getAllProducts() {return allProducts;}
     public LiveData<Boolean> getIsLoading() {return isLoading;}
     public LiveData<String> getErrorMessage() {return errorMessage;}
     public LiveData<Boolean> getIsSuccess() {return isSuccess;}
@@ -44,7 +46,6 @@ public class ProductViewModel extends ViewModel {
         });
     }
 
-    // Di dalam ProductViewModel.java
 
     public void updateProductMultiple(Product product, List<Uri> newImages, List<String> oldImages) {
         isLoading.setValue(true);
@@ -54,6 +55,23 @@ public class ProductViewModel extends ViewModel {
             public void onSuccess() {
                 isLoading.setValue(false);
                 isSuccess.setValue(true);
+            }
+
+            @Override
+            public void onError(String message) {
+                isLoading.setValue(false);
+                errorMessage.setValue(message);
+            }
+        });
+    }
+
+    public void fetchAllProducts() {
+        isLoading.setValue(true);
+        repository.getAllProducts(new ProductRepository.ProductListCallback() {
+            @Override
+            public void onSuccess(List<Product> product) {
+                isLoading.setValue(false);
+                allProducts.setValue(product);
             }
 
             @Override

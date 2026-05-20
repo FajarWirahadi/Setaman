@@ -98,22 +98,19 @@
 
                 <RelativeLayout
                     android:id="@+id/iconBackground"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:layout_marginVertical="12dp"
                     android:layout_marginLeft="16dp"
                     android:background="@drawable/rounded_photo"
-                    android:backgroundTint="@color/gray_100">
-
+                    android:backgroundTint="@color/gray_100"
+                    android:clipToOutline="true">
                     <ImageView
                         android:id="@+id/imgShop"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_centerInParent="true"
-                        android:layout_margin="12dp"
-                        android:clipToOutline="true"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="12dp"
                         android:src="@drawable/building" />
-
                 </RelativeLayout>
 
                 <LinearLayout
@@ -168,6 +165,7 @@
                     android:layout_weight="2"/>
 
                 <LinearLayout
+                    android:id="@+id/btnMyOrders"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
@@ -176,7 +174,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/lihat_semua"
                         style="@style/label_lg_regular"
-                        android:textColor="@color/gray_500"/>
+                        android:textColor="@color/olive_500"/>
                     <ImageView
                         android:layout_width="10dp"
                         android:layout_height="10dp"
@@ -196,15 +194,44 @@
                 android:elevation="2dp">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:id="@+id/menuUnpaid"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:gravity="center"
                     android:layout_weight="1">
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/belum_dibayar"/>
+
+                    <RelativeLayout
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:id="@+id/imgUnpaid"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_centerHorizontal="true"
+                            android:layout_margin="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:src="@drawable/belum_dibayar" />
+
+                        <TextView
+                            android:id="@+id/badgeUnpaid"
+                            android:layout_width="wrap_content"
+                            android:layout_height="22dp"
+                            android:minWidth="18dp"
+                            android:paddingHorizontal="2dp"
+                            android:layout_alignParentTop="true"
+                            android:layout_alignParentEnd="true"
+                            android:background="@drawable/circle_background"
+                            android:backgroundTint="@color/text_error"
+                            android:textColor="@color/white"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:gravity="center"
+                            android:text="0"
+                            android:visibility="gone"/>
+                    </RelativeLayout>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -215,15 +242,44 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:id="@+id/menuProcessing"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:gravity="center"
                     android:layout_weight="1">
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/dalam_proses"/>
+
+                    <RelativeLayout
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_centerHorizontal="true"
+                            android:layout_marginStart="4dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginEnd="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:src="@drawable/dalam_proses" />
+                        <TextView
+                            android:id="@+id/badgeProcessing"
+                            android:layout_width="wrap_content"
+                            android:layout_height="22dp"
+                            android:minWidth="18dp"
+                            android:paddingHorizontal="2dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_alignParentTop="true"
+                            android:background="@drawable/circle_background"
+                            android:backgroundTint="@color/text_error"
+                            android:textColor="@color/white"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:gravity="center"
+                            android:text="99+"
+                            android:visibility="gone"/>
+                    </RelativeLayout>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -234,15 +290,41 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:id="@+id/menuShipped"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:gravity="center"
                     android:layout_weight="1">
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/dikirim"/>
+
+                    <RelativeLayout
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_margin="4dp"
+                            android:src="@drawable/dikirim"
+                            android:layout_centerHorizontal="true"/>
+                        <TextView
+                            android:id="@+id/badgeShipped"
+                            android:layout_width="wrap_content"
+                            android:layout_height="22dp"
+                            android:minWidth="18dp"
+                            android:paddingHorizontal="2dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_alignParentTop="true"
+                            android:background="@drawable/circle_background"
+                            android:backgroundTint="@color/text_error"
+                            android:textColor="@color/white"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:gravity="center"
+                            android:text="99+"
+                            android:visibility="gone"/>
+                    </RelativeLayout>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -253,15 +335,41 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:id="@+id/menuRented"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:gravity="center"
                     android:layout_weight="1">
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/dalam_perawatan"/>
+
+                    <RelativeLayout
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_margin="4dp"
+                            android:src="@drawable/dalam_perawatan"
+                            android:layout_centerHorizontal="true"/>
+                        <TextView
+                            android:id="@+id/badgeRented"
+                            android:layout_width="wrap_content"
+                            android:layout_height="22dp"
+                            android:minWidth="18dp"
+                            android:paddingHorizontal="2dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_alignParentTop="true"
+                            android:background="@drawable/circle_background"
+                            android:backgroundTint="@color/text_error"
+                            android:textColor="@color/white"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:gravity="center"
+                            android:text="99+"
+                            android:visibility="gone"/>
+                    </RelativeLayout>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -270,7 +378,6 @@
                         android:textColor="@color/text_primary"
                         android:textAlignment="center"/>
                 </LinearLayout>
-
             </LinearLayout>
         </LinearLayout>
 
