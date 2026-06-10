@@ -3,13 +3,11 @@ package com.example.florist.views.seller.addproduct;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.MediaController;
-import android.widget.VideoView;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.bumptech.glide.Glide;
-import com.example.florist.R;
 import com.example.florist.databinding.ActivityMediaPreviewBinding;
 
 public class MediaPreviewActivity extends AppCompatActivity {

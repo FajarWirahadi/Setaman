@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class MediaViewModel extends ViewModel {
     private final MutableLiveData<List<Object>> _selectedMedia = new MutableLiveData<>();

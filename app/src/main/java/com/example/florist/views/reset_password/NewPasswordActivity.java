@@ -1,10 +1,5 @@
 package com.example.florist.views.reset_password;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.content.res.AppCompatResources;
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -18,11 +13,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 
 import com.example.florist.R;
-import com.example.florist.views.RegisterActivity;
-import com.example.florist.views.RegisterSelectVerificationActivity;
 
 public class NewPasswordActivity extends AppCompatActivity {
     EditText editTextPassword, editTextPassword2,editTextEmail;

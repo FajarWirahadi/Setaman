@@ -279,6 +279,7 @@
                     android:clickable="true">
 
                     <RelativeLayout
+                        android:id="@+id/layoutMaintenanceAlert"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="16dp"
@@ -363,6 +364,7 @@
                         android:orientation="vertical">
 
                         <TextView
+                            android:id="@+id/tvComplaintTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Pusat Resolusi Komplain"

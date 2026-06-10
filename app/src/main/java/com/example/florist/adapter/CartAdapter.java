@@ -2,7 +2,6 @@ package com.example.florist.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -52,10 +51,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         holder.binding.tvCartName.setText(item.getName());
         holder.binding.tvDurationLabel.setText(rentLabel);
 
-        // 2. Set Jumlah
         holder.binding.tvQuantity.setText(String.valueOf(item.getQuantity()));
 
-        // 3. Kalkulasi Sub-Total Harga Item Ini
         int multiplier = 1;
         if ("Mingguan".equals(item.getDurationType())) multiplier = 7;
         else if ("Bulanan".equals(item.getDurationType())) multiplier = 30;
@@ -66,14 +63,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         formatRupiah.setMaximumFractionDigits(0);
         holder.binding.tvCartPrice.setText(formatRupiah.format(subTotal));
 
-        // 4. Set Gambar
         Glide.with(context)
                 .load(item.getImageUrl())
-                .placeholder(R.drawable.logo_icon) // Ganti jika kau punya ikon placeholder lain
+                .placeholder(R.drawable.logo_icon)
                 .centerCrop()
                 .into(holder.binding.imgCartProduct);
 
-        // 5. Pasang Telinga untuk Tombol-Tombol
         holder.binding.btnPlus.setOnClickListener(v -> listener.onPlusClick(item, position));
         holder.binding.btnMinus.setOnClickListener(v -> listener.onMinusClick(item, position));
         holder.binding.btnDelete.setOnClickListener(v -> listener.onDeleteClick(item, position));

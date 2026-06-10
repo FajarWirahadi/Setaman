@@ -28,10 +28,10 @@
         android:id="@+id/imgPreview"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:background="@drawable/rounded_gray_layout"
-        android:src="@drawable/ic_photo_camera_white_24dp"
-        android:backgroundTint="@color/gray_400"
-        android:scaleType="centerCrop"
+        android:src="@drawable/ic_camera_add"
+        android:backgroundTint="@color/main_color"
+        app:tint="@color/main_color"
+        android:scaleType="fitCenter"
         android:clipToOutline="true"
         android:layout_marginBottom="16dp"/>
 

@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <RelativeLayout
+        android:id="@+id/toolbarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/white"
+        android:elevation="0dp"
+        android:paddingHorizontal="12dp">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/arrow_back"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:tint="@color/gray_900"/>
+
+        <TextView
+            style="@style/title_lg_bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Pesanan Saya"
+            android:textColor="@color/gray_900" />
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbarLayout"
+        android:layout_above="@id/layoutBottomAction"
+        android:fillViewport="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/imgProductThumb"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/rounded_gray_layout"
+                android:layout_alignParentTop="true"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.SmallComponent" />
+
+            <TextView
+                android:id="@+id/tvProductName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="Nama Tanaman Sedang Dimuat..."
+                android:textColor="@color/black"
+                style="@style/label_lg_bold"
+                android:layout_toEndOf="@id/imgProductThumb"
+                android:layout_alignTop="@+id/imgProductThumb" />
+
+            <TextView
+                android:id="@+id/tvProductDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_marginStart="12dp"
+                android:text="Detail sewa..."
+                android:textColor="@color/gray_500"
+                style="@style/body_md_regular"
+                android:layout_toEndOf="@id/imgProductThumb"
+                android:layout_below="@id/tvProductName"/>
+
+            <View
+                android:id="@+id/divider1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="@color/gray_100"
+                android:layout_below="@id/imgProductThumb" />
+
+            <TextView
+                android:id="@+id/tvLabelKualitas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Kualitas Produk"
+                android:textColor="@color/black"
+                style="@style/label_lg_bold"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/divider1" />
+
+            <RatingBar
+                android:id="@+id/ratingBar"
+                style="@style/Widget.AppCompat.RatingBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:numStars="5"
+                android:progressTint="#FFC107" android:progressBackgroundTint="#E0E0E0" android:rating="5.0"
+                android:stepSize="1.0"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/tvLabelKualitas" />
+
+            <RelativeLayout
+                android:id="@+id/layoutAddMedia"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/rounded_gray_layout"
+                android:layout_below="@id/ratingBar">
+
+                <LinearLayout
+                    android:id="@+id/llMediaPlaceholder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_camera_add"
+                        app:tint="@color/olive_500" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Tambah Foto/Video"
+                        android:textColor="@color/olive_500"
+                        style="@style/body_sm_regular" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/imgReviewPreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/layoutCommentHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_below="@id/layoutAddMedia">
+
+                <TextView
+                    android:id="@+id/tvCommentLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tulis ulasan minimal 50 karakter"
+                    android:textColor="@color/gray_900"
+                    style="@style/body_md_bold" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/layoutCommentBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_below="@id/layoutCommentHeader"
+                android:background="@drawable/rounded_gray_layout"
+                android:backgroundTint="@color/gray_50"
+                android:padding="12dp">
+
+                <LinearLayout
+                    android:id="@+id/llInputContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Kondisi: "
+                            android:textColor="@color/gray_900"
+                            style="@style/body_md_bold" />
+
+                        <EditText
+                            android:id="@+id/etReviewKondisi"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:hint="Segar, rimbun, pot bersih..."
+                            android:textColorHint="@color/gray_400"
+                            android:inputType="textCapSentences"
+                            android:imeOptions="actionNext"
+                            style="@style/body_md_regular" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Pelayanan: "
+                            android:textColor="@color/gray_900"
+                            style="@style/body_md_bold" />
+
+                        <EditText
+                            android:id="@+id/etReviewPelayanan"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:hint="Penjual ramah..."
+                            android:textColorHint="@color/gray_400"
+                            android:inputType="textCapSentences"
+                            android:imeOptions="actionNext"
+                            style="@style/body_md_regular" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Pengiriman: "
+                            android:textColor="@color/gray_900"
+                            style="@style/body_md_bold" />
+
+                        <EditText
+                            android:id="@+id/etReviewPengiriman"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:hint="Aman, tidak patah..."
+                            android:textColorHint="@color/gray_400"
+                            android:inputType="textCapSentences"
+                            android:imeOptions="actionDone"
+                            style="@style/body_md_regular" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Bagikan penilaianmu dan bantu Pengguna lain membuat pilihan yang lebih baik!"
+                        android:textColor="@color/gray_400"
+                        android:paddingBottom="24dp"
+                        style="@style/body_sm_regular" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvCharCounter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@id/llInputContainer"
+                    android:layout_alignParentEnd="true"
+                    android:text="0 karakter"
+                    android:textColor="@color/gray_500"
+                    style="@style/label_sm_regular" />
+
+            </RelativeLayout>        </RelativeLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/layoutBottomAction"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/white"
+        android:elevation="8dp"
+        android:padding="16dp">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnSubmitReview"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/rounded_success_button"
+            android:text="Kirim Ulasan"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</RelativeLayout>

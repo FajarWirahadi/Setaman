@@ -1,27 +1,28 @@
 package com.example.florist.views.seller;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.bumptech.glide.Glide;
 import com.example.florist.R;
 import com.example.florist.databinding.ActivityOwnerDashboardBinding;
 import com.example.florist.viewmodels.OwnerDashboardViewModel;
+import com.example.florist.views.chat.InboxActivity;
 import com.example.florist.views.homepage.ShopProfileActivity;
 import com.example.florist.views.seller.addproduct.AddProductActivity;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
-import java.security.acl.Owner;
 
 public class OwnerDashboardActivity extends AppCompatActivity {
 
@@ -66,8 +67,6 @@ public class OwnerDashboardActivity extends AppCompatActivity {
             }
     );
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,12 +80,15 @@ public class OwnerDashboardActivity extends AppCompatActivity {
         setupListeners();
         setupObservers();
 
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
         viewModel.loadDashboardData();
         viewModel.loadTotalProducts();
         viewModel.loadSellerOrderCounts();
     }
-
 
     private void setupObservers() {
         viewModel.getShopData().observe(this, shop -> {
@@ -153,7 +155,7 @@ public class OwnerDashboardActivity extends AppCompatActivity {
 
         viewModel.getCountMaintenance().observe(this, count -> {
             if (count != null && count > 0) {
-                binding.tvMaintenanceAlert.setText("Ada " + count + "Tanaman menunggu perawatan!");
+                binding.tvMaintenanceAlert.setText("Ada " + count + " Tanaman menunggu perawatan!");
                 binding.tvMaintenanceAlert.setTextColor(getResources().getColor(R.color.text_error));
             } else {
                 binding.tvMaintenanceAlert.setText("Tidak ada jadwal perawatan saat ini");
@@ -163,14 +165,33 @@ public class OwnerDashboardActivity extends AppCompatActivity {
 
         viewModel.getCountComplaint().observe(this, count -> {
             if (count != null && count > 0) {
-                binding.tvMaintenanceAlert.setTextColor(getResources().getColor(R.color.text_error));
                 binding.tvComplaintCountText.setText("Terdapat " + count + " komplain menunggu tanggapan");
+                binding.tvComplaintCountText.setTextColor(ContextCompat.getColor(this, R.color.red_600));
+
+                binding.cvComplaintAlert.setCardBackgroundColor(ContextCompat.getColor(this, R.color.red_50));
+
+                binding.cvComplaintAlert.setStrokeColor(ContextCompat.getColor(this, R.color.red_200));
+                binding.icComplaintDash.setColorFilter(ContextCompat.getColor(this, R.color.red_500));
             } else {
+                binding.tvComplaintTitle.setTextColor(ContextCompat.getColor(this, R.color.green_700));
+                binding.tvComplaintCountText.setText("Tidak ada komplain saat ini");
+                binding.tvComplaintCountText.setTextColor(ContextCompat.getColor(this, R.color.green_700));
 
-                binding.tvMaintenanceAlert.setText("Tidak ada komplain untuk saat ini");
-                binding.tvMaintenanceAlert.setTextColor(getResources().getColor(R.color.text_success));
+                binding.cvComplaintAlert.setCardBackgroundColor(ContextCompat.getColor(this, R.color.green_50));
 
+                binding.cvComplaintAlert.setStrokeColor(ContextCompat.getColor(this, R.color.green_200));
+                binding.icComplaintDash.setColorFilter(ContextCompat.getColor(this, R.color.green_500));
             }
+        });
+
+        viewModel.getTodayMaintenanceCount().observe(this, todayCount-> {
+            Integer overdueCount = viewModel.getOverdueMaintenanceCount().getValue();
+            updateMaintenanceAlertUI(todayCount, overdueCount != null? overdueCount : 0);
+        });
+
+        viewModel.getOverdueMaintenanceCount().observe(this, overdueCount -> {
+            Integer todayCount = viewModel.getTodayMaintenanceCount().getValue();
+            updateMaintenanceAlertUI(todayCount != null ? todayCount : 0, overdueCount);
         });
 
         viewModel.getIsLoading().observe(this, isLoading -> {
@@ -186,7 +207,35 @@ public class OwnerDashboardActivity extends AppCompatActivity {
         });
     }
 
+    private void updateMaintenanceAlertUI(Integer todayCount, int overdueCount) {
+        if (overdueCount > 0) {
+            binding.layoutMaintenanceAlert.setBackgroundTintList(
+                    ColorStateList.valueOf(androidx.core.content.ContextCompat.getColor(this, R.color.red_100)));
+
+            binding.tvMaintenanceAlert.setText("Ada " + overdueCount + " tanaman yang TERLAMBAT dirawat!");
+            binding.tvMaintenanceAlert.setTextColor(ContextCompat.getColor(this, R.color.text_error));
+
+        } else if (todayCount > 0) {
+            binding.layoutMaintenanceAlert.setBackgroundTintList(
+                    ColorStateList.valueOf(ContextCompat.getColor(this, R.color.green_100)));
+
+            binding.tvMaintenanceAlert.setText("Ada " + todayCount + " tanaman yang perlu dirawat hari ini.");
+            binding.tvMaintenanceAlert.setTextColor(ContextCompat.getColor(this, R.color.green_600));
+
+        } else {
+            binding.layoutMaintenanceAlert.setBackgroundTintList(
+                    ColorStateList.valueOf(ContextCompat.getColor(this, R.color.gray_100)));
+
+            binding.tvMaintenanceAlert.setText("Tidak ada jadwal perawatan hari ini.");
+            binding.tvMaintenanceAlert.setTextColor(ContextCompat.getColor(this, R.color.gray_600));
+        }
+    }
+
     private void setupListeners() {
+        binding.myToolbar.btnInbox.setOnClickListener(v -> {
+            Intent intent = new Intent(OwnerDashboardActivity.this, InboxActivity.class);
+            startActivity(intent);
+        });
         binding.btnAddProduct.setOnClickListener(v -> {
             Intent intent = new Intent(OwnerDashboardActivity.this, AddProductActivity.class);
             startActivity(intent);
@@ -228,9 +277,9 @@ public class OwnerDashboardActivity extends AppCompatActivity {
         });
 
         binding.cvComplaintAlert.setOnClickListener(v -> {
-            Toast.makeText(this, "Membuka jadwal perawatan", Toast.LENGTH_SHORT).show();
-//            Intent intent = new Intent(this, SellerComplaintListActivity.class);
-//            startActivity(intent);
+            Toast.makeText(this, "Membuka komplain dari pelanggan", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, SellerComplaintListActivity.class);
+            startActivity(intent);
         });
     }
 

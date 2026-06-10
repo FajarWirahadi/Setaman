@@ -12,16 +12,14 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.florist.R;
-import com.example.florist.databinding.ActivityRegisterVerificationBinding; // Sesuaikan nama layout binding
+import com.example.florist.databinding.ActivityRegisterVerificationBinding;
 import com.example.florist.model.User;
 import com.example.florist.viewmodels.AuthViewModel;
-import com.example.florist.views.homepage.HomepageActivity;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 public class RegisterVerificationActivity extends AppCompatActivity {
 

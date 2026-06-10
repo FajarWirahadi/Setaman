@@ -36,11 +36,14 @@ public class SellerComplaintListActivity extends AppCompatActivity {
     private void setupUI() {
         binding.btnBack.setOnClickListener(v -> finish());
 
-        adapter = new SellerComplaintAdapter(this, order -> {
-            Toast.makeText(this, "Membuka Detail Komplain: " + order.getOrderId(), Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this, SellerComplaintDetailActivity.class);
+        adapter = new SellerComplaintAdapter(this, rental -> {
+            Intent intent = new Intent(this, RentalDetailActivity.class);
+            intent.putExtra("RENTAL_ID", rental.getRentalId());
+            intent.putExtra("ORDER_ID", rental.getOrderId());
+            intent.putExtra("ROLE", "SELLER");
+            intent.putExtra("STORE_NAME", rental.getSellerName());
+            intent.putExtra("STORE_PHOTO_URL", "");
             startActivity(intent);
-
         });
         binding.rvComplaints.setAdapter(adapter);
     }
@@ -59,8 +62,8 @@ public class SellerComplaintListActivity extends AppCompatActivity {
             binding.progressBar.setVisibility((isLoading != null && isLoading) ? View.VISIBLE : View.GONE);
         });
 
-        viewModel.getComplaintOrders().observe(this, orders -> {
-            if (orders != null) adapter.updateList(orders);
+        viewModel.getComplaintRentals().observe(this, rentals -> {
+            if (rentals != null) adapter.updateList(rentals);
         });
 
         viewModel.getErrorMessage().observe(this, error -> {

@@ -7,7 +7,7 @@ import android.os.Looper;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.florist.databinding.ActivityProductPublishedBinding; // Import binding otomatis
+import com.example.florist.databinding.ActivityProductPublishedBinding;
 import com.example.florist.views.seller.OwnerDashboardActivity;
 
 public class ProductPublishedActivity extends AppCompatActivity {

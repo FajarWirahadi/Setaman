@@ -4,13 +4,11 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.florist.model.AuthRepository;
 import com.example.florist.model.Order;
-import com.example.florist.model.SellerOrderRepository;
+import com.example.florist.repository.AuthRepository;
+import com.example.florist.repository.SellerOrderRepository;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.ListenerRegistration;
-
 
 import java.util.List;
 

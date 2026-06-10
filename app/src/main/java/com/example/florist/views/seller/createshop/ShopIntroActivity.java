@@ -1,15 +1,12 @@
 package com.example.florist.views.seller.createshop;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
-import com.example.florist.R;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.florist.databinding.ActivityShopIntroBinding;
 
 public class ShopIntroActivity extends AppCompatActivity {

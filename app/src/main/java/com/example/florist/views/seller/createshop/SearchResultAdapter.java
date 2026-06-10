@@ -4,11 +4,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.florist.R;
 import com.mapbox.search.result.SearchSuggestion;
-import com.mapbox.search.result.SearchSuggestion;
+
 import java.util.ArrayList;
 import java.util.List;
 

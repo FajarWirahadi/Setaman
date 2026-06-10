@@ -1,19 +1,20 @@
 package com.example.florist.views.buyer;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
-
-import com.example.florist.adapter.OrderAdapter;
+import com.example.florist.adapter.BuyerOrderAdapter;
 import com.example.florist.databinding.FragmentOrderListBinding;
+import com.example.florist.model.Order;
 import com.example.florist.viewmodels.OrderViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,7 +23,7 @@ public class OrderListFragment extends Fragment {
 
     private FragmentOrderListBinding binding;
     private OrderViewModel viewModel;
-    private OrderAdapter adapter;
+    private BuyerOrderAdapter adapter;
     private String currentStatus;
     private String currentUserId;
 
@@ -47,6 +48,9 @@ public class OrderListFragment extends Fragment {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             currentUserId = user.getUid();
+
+            viewModel = new ViewModelProvider(this).get(OrderViewModel.class);
+
             setupUI();
             setupViewModel();
         } else {
@@ -55,16 +59,29 @@ public class OrderListFragment extends Fragment {
     }
 
     private void setupUI() {
-        adapter = new OrderAdapter(requireContext());
+        adapter = new BuyerOrderAdapter(requireContext(), new BuyerOrderAdapter.OnOrderActionListener() {
+            @Override
+            public void onAcceptOrder(Order order) {
+                // Fragment meneruskan perintah ke ViewModel
+                if (viewModel != null) {
+                    viewModel.acceptOrder(order);
+                }
+            }
+
+            @Override
+            public void onEndRental(Order order) {
+                if (viewModel != null) {
+                    viewModel.endRental(order);
+                }
+            }
+        });
+
         binding.rvOrders.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvOrders.setAdapter(adapter);
     }
 
     private void setupViewModel() {
-        viewModel = new ViewModelProvider(this).get(OrderViewModel.class);
-
         viewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
-
 //             binding.progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         });
 
@@ -79,11 +96,19 @@ public class OrderListFragment extends Fragment {
             }
         });
 
-        viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
-            Toast.makeText(requireContext(), "Error: " + error, Toast.LENGTH_SHORT).show();
+        viewModel.getActionSuccessMessage().observe(getViewLifecycleOwner(), successMsg -> {
+            if (successMsg != null && !successMsg.isEmpty()) {
+                Toast.makeText(requireContext(), successMsg, Toast.LENGTH_SHORT).show();
+            }
         });
 
-        viewModel.fetchOrders(currentUserId, currentStatus);
+        viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
+            if (error != null && !error.isEmpty()) {
+                Toast.makeText(requireContext(), "Error: " + error, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        viewModel.fetchOrders(currentStatus);
     }
 
     @Override

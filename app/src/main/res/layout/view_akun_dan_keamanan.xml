@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/myAccount"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -15,6 +16,7 @@
 
     <!--UBAH PROFIL LAYOUT-->
     <LinearLayout
+        android:id="@+id/btnEditProfileAcc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -49,6 +51,7 @@
 
     <!--UBAH DATA AKUN LAYOUT-->
     <LinearLayout
+        android:id="@+id/btnEditDataAcc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"

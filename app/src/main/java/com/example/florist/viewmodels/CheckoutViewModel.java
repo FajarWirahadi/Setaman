@@ -5,17 +5,14 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.florist.model.CartItem;
-import com.example.florist.model.CheckoutRepository;
 import com.example.florist.model.DeliveryAddress;
-import com.example.florist.model.Order;
 import com.example.florist.model.User;
+import com.example.florist.repository.CheckoutRepository;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 public class CheckoutViewModel extends ViewModel {
     private final CheckoutRepository repo = new CheckoutRepository();
@@ -103,10 +100,8 @@ public class CheckoutViewModel extends ViewModel {
     private void calculateTotals(List<CartItem> items) {
         long tempSubTotal = 0;
         for (CartItem item : items) {
-            int multiplier = 1;
-            if ("Mingguan".equals(item.getDurationType())) multiplier = 7;
-            else if ("Bulanan".equals(item.getDurationType())) multiplier = 30;
-            tempSubTotal += (long) item.getPrice() * item.getQuantity() * item.getDurationValue() * multiplier;
+            long duration = item.getDurationValue() > 0 ? item.getDurationValue() : 1;
+            tempSubTotal += (long) item.getPrice() * item.getQuantity() * duration;
         }
         subTotal.setValue(tempSubTotal);
 
@@ -119,6 +114,8 @@ public class CheckoutViewModel extends ViewModel {
         List<CartItem> items = checkoutList.getValue();
         DeliveryAddress address = selectedAddress.getValue();
 
+        String buyerName = currentBuyerName.getValue() != null ? currentBuyerName.getValue() : "Pelanggan";
+
         if (userId == null || items == null || items.isEmpty() || address == null) {
             errorMessage.setValue("Data pesanan tidak lengkap! Pastikan alamat dipilih.");
             return;
@@ -130,7 +127,7 @@ public class CheckoutViewModel extends ViewModel {
 
         isLoading.setValue(true);
 
-        repo.processCheckout(items, userId, address, paymentMethod, isDirectBuy, new CheckoutRepository.ActionCallback() {
+        repo.processCheckout(items, userId, buyerName, address, paymentMethod, isDirectBuy, new CheckoutRepository.ActionCallback() {
             @Override
             public void onSuccess(String orderId) {
                 if (paymentMethod.equals("COD")) {

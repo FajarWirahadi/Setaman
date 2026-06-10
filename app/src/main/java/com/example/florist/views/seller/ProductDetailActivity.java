@@ -1,16 +1,14 @@
 package com.example.florist.views.seller;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.viewpager2.widget.ViewPager2;
-
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.example.florist.R;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager2.widget.ViewPager2;
+
 import com.example.florist.databinding.ActivityProductDetailBinding;
 import com.example.florist.model.Product;
 
-import java.text.Format;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;

@@ -21,12 +21,12 @@
             android:src="@drawable/ic_back" />
 
         <TextView
+            style="@style/title_md_bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="Pusat Resolusi Komplain"
-            android:textColor="@color/black"
-            style="@style/title_lg_bold" />
+            android:textColor="@color/black" />
     </RelativeLayout>
 
     <ProgressBar

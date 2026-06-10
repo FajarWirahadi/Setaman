@@ -64,8 +64,8 @@
 
         <ImageView
             android:id="@+id/imgOrderProduct"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:scaleType="centerCrop"
             android:background="@drawable/rounded_gray_layout"
             android:clipToOutline="true"/>
@@ -86,23 +86,42 @@
                 android:ellipsize="end"/>
 
             <TextView
-                android:id="@+id/tvOrderQty"
+                android:id="@+id/tvDuration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1 barang"
+                android:text="Durasi : 1 bulan"
                 android:textColor="@color/gray_500"
                 style="@style/label_lg_regular"
                 android:layout_below="@id/tvOrderProductName"/>
 
             <TextView
-                android:id="@+id/tvMoreItems"
+                android:id="@+id/tvDurationPrice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="+ 2 produk lainnya"
-                android:textSize="12sp"
-                android:textColor="@color/gray_700"
-                android:layout_alignParentBottom="true"
-                android:visibility="gone"/> </RelativeLayout>
+                android:text="Harga Perhari : Rp 2.500"
+                android:textColor="@color/gray_500"
+                style="@style/label_lg_regular"
+                android:layout_below="@id/tvDuration"/>
+
+            <TextView
+                android:id="@+id/tvTotalPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rp 75.000"
+                android:textColor="@color/text_primary"
+                style="@style/body_md_medium"
+                android:layout_below="@id/tvDurationPrice"/>
+
+            <TextView
+                android:id="@+id/tvOrderQty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="x1"
+                android:textColor="@color/text_primary"
+                style="@style/body_md_medium"
+                android:layout_alignParentEnd="true"/>
+
+        </RelativeLayout>
     </LinearLayout>
 
     <View
@@ -137,17 +156,37 @@
                 style="@style/title_md_bold"/>
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btnOrderAction"
+
+
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:text="Lihat Detail"
-            android:textSize="12sp"
-            android:textColor="@color/white"
-            android:background="@drawable/rounded_success_button"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:paddingHorizontal="16dp"
-            android:textAllCaps="false"/>
-    </RelativeLayout>
+            android:layout_centerVertical="true">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnReviewAction"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Beri Ulasan"
+                android:textSize="12sp"
+                android:textColor="@color/white"
+                android:background="@drawable/rounded_success_button"
+                android:paddingHorizontal="16dp"
+                android:textAllCaps="false"
+                android:layout_marginEnd="8dp"
+                android:visibility="visible"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnOrderAction"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Lihat Detail"
+                android:textSize="12sp"
+                android:textColor="@color/text_success"
+                android:background="@drawable/rounded_white_button"
+                android:paddingHorizontal="16dp"
+                android:textAllCaps="false"/>
+        </LinearLayout>    </RelativeLayout>
 </LinearLayout>

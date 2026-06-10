@@ -1,7 +1,6 @@
 package com.example.florist.adapter;
 
 import android.content.Context;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,6 @@ import com.example.florist.R;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 

@@ -1,25 +1,20 @@
 package com.example.florist.views;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-
 import android.text.InputType;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.example.florist.R;
 import com.example.florist.databinding.ActivityLoginBinding;
-
 import com.example.florist.viewmodels.AuthViewModel;
 import com.example.florist.views.homepage.HomepageActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -56,7 +51,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void setupGoogleSignIn() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id)) // Pastikan ini tidak merah
+                .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
 
@@ -70,13 +65,10 @@ public class LoginActivity extends AppCompatActivity {
                     Intent data = result.getData();
                     Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
                     try {
-                        // Google Sign In berhasil, ambil akunnya
                         GoogleSignInAccount account = task.getResult(ApiException.class);
 
-                        // Ambil ID Token dari akun tersebut
                         String idToken = account.getIdToken();
 
-                        // Kirim Token ke ViewModel untuk ditukar jadi akun Firebase
                         authViewModel.loginWithGoogle(idToken);
 
                     } catch (ApiException e) {
@@ -108,12 +100,10 @@ public class LoginActivity extends AppCompatActivity {
         authViewModel.getErrorMessage().observe(this, errorMsg -> {
             if (errorMsg != null) {
                 if (errorMsg.equals("USER_NOT_FOUND")) {
-                    // KASUS KHUSUS: Akun belum terdaftar
                     showRegisterSnackbar();
                 } else if (errorMsg.equals("PASSWORD_WRONG")) {
                     Toast.makeText(this, "Kata sandi salah, silakan coba lagi.", Toast.LENGTH_SHORT).show();
                 } else {
-                    // Error umum lainnya
                     Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
                 }
             }
@@ -154,7 +144,7 @@ public class LoginActivity extends AppCompatActivity {
 
         binding.tvShowPassword.setOnClickListener(v -> {
             if(isPasswordVisible) {
-                String pass = binding.etPassword.toString();
+                String pass = binding.etPassword.getText().toString();
                 binding.etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
                 binding.etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
                 binding.etPassword.setText(pass);
@@ -172,8 +162,8 @@ public class LoginActivity extends AppCompatActivity {
 
 
         ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("Please Wait..");
-        progressDialog.setMessage("Loging to your account");
+        progressDialog.setTitle("Mohon tunggu");
+        progressDialog.setMessage("Masuk ke akun anda");
         progressDialog.setCancelable(false);
 
 
@@ -182,11 +172,10 @@ public class LoginActivity extends AppCompatActivity {
     private void showRegisterSnackbar() {
         Snackbar.make(binding.getRoot(), "Akun belum terdaftar.", Snackbar.LENGTH_LONG)
                 .setAction("DAFTAR SEKARANG", v -> {
-                    // Aksi jika tombol dipencet: Pindah ke RegisterActivity
                     Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
                     startActivity(intent);
                 })
-                .setActionTextColor(getResources().getColor(android.R.color.holo_green_light)) // Ganti warna teks tombol jika mau
+                .setActionTextColor(getResources().getColor(android.R.color.holo_green_light))
                 .show();
     }
 

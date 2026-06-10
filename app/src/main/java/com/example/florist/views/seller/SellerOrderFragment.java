@@ -17,8 +17,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.florist.R;
 import com.example.florist.adapter.SellerOrderAdapter;
+import com.example.florist.databinding.DialogUpdateDeliveryBinding;
 import com.example.florist.databinding.FragmentSellerOrderBinding;
 import com.example.florist.model.Order;
+import com.example.florist.viewmodels.SellerDeliveryViewModel;
 import com.example.florist.viewmodels.SellerOrderViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
@@ -26,6 +28,7 @@ public class SellerOrderFragment extends Fragment {
     private FragmentSellerOrderBinding binding;
     private SellerOrderAdapter adapter;
     private SellerOrderViewModel viewModel;
+    private SellerDeliveryViewModel deliveryViewModel;
     private String orderStatus;
 
     public static SellerOrderFragment newInstance(String status) {
@@ -54,13 +57,12 @@ public class SellerOrderFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         viewModel = new ViewModelProvider(this).get(SellerOrderViewModel.class);
+        deliveryViewModel = new ViewModelProvider(this).get(SellerDeliveryViewModel.class);
 
         setupRecyclerView();
         setupObservers();
 
         viewModel.fetchSellerOrders(orderStatus);
-
-
     }
 
 
@@ -76,9 +78,43 @@ public class SellerOrderFragment extends Fragment {
             public void onRejectClicked(Order order) {
                 showRejectDialog(order);
             }
+
+            @Override
+            public void onUpdateDeliveryClicked(Order order) {
+                showUpdateDeliveryDialog(order.getOrderId());
+            }
         });
+
+
         binding.rvOrders.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvOrders.setAdapter(adapter);
+    }
+
+    private void showUpdateDeliveryDialog(String orderId) {
+        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
+        DialogUpdateDeliveryBinding dialogBinding = DialogUpdateDeliveryBinding.inflate(getLayoutInflater());
+        dialog.setContentView(dialogBinding.getRoot());
+
+        dialogBinding.btnSubmitDelivery.setOnClickListener(v -> {
+            int selectedId = dialogBinding.rgDeliveryStatus.getCheckedRadioButtonId();
+
+            if (selectedId == -1) {
+                Toast.makeText(requireContext(), "Silakan pilih tahapan terlebih dahulu!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            dialogBinding.btnSubmitDelivery.setEnabled(false);
+            dialogBinding.btnSubmitDelivery.setText("Menyimpan...");
+
+            RadioButton selectedRadioButton = dialogBinding.getRoot().findViewById(selectedId);
+            String statusTitle = selectedRadioButton.getText().toString();
+            String note = dialogBinding.etDeliveryNote.getText().toString().trim();
+
+            deliveryViewModel.addDeliveryLog(orderId, statusTitle, note);
+            dialog.dismiss();
+        });
+
+        dialog.show();
     }
 
     private void showRejectDialog(Order order) {
@@ -128,6 +164,19 @@ public class SellerOrderFragment extends Fragment {
         });
 
         viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
+            if (error != null) {
+                Toast.makeText(requireContext(), "Error: " + error, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        deliveryViewModel.getIsSuccess().observe(getViewLifecycleOwner(), isSuccess -> {
+            if (isSuccess != null && isSuccess) {
+                Toast.makeText(requireContext(), "Status pengantaran berhasil diupdate!", Toast.LENGTH_SHORT).show();
+                viewModel.fetchSellerOrders(orderStatus);
+            }
+        });
+
+        deliveryViewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
             if (error != null) {
                 Toast.makeText(requireContext(), "Error: " + error, Toast.LENGTH_SHORT).show();
             }

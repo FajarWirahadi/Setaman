@@ -2,12 +2,15 @@ package com.example.florist.views.seller.addproduct;
 
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.florist.R;
 import com.example.florist.adapter.CategoryAdapter;
 import com.example.florist.model.Category;
+
 import java.util.ArrayList;
 import java.util.List;
 

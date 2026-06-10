@@ -1,6 +1,8 @@
 package com.example.florist.adapter;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,9 +26,11 @@ public class SellerOrderAdapter extends RecyclerView.Adapter<SellerOrderAdapter.
     private final Context context;
     private final List<Order> orderList = new ArrayList<>();
     private final OnOrderActionListener actionListener;
+
     public interface OnOrderActionListener {
         void onAcceptClicked(Order order);
         void onRejectClicked(Order order);
+        void onUpdateDeliveryClicked(Order order);
     }
 
     public SellerOrderAdapter(Context context, OnOrderActionListener actionListener) {
@@ -79,7 +83,7 @@ public class SellerOrderAdapter extends RecyclerView.Adapter<SellerOrderAdapter.
             holder.binding.tvDurationPrice.setText(prefixHarga + " : " + formatRupiah.format(firstItem.getPrice()));
 
             double itemSubTotal = firstItem.getPrice() * firstItem.getQuantity() * firstItem.getDurationValue();
-            holder.binding.tvTotalPrice.setText(formatRupiah.format(itemSubTotal));
+            holder.binding.tvTotalPrice.setText(formatRupiah.format(order.getTotalAmount()));
 
             holder.binding.tvOrderQty.setText("x" + firstItem.getQuantity());
 
@@ -112,6 +116,9 @@ public class SellerOrderAdapter extends RecyclerView.Adapter<SellerOrderAdapter.
                 holder.binding.btnOrderAction.setVisibility(View.VISIBLE);
                 holder.binding.btnOrderAction.setText("Kirim Pesanan");
                 holder.binding.btnOrderAction.setBackgroundTintList(context.getResources().getColorStateList(R.color.gray_900));
+                holder.binding.tvOrderStatus.setText("Diproses");
+                holder.binding.tvOrderStatus.setTextColor(Color.parseColor("#F57C00"));
+                holder.binding.tvOrderStatus.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FFF3E0")));
                 holder.binding.btnOrderAction.setOnClickListener(v -> actionListener.onAcceptClicked(order));
                 break;
 

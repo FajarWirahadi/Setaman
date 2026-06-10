@@ -7,7 +7,8 @@ public class Complaint {
     private String reason;
     private String description;
     private String evidenceImageUrl;
-    private String status; //"Pending", "Investigating", "Resolved"
+    private String sellerImageUrl;
+    private String status;
     private Timestamp createdAt;
     private String sellerResponseText = null;
     private String buyerResponseText = null;
@@ -57,6 +58,14 @@ public class Complaint {
 
     public void setEvidenceImageUrl(String evidenceImageUrl) {
         this.evidenceImageUrl = evidenceImageUrl;
+    }
+
+    public String getSellerImageUrl() {
+        return sellerImageUrl;
+    }
+
+    public void setSellerImageUrl(String sellerImageUrl) {
+        this.sellerImageUrl = sellerImageUrl;
     }
 
     public String getStatus() {

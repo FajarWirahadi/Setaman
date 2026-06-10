@@ -17,7 +17,6 @@ import com.example.florist.databinding.FragmentProfileBinding;
 import com.example.florist.model.User;
 import com.example.florist.viewmodels.ProfileViewModel;
 import com.example.florist.views.LoginActivity;
-import com.example.florist.views.buyer.CartActivity;
 import com.example.florist.views.buyer.MyOrdersActivity;
 import com.example.florist.views.seller.OwnerDashboardActivity;
 import com.example.florist.views.seller.createshop.ShopIntroActivity;
@@ -28,7 +27,13 @@ public class ProfileFragment extends Fragment {
     private FragmentProfileBinding binding;
     private ProfileViewModel viewModel;
 
-    // WAJIB KOSONG. Fragment butuh konstruktor kosong.
+    private final androidx.activity.result.ActivityResultLauncher<androidx.activity.result.PickVisualMediaRequest> pickProfileImage =
+            registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia(), uri -> {
+                if (uri != null) {
+                    viewModel.updateProfileImage(uri);
+                }
+            });
+
     public ProfileFragment() {}
 
     @Override
@@ -80,7 +85,6 @@ public class ProfileFragment extends Fragment {
         });
 
         viewModel.getCountUnpaid().observe(getViewLifecycleOwner(), count -> {
-            // PERTAHANAN BERLAPIS: Pastikan tidak null sebelum digunakan!
             if (count != null && count > 0) {
                 binding.badgeUnpaid.setVisibility(View.VISIBLE);
                 binding.badgeUnpaid.setText(count > 99 ? "99+" : String.valueOf(count));
@@ -147,6 +151,18 @@ public class ProfileFragment extends Fragment {
             startActivity(new Intent(requireContext(), MyOrdersActivity.class));
         });
 
+        binding.imgProfile.setOnClickListener(v -> {
+            pickProfileImage.launch(new androidx.activity.result.PickVisualMediaRequest.Builder()
+                    .setMediaType(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                    .build());
+        });
+
+        binding.myAccount.btnEditProfileAcc.setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), EditProfileActivity.class);
+            intent.putExtra("EXTRA_USERNAME", binding.tvUsername.getText().toString());
+            startActivity(intent);
+        });
+
         binding.menuUnpaid.setOnClickListener(v -> openMyOrdersAtTab(0));
         binding.menuProcessing.setOnClickListener(v -> openMyOrdersAtTab(0));
         binding.menuShipped.setOnClickListener(v -> openMyOrdersAtTab(0));
@@ -164,6 +180,14 @@ public class ProfileFragment extends Fragment {
     private void updateUi(User user) {
         binding.tvUsername.setText(user.getUsername());
         binding.tvUserId.setText("ID : " + user.getUserId());
+
+        if (user.getProfileImageUrl() != null && !user.getProfileImageUrl().isEmpty()) {
+            com.bumptech.glide.Glide.with(requireContext())
+                    .load(user.getProfileImageUrl())
+                    .placeholder(R.drawable.ic_person)
+                    .circleCrop()
+                    .into(binding.imgProfile);
+        }
 
         if (user.isHasShop()) {
             binding.tvShopName.setText("Memuat data toko...");
@@ -190,6 +214,8 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+
+
     private void logoutAndRedirect() {
         Intent intent = new Intent(requireContext(), OnboardingActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -197,10 +223,11 @@ public class ProfileFragment extends Fragment {
         requireActivity().finish();
     }
 
+
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // MENCEGAH MEMORY LEAK
         binding = null;
     }
 }

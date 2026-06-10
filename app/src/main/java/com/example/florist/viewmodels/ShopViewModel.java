@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.florist.model.ShopRepository;
+import com.example.florist.repository.ShopRepository;
 
 public class ShopViewModel extends ViewModel {
     private ShopRepository shopRepository;

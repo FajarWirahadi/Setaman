@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.florist.model.AuthRepository;
-import com.example.florist.model.Order;
+import com.example.florist.repository.AuthRepository;
+import com.example.florist.model.Rental; // KITA PAKAI RENTAL SEKARANG
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -17,15 +17,14 @@ public class SellerComplaintViewModel extends ViewModel {
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final AuthRepository authRepository = AuthRepository.getInstance();
-
-    private final MutableLiveData<List<Order>> complaintOrders = new MutableLiveData<>();
+    private final MutableLiveData<List<Rental>> complaintRentals = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> isSessionExpired = new MutableLiveData<>(); // LiveData Sesi
+    private final MutableLiveData<Boolean> isSessionExpired = new MutableLiveData<>();
 
     private ListenerRegistration listenerRegistration;
 
-    public LiveData<List<Order>> getComplaintOrders() { return complaintOrders; }
+    public LiveData<List<Rental>> getComplaintRentals() { return complaintRentals; }
     public LiveData<Boolean> getIsLoading() { return isLoading; }
     public LiveData<String> getErrorMessage() { return errorMessage; }
     public LiveData<Boolean> getIsSessionExpired() { return isSessionExpired; }
@@ -44,9 +43,10 @@ public class SellerComplaintViewModel extends ViewModel {
             listenerRegistration.remove();
         }
 
-        listenerRegistration = db.collection("orders")
+        // BACA DARI KOLEKSI RENTALS, BUKAN ORDERS!
+        listenerRegistration = db.collection("rentals")
                 .whereEqualTo("sellerId", sellerId)
-                .whereEqualTo("status", "Komplain")
+                .whereEqualTo("hasComplaint", true)
                 .addSnapshotListener((value, error) -> {
                     isLoading.setValue(false);
 
@@ -56,14 +56,14 @@ public class SellerComplaintViewModel extends ViewModel {
                     }
 
                     if (value != null) {
-                        List<Order> orders = new ArrayList<>();
+                        List<Rental> rentals = new ArrayList<>();
                         for (com.google.firebase.firestore.DocumentSnapshot doc : value) {
-                            Order order = doc.toObject(Order.class);
-                            if (order != null) {
-                                orders.add(order);
+                            Rental rental = doc.toObject(Rental.class);
+                            if (rental != null) {
+                                rentals.add(rental);
                             }
                         }
-                        complaintOrders.setValue(orders);
+                        complaintRentals.setValue(rentals);
                     }
                 });
     }

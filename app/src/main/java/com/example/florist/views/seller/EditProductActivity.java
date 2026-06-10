@@ -1,12 +1,5 @@
 package com.example.florist.views.seller;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.PickVisualMediaRequest;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -17,15 +10,22 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
+
 import com.example.florist.R;
+import com.example.florist.adapter.MediaAdapter;
 import com.example.florist.databinding.ActivityEditProductBinding;
 import com.example.florist.model.Product;
+import com.example.florist.utils.DurationBottomSheetFragment;
 import com.example.florist.utils.InputCounterHelper;
 import com.example.florist.viewmodels.MediaViewModel;
 import com.example.florist.viewmodels.ProductFormViewModel;
 import com.example.florist.viewmodels.ProductViewModel;
-import com.example.florist.utils.DurationBottomSheetFragment;
-import com.example.florist.adapter.MediaAdapter;
 import com.example.florist.views.seller.addproduct.MediaPreviewActivity;
 import com.example.florist.views.seller.addproduct.SelectCategoryActivity;
 

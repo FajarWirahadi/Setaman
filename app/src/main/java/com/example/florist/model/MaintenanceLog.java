@@ -11,8 +11,8 @@ public class MaintenanceLog {
     public MaintenanceLog() {
     }
 
-    public MaintenanceLog(String logID, String description, String imageUrl, Timestamp createdAt) {
-        this.logId = logID;
+    public MaintenanceLog(String logId, String description, String imageUrl, Timestamp createdAt) {
+        this.logId = logId;
         this.description = description;
         this.imageUrl = imageUrl;
         this.createdAt = createdAt;
@@ -22,8 +22,8 @@ public class MaintenanceLog {
         return logId;
     }
 
-    public void setLogID(String logID) {
-        this.logId = logID;
+    public void setLogId(String logId) {
+        this.logId = logId;
     }
 
     public String getDescription() {

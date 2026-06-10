@@ -10,6 +10,8 @@ public class User implements Serializable {
     private String phoneNumber;
     private boolean hasShop;
     private String address;
+    private String profileImageUrl;
+
 
     public User() {
     }
@@ -76,5 +78,13 @@ public class User implements Serializable {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 }

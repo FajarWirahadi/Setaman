@@ -9,7 +9,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.florist.model.MediaRepository;
+import com.example.florist.repository.MediaRepository;
 import com.zhihu.matisse.Matisse;
 
 import java.util.List;

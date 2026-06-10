@@ -44,7 +44,6 @@
         android:background="@drawable/rounded_gray_layout"
         android:src="@drawable/ic_camera_add"
         android:scaleType="fitCenter"
-        app:tint="@color/main_color"
         android:layout_marginBottom="16dp"/>
 
     <TextView

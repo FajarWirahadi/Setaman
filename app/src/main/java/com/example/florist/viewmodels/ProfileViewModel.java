@@ -1,16 +1,15 @@
 package com.example.florist.viewmodels;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.florist.model.AuthRepository;
 import com.example.florist.model.Shop;
-import com.example.florist.model.ShopRepository;
 import com.example.florist.model.User;
+import com.example.florist.repository.AuthRepository;
+import com.example.florist.repository.ShopRepository;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.AggregateSource;
@@ -27,6 +26,7 @@ public class ProfileViewModel extends ViewModel {
 
     private MutableLiveData<User> userProfile = new MutableLiveData<User>();
     private MutableLiveData<Shop> shopProfile = new MutableLiveData<Shop>();
+    private MutableLiveData<Boolean> isUpdateSuccess = new MutableLiveData<>();
     private MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     private MutableLiveData<Boolean> navigateToOnboarding = new MutableLiveData<>();
@@ -47,7 +47,7 @@ public class ProfileViewModel extends ViewModel {
         return userProfile;
     }
     public LiveData<Shop> getShopProfile() { return shopProfile;}
-
+    public LiveData<Boolean> getIsUpdateSuccess() {return isUpdateSuccess;}
     public LiveData<String> getErrorMessage() {
         return errorMessage;
     }
@@ -176,7 +176,23 @@ public class ProfileViewModel extends ViewModel {
         });
     }
 
-    // Panggil ini jika user menekan tombol "Saya sudah verifikasi" (Refresh status)
+    public void updateProfileImage(android.net.Uri imageUri) {
+        isLoading.setValue(true);
+
+        authRepository.updateUserProfileImage(imageUri, new AuthRepository.UpdateProfileCallback() {
+            @Override
+            public void onSuccess(String newImageUrl) {
+                isLoading.setValue(false);
+                loadUserProfile();
+            }
+            @Override
+            public void onError(String message) {
+                isLoading.setValue(false);
+                errorMessage.setValue(message);
+            }
+        });
+    }
+
     public void refreshUserStatus() {
         isLoading.setValue(true);
         authRepository.reloadUser(new AuthRepository.AuthCallback() {
@@ -197,6 +213,28 @@ public class ProfileViewModel extends ViewModel {
                 errorMessage.setValue("Data profil tidak ditemukan. Silakan login ulang.");
             }
         });
+    }
+
+    public void updateProfileData(String newName, String newPhone) {
+        isLoading.setValue(true);
+
+        authRepository.updateUserData(newName, newPhone, new AuthRepository.UpdateDataCallback() {
+            @Override
+            public void onSuccess() {
+                isLoading.setValue(false);
+                isUpdateSuccess.setValue(true);
+                loadUserProfile();
+            }
+
+            @Override
+            public void onError(String message) {
+                isLoading.setValue(false);
+                errorMessage.setValue("Gagal menyimpan: " + message);
+            }
+        });
+    }
+    public void resetUpdateStatus() {
+        isUpdateSuccess.setValue(false);
     }
 
     public void logout(Context context){

@@ -102,7 +102,7 @@ exports.midtransWebhook = functions
                     });
                     
 
-                    await sendNotificationToSeller(orderData);
+                    await sendNotificationToSeller(orderData, orderId);
                 }
             } else if (transactionStatus === 'cancel' || transactionStatus === 'deny' || transactionStatus === 'expire') {
                 await orderRef.update({ status: 'Dibatalkan' });
@@ -155,17 +155,65 @@ exports.handleOrderRejected = functions
         return null;
     });
 
-async function sendNotificationToSeller(orderData) {
+    // ============================================================================
+// FUNGSI: MENGHITUNG RATA-RATA RATING PRODUK SECARA OTOMATIS
+// ============================================================================
+exports.calculateProductAverageRating = functions
+    .region("asia-southeast2")
+    .firestore
+    .document("products/{productId}/reviews/{reviewId}")
+    .onWrite(async (change, context) => {
+        const productId = context.params.productId;
+        
+        const reviewsRef = db.collection("products").doc(productId).collection("reviews");
+
+        try {
+            const snapshot = await reviewsRef.get();
+            let totalRating = 0;
+            let reviewCount = snapshot.size;
+
+           
+            if (reviewCount === 0) {
+                await db.collection("products").doc(productId).update({
+                    rating: 0,
+                    reviewCount: 0
+                });
+                console.log(`Produk ${productId} sekarang tidak memiliki ulasan (0).`);
+                return null;
+            }
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+            
+                totalRating += (typeof data.rating === 'number' ? data.rating : 0);
+            });
+
+            const averageRating = totalRating / reviewCount;
+
+        
+            await db.collection("products").doc(productId).update({
+                rating: Number(averageRating.toFixed(1)), 
+                reviewCount: reviewCount
+            });
+
+            console.log(`Berhasil update rating Produk ${productId} -> Rata-rata: ${averageRating.toFixed(1)} dari ${reviewCount} ulasan.`);
+            return null;
+
+        } catch (error) {
+            console.error(`Gagal menghitung rating untuk produk ${productId}:`, error);
+            return null;
+        }
+    });
+
+async function sendNotificationToSeller(orderData, orderId) {
     const sellerId = orderData.sellerId;
     
     if (!sellerId) return console.log("Gagal Notif: ID Penjual tidak ditemukan di data order.");
 
     const userDoc = await db.collection("users").doc(sellerId).get();
-    
     if (!userDoc.exists) return console.log("Gagal Notif: Data Penjual tidak ditemukan.");
     
     const fcmToken = userDoc.data().fcmToken;
-
     if (!fcmToken) return console.log("Gagal Notif: Penjual belum mendaftarkan Token FCM.");
 
     const payload = {
@@ -173,6 +221,12 @@ async function sendNotificationToSeller(orderData) {
             title: "Pesanan Baru Lunas! 💸🌸",
             body: `Cek toko sekarang! Ada pesanan lunas dari ${orderData.buyerName || 'pelanggan'}. Segera proses dan siapkan tanamannya!`
         },
+
+        data: {
+            type: "new_order",
+            orderId: String(orderId) 
+        },
+   
         token: fcmToken
     };
 
@@ -183,3 +237,122 @@ async function sendNotificationToSeller(orderData) {
         console.error("FCM Gagal: Error saat mengirim notifikasi:", error);
     }
 }
+exports.notifyBuyerOnDeliveryUpdate = functions
+    .region("asia-southeast2")
+    .firestore
+    .document("orders/{orderId}/delivery_logs/{logId}")
+    .onCreate(async (snapshot, context) => {
+        const logData = snapshot.data();
+        const orderId = context.params.orderId;
+
+        console.log(`Mendeteksi update pengantaran baru untuk Order: ${orderId}`);
+
+        try {
+            const orderDoc = await db.collection("orders").doc(orderId).get();
+            if (!orderDoc.exists) {
+                console.log("Gagal Notif: Dokumen order tidak ditemukan.");
+                return null;
+            }
+            
+            const buyerId = orderDoc.data().buyerId;
+            if (!buyerId) {
+                console.log("Gagal Notif: Order tidak memiliki buyerId.");
+                return null;
+            }
+
+            // 2. Ambil data User (Pembeli) untuk mendapatkan FCM Token
+            const userDoc = await db.collection("users").doc(buyerId).get();
+            if (!userDoc.exists) {
+                console.log("Gagal Notif: Data pembeli tidak ditemukan di database.");
+                return null;
+            }
+
+            const fcmToken = userDoc.data().fcmToken;
+            if (!fcmToken) {
+                console.log(`Gagal Notif: Pembeli (${buyerId}) belum mendaftarkan Token FCM.`);
+                return null;
+            }
+
+            const bodyText = (logData.description && logData.description.trim() !== "") 
+                             ? logData.description 
+                             : `Pesananmu memasuki tahap: ${logData.statusTitle}. Buka aplikasi untuk melacak!`;
+
+            const payload = {
+                notification: {
+                    title: `Update Pengantaran: ${logData.statusTitle} 🚚`,
+                    body: bodyText
+                },
+                data: {
+                    type: "delivery_update",
+                    orderId: String(orderId)
+                },
+                token: fcmToken
+            };
+
+            const response = await admin.messaging().send(payload);
+            console.log("Notifikasi Berhasil: Notifikasi update pengantaran terkirim ke Pembeli.", response);
+            return null;
+
+        } catch (error) {
+            console.error("Notifikasi Error: Terjadi kesalahan saat memproses notifikasi pembeli:", error);
+            return null;
+        }
+    });
+
+    exports.sendChatNotification = functions.region('asia-southeast2').firestore
+    .document('chat_rooms/{roomId}/messages/{messageId}')
+    .onCreate(async (snap, context) => {
+        const messageData = snap.data();
+        const roomId = context.params.roomId;
+        const senderId = messageData.senderId;
+        const text = messageData.text;
+
+        try {
+            let senderName = "Pengguna Setaman";
+            
+            const shopDoc = await admin.firestore().collection('shops').doc(senderId).get();
+            if (shopDoc.exists) {
+                senderName = shopDoc.data().shopName || "Penjual";
+            } else {
+                const userDoc = await admin.firestore().collection('users').doc(senderId).get();
+                if (userDoc.exists) {
+                    senderName = userDoc.data().username || userDoc.data().name || "Pembeli";
+                }
+            }
+
+            const roomDoc = await admin.firestore().collection('chat_rooms').doc(roomId).get();
+            if (!roomDoc.exists) return null;
+            const roomData = roomDoc.data();
+
+            const receiverId = (senderId === roomData.buyerId) ? roomData.sellerId : roomData.buyerId;
+        
+            const userDocReceiver = await admin.firestore().collection('users').doc(receiverId).get();
+            if (!userDocReceiver.exists) return null;
+            
+            const fcmToken = userDocReceiver.data().fcmToken;
+            if (!fcmToken) return null;
+
+        
+            const message = {
+                notification: {
+                    title: senderName,
+                    body: text
+                },
+                data: {
+                    type: "chat",
+                    roomId: roomId,
+                    targetId: senderId,      
+                    targetName: senderName   
+                },
+                token: fcmToken
+            };
+
+            const response = await admin.messaging().send(message);
+            console.log('Notifikasi chat berhasil dikirim:', response);
+            return null;
+
+        } catch (error) {
+            console.error('Gagal memproses notifikasi chat:', error);
+            return null;
+        }
+    });

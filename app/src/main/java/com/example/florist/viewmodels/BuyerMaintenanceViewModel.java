@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.florist.model.BuyerMaintenanceRepository;
 import com.example.florist.model.MaintenanceLog;
+import com.example.florist.repository.BuyerMaintenanceRepository;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.List;
@@ -19,8 +19,8 @@ public class BuyerMaintenanceViewModel extends ViewModel {
     public LiveData<List<MaintenanceLog>> getMaintenanceLogs() { return maintenanceLogs; }
     public LiveData<String> getErrorMessage() { return errorMessage; }
 
-    public void startListening(String orderId) {
-        registration = repository.listenToMaintenanceLogs(orderId, new BuyerMaintenanceRepository.MaintenanceLogCallback() {
+    public void startListening(String rentalId) {
+        registration = repository.listenToMaintenanceLogs(rentalId, new BuyerMaintenanceRepository.MaintenanceLogCallback() {
             @Override
             public void onSuccess(List<MaintenanceLog> logs) {
                 maintenanceLogs.setValue(logs);

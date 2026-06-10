@@ -5,9 +5,9 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.florist.model.Product;
-import com.example.florist.model.ProductRepository;
 import com.example.florist.model.Shop;
-import com.example.florist.model.ShopRepository;
+import com.example.florist.repository.ProductRepository;
+import com.example.florist.repository.ShopRepository;
 
 import java.util.List;
 

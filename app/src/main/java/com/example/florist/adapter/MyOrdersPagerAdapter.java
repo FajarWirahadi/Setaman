@@ -11,8 +11,7 @@ import com.example.florist.views.buyer.OrderListFragment;
 
 public class MyOrdersPagerAdapter extends FragmentStateAdapter {
 
-    // Status persis seperti yang kita simpan di Firestore saat Checkout
-    private final String[] statuses = {"PENDING", "Menunggu Konfirmasi", "Dikirim", "Selesai", "Dibatalkan"};
+    private final String[] statuses = {"Menunggu Konfirmasi", "Diproses", "Dikirim", "Selesai", "Dibatalkan"};
 
     public MyOrdersPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
         super(fragmentActivity);
@@ -21,7 +20,6 @@ public class MyOrdersPagerAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        // Kita daur ulang 1 Fragment yang sama, tapi memberinya "KTP" status yang berbeda
         OrderListFragment fragment = new OrderListFragment();
         Bundle args = new Bundle();
         args.putString("ORDER_STATUS", statuses[position]);

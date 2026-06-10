@@ -21,7 +21,6 @@ public class SellerOrderActivity extends AppCompatActivity {
     private SellerOrderViewModel viewModel;
     private ProgressDialog progressDialog;
 
-    // Nama-nama Tab dan Status yang akan dikirim ke Fragment
     private final String[] tabTitles = new String[]{"Pesanan Baru", "Diproses", "Dikirim", "Selesai", "Dibatalkan"};
     private final String[] orderStatuses = new String[]{"Menunggu Konfirmasi", "Diproses", "Dikirim", "Selesai", "Dibatalkan"};
 

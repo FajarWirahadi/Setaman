@@ -1,14 +1,11 @@
 package com.example.florist.utils;
 
 import android.graphics.Color;
-import android.renderscript.ScriptGroup;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import com.example.florist.R;
 
 public class InputCounterHelper {
 

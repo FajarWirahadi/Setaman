@@ -1,10 +1,10 @@
 package com.example.florist.model;
 
-import java.util.Date;
 import com.google.firebase.firestore.DocumentId;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Product implements Serializable {

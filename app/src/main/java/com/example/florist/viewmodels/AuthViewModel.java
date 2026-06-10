@@ -6,8 +6,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.florist.model.AuthRepository;
 import com.example.florist.model.User;
+import com.example.florist.repository.AuthRepository;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
@@ -16,8 +16,6 @@ import com.google.firebase.auth.PhoneAuthProvider;
 public class AuthViewModel extends ViewModel {
 
     private AuthRepository authRepository;
-
-    // Livedata untuk user yang berhasil login
     private MutableLiveData<FirebaseUser> userLiveData;
     private MutableLiveData<Boolean> isLoading;
     private MutableLiveData<String> errorMessage;
@@ -58,6 +56,9 @@ public class AuthViewModel extends ViewModel {
 
     public LiveData<String> getEmailVerificationMsg() {return emailVerificationMsg;}
 
+    public String getCurrentUserId() {
+        return authRepository.getCurrentUserId();
+    }
     public void login(String email, String password) {
         if (authRepository == null) {
             authRepository = AuthRepository.getInstance();
@@ -107,13 +108,13 @@ public class AuthViewModel extends ViewModel {
             @Override
             public void onSuccess(FirebaseUser user) {
                 isLoading.setValue(false);
-                userLiveData.setValue(user);// User lama trigger ke HomepageActivity
+                userLiveData.setValue(user);
             }
 
             @Override
             public void onNewUser(FirebaseUser user) {
                 isLoading.setValue(false);
-                newGoogleUser.setValue(user);// User baru trigger ke RegisterActivity
+                newGoogleUser.setValue(user);
             }
 
             @Override
@@ -216,13 +217,13 @@ public class AuthViewModel extends ViewModel {
             @Override
             public void onSuccess(FirebaseUser user) {
                 isLoading.setValue(false);
-                userLiveData.setValue(user); // Kabari View bahwa verifikasi sukses
+                userLiveData.setValue(user);
             }
 
             @Override
             public void onError(String message) {
                 isLoading.setValue(false);
-                errorMessage.setValue(message); // Kabari View ada error (misal kode salah)
+                errorMessage.setValue(message);
             }
         });
     }
@@ -339,6 +340,13 @@ public class AuthViewModel extends ViewModel {
                 errorMessage.setValue("Gagal memuat status user: " + message);
             }
         });
+    }
+
+    public FirebaseUser getCurrentUser() {
+        if (authRepository == null) {
+            authRepository = AuthRepository.getInstance();
+        }
+        return authRepository.getCurrentUser();
     }
 
 }

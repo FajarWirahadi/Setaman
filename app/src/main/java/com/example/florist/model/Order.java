@@ -1,8 +1,8 @@
 package com.example.florist.model;
 
-import java.io.Serializable;
 import com.google.firebase.Timestamp;
-import java.util.Date;
+
+import java.io.Serializable;
 import java.util.List;
 
 public class Order implements Serializable {
@@ -17,6 +17,12 @@ public class Order implements Serializable {
     private DeliveryAddress deliveryAddress;
     private String paymentMethod;
     private String cancellationReason;
+    private boolean isReviewed = false;
+    private String orderType;
+    private Timestamp rentalStartDate;
+    private Timestamp rentalEndDate;
+    private boolean hasComplaint = false;
+
 
     public Order() {
     }
@@ -45,7 +51,6 @@ public class Order implements Serializable {
         this.paymentMethod = paymentMethod;
     }
 
-    // 2. Konstruktor Penuh
     public Order(String orderId, String buyerId, String sellerId, List<CartItem> items, double totalAmount, DeliveryAddress deliveryAddress, String paymentMethod) {
         this.orderId = orderId;
         this.buyerId = buyerId;
@@ -95,9 +100,43 @@ public class Order implements Serializable {
     public DeliveryAddress getDeliveryAddress() { return deliveryAddress; }
     public void setDeliveryAddress(DeliveryAddress deliveryAddress) { this.deliveryAddress = deliveryAddress; }
 
+    public boolean isReviewed() { return isReviewed; }
+    public void setReviewed(boolean reviewed) { isReviewed = reviewed; }
+
+    public String getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
+    }
+
+    public Timestamp getRentalStartDate() {
+        return rentalStartDate;
+    }
+
+    public void setRentalStartDate(Timestamp rentalStartDate) {
+        this.rentalStartDate = rentalStartDate;
+    }
+
+    public Timestamp getRentalEndDate() {
+        return rentalEndDate;
+    }
+
+    public void setRentalEndDate(Timestamp rentalEndDate) {
+        this.rentalEndDate = rentalEndDate;
+    }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public boolean isHasComplaint() {
+        return hasComplaint;
+    }
+
+    public void setHasComplaint(boolean hasComplaint) {
+        this.hasComplaint = hasComplaint;
+    }
 
     public String getReceiverName() {
         if (deliveryAddress != null) {

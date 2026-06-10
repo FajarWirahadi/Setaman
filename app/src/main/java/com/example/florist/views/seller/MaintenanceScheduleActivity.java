@@ -1,43 +1,49 @@
 package com.example.florist.views.seller;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.PickVisualMediaRequest;
-import androidx.activity.result.contract.ActivityResultContract;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.bumptech.glide.Glide;
-import com.example.florist.R;
+import com.example.florist.adapter.CalendarAdapter;
 import com.example.florist.adapter.MaintenanceScheduleAdapter;
 import com.example.florist.databinding.ActivityMaintenanceScheduleBinding;
 import com.example.florist.databinding.DialogAddMaintenanceLogBinding;
-import com.example.florist.model.Order;
+import com.example.florist.model.Rental;
 import com.example.florist.viewmodels.MaintenanceViewModel;
+import com.example.florist.views.chat.ChatRoomActivity;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
-import org.checkerframework.common.subtyping.qual.Bottom;
-
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MaintenanceScheduleActivity extends AppCompatActivity {
 
     private ActivityMaintenanceScheduleBinding binding;
     private MaintenanceViewModel viewModel;
     private MaintenanceScheduleAdapter adapter;
+    private CalendarAdapter calendarAdapter;
     private ProgressDialog progressDialog;
 
     private Uri selectedImageUri = null;
     private BottomSheetDialog addLogDialog;
     private DialogAddMaintenanceLogBinding dialogBinding;
+    private List<Date> dateList = new ArrayList<>();
 
     private final ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
             registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
@@ -50,9 +56,6 @@ public class MaintenanceScheduleActivity extends AppCompatActivity {
                 }
             });
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,9 +67,8 @@ public class MaintenanceScheduleActivity extends AppCompatActivity {
         setupUI();
         setupObservers();
 
-        viewModel.fetchOrdersInMaintenance();
+        viewModel.fetchSellerRentals("AKTIF");
     }
-
 
     private void setupUI() {
         binding.btnBack.setOnClickListener(v -> finish());
@@ -75,13 +77,50 @@ public class MaintenanceScheduleActivity extends AppCompatActivity {
         progressDialog.setMessage("Mengunggah laporan...");
         progressDialog.setCancelable(false);
 
-        adapter = new MaintenanceScheduleAdapter(this, this::showAddDialog);
+        adapter = new MaintenanceScheduleAdapter(this, new MaintenanceScheduleAdapter.OnMaintenanceListener() {
+            @Override
+            public void onAddLogClicked(Rental rental) {
+                showAddDialog(rental);
+            }
+
+            @Override
+            public void onCardClicked(Rental rental) {
+                Intent intent = new Intent(MaintenanceScheduleActivity.this, RentalDetailActivity.class);
+                intent.putExtra("RENTAL_ID", rental.getRentalId());
+                intent.putExtra("ORDER_ID", rental.getOrderId());
+                intent.putExtra("STORE_NAME", rental.getSellerName());
+                intent.putExtra("ROLE", "SELLER");
+                startActivity(intent);
+            }
+
+            @Override
+            public void onChatClicked(Rental rental) {
+                Intent chatIntent = new Intent(MaintenanceScheduleActivity.this, ChatRoomActivity.class);
+
+                chatIntent.putExtra("EXTRA_TARGET_ID", rental.getBuyerId());
+                chatIntent.putExtra("EXTRA_TARGET_NAME", rental.getBuyerName());
+                chatIntent.putExtra("EXTRA_TARGET_IMAGE", rental.getPlantImageUrl());
+                String quoteText = "🌿 *Jadwal Perawatan*\n\"Sewa ID: " + rental.getOrderId() + " - " + rental.getPlantName() + "\"\n";
+                chatIntent.putExtra("EXTRA_DRAFT_MESSAGE", quoteText);
+                chatIntent.putExtra("EXTRA_DRAFT_IMAGE", rental.getPlantImageUrl());
+
+                chatIntent.putExtra("EXTRA_DRAFT_REF_ID", rental.getRentalId());
+                chatIntent.putExtra("EXTRA_DRAFT_REF_TYPE", "MAINTENANCE");
+                chatIntent.putExtra("EXTRA_DRAFT_RENTAL_ID", rental.getRentalId());
+
+                startActivity(chatIntent);
+            }
+        });
+
         binding.rvMaintenanceSchedule.setLayoutManager(new LinearLayoutManager(this));
         binding.rvMaintenanceSchedule.setAdapter(adapter);
 
+        setupCalendar();
+        // binding.btnTabOngoing.setOnClickListener(v -> viewModel.fetchSellerRentals("AKTIF"));
+        // binding.btnTabHistory.setOnClickListener(v -> viewModel.fetchSellerRentals("SELESAI"));
     }
 
-    private void showAddDialog(Order order) {
+    private void showAddDialog(Rental rental) {
         addLogDialog = new BottomSheetDialog(this);
 
         dialogBinding = DialogAddMaintenanceLogBinding.inflate(getLayoutInflater());
@@ -99,30 +138,24 @@ public class MaintenanceScheduleActivity extends AppCompatActivity {
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 checkValidation();
             }
-
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
+            public void afterTextChanged(Editable editable) {}
         });
 
         dialogBinding.btnSubmitLog.setOnClickListener(v -> {
             String description = dialogBinding.etDescription.getText().toString().trim();
-            viewModel.AddMaintenance(order, selectedImageUri, description);
+            // 3. LEMPAR OBJEK RENTAL KE VIEWMODEL
+            viewModel.AddMaintenance(rental, selectedImageUri, description);
         });
         addLogDialog.show();
     }
 
     private void setupObservers() {
-        viewModel.getOrdersInMaintenance().observe(this, orders -> {
-            if (orders != null) {
-                adapter.updateList(orders);
-                updateSummary(orders);
+        viewModel.getFilteredRentals().observe(this, rentals -> {
+            if (rentals != null) {
+                adapter.updateList(rentals);
             }
         });
 
@@ -140,8 +173,8 @@ public class MaintenanceScheduleActivity extends AppCompatActivity {
 
         viewModel.getActionSuccessMessage().observe(this, message -> {
             if (message != null) {
-                Toast.makeText(this, "message", Toast.LENGTH_SHORT).show();
-                if (addLogDialog != null && !addLogDialog.isShowing()) {
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+                if (addLogDialog != null && addLogDialog.isShowing()) {
                     addLogDialog.dismiss();
                 }
                 selectedImageUri = null;
@@ -149,11 +182,11 @@ public class MaintenanceScheduleActivity extends AppCompatActivity {
         });
     }
 
-    private void updateSummary(List<Order> orders) {
-        binding.tvTotalAll.setText(String.valueOf(orders.size()));
-        binding.tvTotalFinished.setText("0");
-        binding.tvTotalOngoing.setText(String.valueOf(orders.size()));
-    }
+//    private void updateSummary(List<Rental> rentals) {
+//        binding.tvTotalAll.setText(String.valueOf(rentals.size()));
+//        binding.tvTotalFinished.setText("0"); // Anda bisa menghitung yang statusnya 'SELESAI' nanti
+//        binding.tvTotalOngoing.setText(String.valueOf(rentals.size()));
+//    }
 
     private void checkValidation() {
         if (dialogBinding != null) {
@@ -161,5 +194,28 @@ public class MaintenanceScheduleActivity extends AppCompatActivity {
             boolean isValid = (selectedImageUri != null) && (!text.isEmpty());
             dialogBinding.btnSubmitLog.setEnabled(isValid);
         }
+    }
+
+    private void setupCalendar() {
+        dateList.clear();
+        Calendar cal = Calendar.getInstance();
+        for (int i = 0; i < 14; i++) {
+            dateList.add(cal.getTime());
+            cal.add(Calendar.DAY_OF_YEAR, 1);
+        }
+        viewModel.setSelectedDate(dateList.get(0));
+
+        calendarAdapter = new CalendarAdapter(dateList, 0, new CalendarAdapter.OnDateClickListener() {
+            @Override
+            public void onDateClick(Date date) {
+                viewModel.setSelectedDate(date);
+            }
+        });
+
+        binding.rvCalendar.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        binding.rvCalendar.setAdapter(calendarAdapter);
+
+        SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM yyyy", new Locale("id", "ID"));
+        binding.tvCurrentMonth.setText(monthFormat.format(dateList.get(0)));
     }
 }

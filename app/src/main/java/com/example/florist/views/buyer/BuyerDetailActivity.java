@@ -1,10 +1,5 @@
 package com.example.florist.views.buyer;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -13,6 +8,10 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.bumptech.glide.Glide;
 import com.example.florist.R;
 import com.example.florist.adapter.BuyerImageSliderAdapter;
@@ -20,19 +19,17 @@ import com.example.florist.databinding.ActivityBuyerDetailBinding;
 import com.example.florist.databinding.DialogAddToCartBinding;
 import com.example.florist.model.CartItem;
 import com.example.florist.model.Product;
-import com.example.florist.model.Shop;
 import com.example.florist.viewmodels.BuyerDetailViewModel;
 import com.example.florist.viewmodels.CartViewModel;
+import com.example.florist.views.chat.ChatRoomActivity;
 import com.example.florist.views.homepage.ShopProfileActivity;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class BuyerDetailActivity extends AppCompatActivity {
@@ -111,32 +108,24 @@ public class BuyerDetailActivity extends AppCompatActivity {
             binding.svMainContent.setOnScrollChangeListener((androidx.core.widget.NestedScrollView.OnScrollChangeListener)
                     (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
 
-                        // Jarak guliran di mana header akan 100% putih (misal 350 pixel)
-                        // Sesuaikan angka ini dengan tinggi gambar bannermu!
                         float fadeDistance = 350f;
 
                         float percentage = scrollY / fadeDistance;
                         if (percentage > 1.0f) percentage = 1.0f;
                         if (percentage < 0.0f) percentage = 0.0f;
 
-                        // --- A. EFEK MUNCULNYA EDITTEXT ---
                         binding.etSearch.setAlpha(percentage);
-                        // Aktifkan klik jika sudah setengah muncul
                         binding.etSearch.setEnabled(percentage > 0.5f);
 
-                        // --- B. EFEK PERUBAHAN WARNA BACKGROUND HEADER ---
-                        // 255 adalah nilai Solid (tidak tembus pandang). Kita kalikan dengan persentase.
                         int alphaColor = (int) (percentage * 255);
-                        // Buat warna putih dengan tingkat transparansi dinamis
                         int dynamicWhiteColor = android.graphics.Color.argb(alphaColor, 255, 255, 255);
 
                         binding.headerLayout.setBackgroundColor(dynamicWhiteColor);
 
-                        // --- C. (OPSIONAL) EFEK BAYANGAN / ELEVASI ---
                         if (percentage >= 1.0f) {
-                            binding.headerLayout.setElevation(8f); // Beri bayangan saat solid
+                            binding.headerLayout.setElevation(8f);
                         } else {
-                            binding.headerLayout.setElevation(0f); // Hilangkan bayangan saat transparan
+                            binding.headerLayout.setElevation(0f);
                         }
                     });
         }
@@ -167,6 +156,13 @@ public class BuyerDetailActivity extends AppCompatActivity {
         binding.btnBack.setOnClickListener(v -> onBackPressed());
 
         binding.btnChat.setOnClickListener(v -> {
+            if (product != null && product.getOwnerId() != null) {
+                android.content.Intent intent = new android.content.Intent(this, ChatRoomActivity.class);
+                intent.putExtra("EXTRA_TARGET_ID", product.getOwnerId());
+                intent.putExtra("EXTRA_TARGET_NAME", binding.tvShopName.getText().toString());String targetImage = "";
+                intent.putExtra("EXTRA_TARGET_IMAGE", targetImage);
+                startActivity(intent);
+            }
             Toast.makeText(this, "Membuka obrolan dengan penjual...", Toast.LENGTH_SHORT).show();
         });
         binding.btnCart.setOnClickListener(v -> {

@@ -1,8 +1,8 @@
 package com.example.florist.views.buyer;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.florist.adapter.MyOrdersPagerAdapter;
 import com.example.florist.databinding.ActivityMyOrdersBinding;
@@ -27,7 +27,7 @@ public class MyOrdersActivity extends AppCompatActivity {
         MyOrdersPagerAdapter pagerAdapter = new MyOrdersPagerAdapter(this);
         binding.viewPagerOrders.setAdapter(pagerAdapter);
 
-        String[] tabTitles = {"Belum Bayar", "Diproses", "Dikirim", "Selesai", "Dibatalkan"};
+        String[] tabTitles = {"Menunggu", "Diproses", "Dikirim", "Selesai", "Dibatalkan"};
 
         new TabLayoutMediator(binding.tabLayoutOrders, binding.viewPagerOrders,
                 (tab, position) -> tab.setText(tabTitles[position])

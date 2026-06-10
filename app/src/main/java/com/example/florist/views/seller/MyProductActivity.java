@@ -1,24 +1,18 @@
 package com.example.florist.views.seller;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.example.florist.adapter.ProductPagerAdapter;
 import com.example.florist.databinding.ActivityMyProductBinding;
 import com.example.florist.model.Product;
-import com.example.florist.adapter.ProductAdapter;
 import com.example.florist.viewmodels.MyProductViewModel;
-import com.google.android.material.tabs.TabLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;

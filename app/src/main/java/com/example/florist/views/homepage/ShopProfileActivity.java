@@ -10,20 +10,22 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.bumptech.glide.Glide;
 import com.example.florist.R;
 import com.example.florist.databinding.ActivityShopProfileBinding;
+import com.example.florist.model.Product;
 import com.example.florist.viewmodels.CartViewModel;
 import com.example.florist.viewmodels.ShopProfileViewModel;
 import com.example.florist.views.buyer.CartActivity;
-import com.example.florist.views.homepage.ShopProductFragment;
+import com.example.florist.views.chat.ChatRoomActivity;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 public class ShopProfileActivity extends AppCompatActivity {
+
+    private Product product;
 
     private ActivityShopProfileBinding binding;
     private ShopProfileViewModel viewModel;
@@ -40,6 +42,8 @@ public class ShopProfileActivity extends AppCompatActivity {
         cartViewModel = new ViewModelProvider(this).get(CartViewModel.class);
 
         String shopId = getIntent().getStringExtra("EXTRA_SHOP_ID");
+        product = (Product) getIntent().getSerializableExtra("EXTRA_PRODUCT");
+
 
         if (shopId == null || shopId.isEmpty()) {
             Toast.makeText(this, "Data toko tidak ditemukan", Toast.LENGTH_SHORT).show();
@@ -55,8 +59,23 @@ public class ShopProfileActivity extends AppCompatActivity {
     }
 
     private void setupUI() {
+        String shopId = getIntent().getStringExtra("EXTRA_SHOP_ID");
         binding.btnBack.setOnClickListener(v -> onBackPressed());
         binding.btnCart.setOnClickListener(v -> startActivity(new Intent(this, CartActivity.class)));
+        binding.btnChat.setOnClickListener(v -> {
+            if (shopId != null && !shopId.isEmpty()) {
+                String shopName = binding.tvShopName.getText().toString();
+                Intent intent = new Intent(ShopProfileActivity.this, ChatRoomActivity.class);
+                intent.putExtra("EXTRA_TARGET_ID", shopId);
+
+                intent.putExtra("EXTRA_TARGET_NAME", shopName.isEmpty() ? "Penjual Setaman" : shopName);
+                intent.putExtra("EXTRA_TARGET_IMAGE", "");
+
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Data toko belum siap, tunggu sebentar.", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Memuat etalase...");
@@ -97,7 +116,6 @@ public class ShopProfileActivity extends AppCompatActivity {
                 binding.tvShopName.setText(shop.getShopName());
                 binding.tvShopFollowerCount.setText(shop.getShopCity() != null ? "Kota " + shop.getShopCity() : "Lokasi tidak diketahui");
 
-                // Update foto profil toko
                 if (shop.getShopImageUrl() != null && !shop.getShopImageUrl().isEmpty()) {
                     Glide.with(this)
                             .load(shop.getShopImageUrl())
@@ -141,7 +159,7 @@ public class ShopProfileActivity extends AppCompatActivity {
         @NonNull
         @Override
         public Fragment createFragment(int position) {
-            // Memanggil Fragment kloningan dengan memberikan nomor posisinya
+
             return ShopProductFragment.newInstance(position);
         }
 

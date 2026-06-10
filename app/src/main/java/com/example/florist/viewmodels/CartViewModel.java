@@ -4,10 +4,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.florist.model.AuthRepository;
 import com.example.florist.model.CartItem;
-import com.example.florist.model.CartRepository;
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.florist.repository.AuthRepository;
+import com.example.florist.repository.CartRepository;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;

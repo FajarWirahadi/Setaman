@@ -91,7 +91,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:background="@color/bg_primary"
-        android:paddingVertical="12dp">
+        android:paddingVertical="8dp">
 
         <ImageView
             android:id="@+id/imgShopProfile"
@@ -152,6 +152,7 @@
             android:orientation="horizontal">
 
             <ImageView
+                android:id="@+id/btnChat"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:background="@drawable/circle_background"
@@ -190,7 +191,7 @@
         android:id="@+id/shop_tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         android:background="@color/bg_primary"
         app:tabIndicatorColor="@color/olive_500"
         app:tabSelectedTextColor="@color/olive_500"

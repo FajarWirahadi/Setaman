@@ -4,7 +4,6 @@ import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
@@ -16,14 +15,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.florist.R;
 import com.example.florist.databinding.ActivityRegisterBinding;
-import com.example.florist.model.AuthRepository;
 import com.example.florist.model.User;
+import com.example.florist.repository.AuthRepository;
 import com.example.florist.viewmodels.AuthViewModel;
 import com.example.florist.views.homepage.HomepageActivity;
 import com.google.android.material.snackbar.Snackbar;

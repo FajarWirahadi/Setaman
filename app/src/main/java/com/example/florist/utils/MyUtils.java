@@ -7,12 +7,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Switch;
 
 import androidx.appcompat.content.res.AppCompatResources;
 
 import com.example.florist.R;
-import com.example.florist.views.RegisterPhoneActivity;
 
 public class MyUtils {
     public static class GenericTextWatcher implements TextWatcher {

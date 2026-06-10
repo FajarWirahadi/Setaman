@@ -17,7 +17,6 @@ import com.example.florist.R;
 import com.example.florist.model.Product;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 

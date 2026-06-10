@@ -7,13 +7,15 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.florist.model.Product;
-import com.example.florist.model.ProductRepository;
+import com.example.florist.repository.ProductRepository;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class ProductViewModel extends ViewModel {
     private ProductRepository repository;
     private MutableLiveData<List<Product>> allProducts = new MutableLiveData<>();
+    private MutableLiveData<HashMap<String, ProductRepository.ShopData>> shopDataMap = new MutableLiveData<>();
     private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     private MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private MutableLiveData<Boolean> isSuccess = new MutableLiveData<>();
@@ -23,6 +25,7 @@ public class ProductViewModel extends ViewModel {
     }
 
     public LiveData<List<Product>> getAllProducts() {return allProducts;}
+    public LiveData<HashMap<String, ProductRepository.ShopData>> getShopDataMap() {return shopDataMap;}
     public LiveData<Boolean> getIsLoading() {return isLoading;}
     public LiveData<String> getErrorMessage() {return errorMessage;}
     public LiveData<Boolean> getIsSuccess() {return isSuccess;}
@@ -81,6 +84,21 @@ public class ProductViewModel extends ViewModel {
             }
         });
     }
+    public void fetchShopNames() {
+        isLoading.setValue(true);
+        repository.getShopNames(new ProductRepository.ShopNamesCallback() {
+            @Override
+            public void onSuccess(java.util.HashMap<String, ProductRepository.ShopData> shopNames) {
+                isLoading.setValue(false);
+                shopDataMap.setValue(shopNames);
+            }
 
+            @Override
+            public void onError(String message) {
+                isLoading.setValue(false);
+                errorMessage.setValue("Gagal memuat nama toko: " + message);
+            }
+        });
+    }
 
 }

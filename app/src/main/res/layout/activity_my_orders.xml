@@ -26,12 +26,12 @@
             app:tint="@color/gray_900"/>
 
         <TextView
+            style="@style/title_md_bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:text="Pesanan Saya"
-            android:textColor="@color/gray_900"
-            style="@style/title_md_bold"
-            android:layout_centerInParent="true"/>
+            android:textColor="@color/gray_900" />
     </RelativeLayout>
 
     <com.google.android.material.tabs.TabLayout

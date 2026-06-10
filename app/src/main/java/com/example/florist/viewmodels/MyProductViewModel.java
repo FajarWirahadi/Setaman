@@ -3,9 +3,9 @@ package com.example.florist.viewmodels;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.florist.model.AuthRepository;
 import com.example.florist.model.Product;
-import com.example.florist.model.ProductRepository;
+import com.example.florist.repository.AuthRepository;
+import com.example.florist.repository.ProductRepository;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;

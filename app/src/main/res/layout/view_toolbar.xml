@@ -32,16 +32,16 @@
             android:textColor="@color/text_primary" />
 
         <ImageView
-            android:id="@+id/btn_message"
+            android:id="@+id/btnInbox"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_envelope"
-            android:layout_toStartOf="@id/btn_notification"
+            android:layout_toStartOf="@id/btnNotification"
             android:layout_centerVertical="true"
             android:layout_marginHorizontal="8dp"
             android:contentDescription="@string/back_button"/>
         <ImageView
-            android:id="@+id/btn_notification"
+            android:id="@+id/btnNotification"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_bell"

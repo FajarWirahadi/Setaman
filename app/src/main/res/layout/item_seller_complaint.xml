@@ -2,62 +2,191 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
     android:layout_marginVertical="8dp"
+    app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="12dp"
-    app:cardElevation="2dp"
-    app:strokeWidth="1dp"
-    app:strokeColor="#FFF0F0"
-    app:cardBackgroundColor="#FFF8F8">
+    app:cardElevation="0dp"
+    app:strokeColor="@color/gray_200"
+    app:strokeWidth="1dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="wrap_content">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <View
+            android:id="@+id/card_left_indicator"
+            android:layout_width="4dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignBottom="@+id/bottom_anchor"
+            android:background="@color/red_500" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/icon_indicator"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_toEndOf="@id/card_left_indicator"
+            app:cardBackgroundColor="@color/red_50"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/red_200"
+            app:strokeWidth="1dp">
             <TextView
-                android:id="@+id/tvOrderId"
+                android:id="@+id/tvBuyerInitial"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ID Pesanan: #12345"
-                style="@style/title_md_bold"
-                android:textColor="@color/black"/>
-            <TextView
-                android:id="@+id/tvComplaintStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:text="Butuh Tindakan"
-                android:textColor="@color/text_error"
-                style="@style/title_sm_bold"/>
-        </RelativeLayout>
+                android:layout_gravity="center"
+                android:text="P"
+                android:textColor="@color/red_600"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/tvComplaintStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignTop="@id/icon_indicator"
+            android:layout_alignBottom="@id/icon_indicator"
+            android:layout_marginEnd="16dp"
+            android:gravity="center_vertical"
+            android:textColor="@color/red_500"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            tools:text="Butuh Tindakan" />
 
         <TextView
             android:id="@+id/tvBuyerName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Pembeli: Loading..."
-            android:textColor="@color/gray_700"
-            style="@style/body_md_regular"/>
+            android:layout_alignTop="@id/icon_indicator"
+            android:layout_alignBottom="@id/icon_indicator"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:layout_toStartOf="@id/tvComplaintStatus"
+            android:layout_toEndOf="@id/icon_indicator"
+            android:gravity="center_vertical"
+            android:textColor="@color/gray_800"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            tools:text="Robert Fox" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/icon_indicator"
+            android:layout_marginTop="16dp"
+            android:layout_toEndOf="@id/card_left_indicator"
+            android:background="@color/gray_100" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/imgPlantContainer"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_below="@id/divider"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="16dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/gray_200"
+            app:strokeWidth="1dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+            <ImageView
+                android:id="@+id/imgPlant"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/gray_50"
+                android:scaleType="centerCrop" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/tvPlantName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/divider"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="16dp"
+            android:layout_toStartOf="@id/imgPlantContainer"
+            android:layout_toEndOf="@id/card_left_indicator"
+            android:textColor="@color/gray_900"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            tools:text="Tanaman Mawar Merah" />
+
+        <TextView
+            android:id="@+id/tvOrderId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvPlantName"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="16dp"
+            android:layout_toStartOf="@id/imgPlantContainer"
+            android:layout_toEndOf="@id/card_left_indicator"
+            android:textColor="@color/gray_500"
+            android:textSize="13sp"
+            tools:text="Sewa #RENTAL-123" />
+
+        <TextView
+            android:id="@+id/tvRentalDuration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvOrderId"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="16dp"
+            android:layout_toStartOf="@id/imgPlantContainer"
+            android:layout_toEndOf="@id/card_left_indicator"
+            android:textColor="@color/gray_500"
+            android:textSize="13sp"
+            tools:text="Masa Sewa: 12 Okt - 19 Okt" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRespond"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
+            android:layout_below="@id/tvRentalDuration"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="12dp"
+            android:layout_marginBottom="16dp"
+            android:layout_toEndOf="@id/card_left_indicator"
+            android:backgroundTint="@color/red_500"
             android:text="Tanggapi Komplain"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            android:backgroundTint="@color/text_error"
-            app:cornerRadius="8dp"
-            style="@style/Widget.MaterialComponents.Button"/>
-    </LinearLayout>
+            app:cornerRadius="8dp" />
+
+        <Space
+            android:id="@+id/bottom_anchor"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_below="@id/btnRespond" />
+
+        <View
+            android:id="@+id/card_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignTop="@id/card_left_indicator"
+            android:layout_alignBottom="@id/card_left_indicator"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:elevation="2dp"
+            android:focusable="true" />
+
+    </RelativeLayout>
 </com.google.android.material.card.MaterialCardView>

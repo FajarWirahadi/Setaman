@@ -1,21 +1,16 @@
 package com.example.florist.viewmodels;
 
-import android.widget.Toast;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.bumptech.glide.Glide;
-import com.example.florist.R;
 import com.example.florist.model.CartItem;
-import com.example.florist.model.CartRepository;
 import com.example.florist.model.Product;
 import com.example.florist.model.Shop;
-import com.example.florist.model.ShopRepository;
+import com.example.florist.repository.CartRepository;
+import com.example.florist.repository.ShopRepository;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Date;
 

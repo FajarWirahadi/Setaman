@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/rounded_gray_layout"> <TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Update Status Pengantaran"
+    style="@style/title_lg_bold"
+    android:textColor="@color/black"
+    android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pilih Tahapan Saat Ini *"
+        style="@style/label_lg_bold"
+        android:layout_marginBottom="12dp"/>
+
+    <RadioGroup
+        android:id="@+id/rgDeliveryStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+
+        <RadioButton
+            android:id="@+id/rbStatus1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📦 Pesanan Sedang Disiapkan"
+            style="@style/body_md_regular"
+            android:padding="14dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/rounded_gray_layout"/>
+
+        <RadioButton
+            android:id="@+id/rbStatus2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🚚 Dalam Perjalanan"
+            style="@style/body_md_regular"
+            android:padding="14dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/rounded_gray_layout"/>
+
+        <RadioButton
+            android:id="@+id/rbStatus3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📍 Tiba di Lokasi Tujuan"
+            style="@style/body_md_regular"
+            android:padding="14dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/rounded_gray_layout"/>
+
+        <RadioButton
+            android:id="@+id/rbStatus4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="✅ Pesanan Diterima Pembeli"
+            style="@style/body_md_regular"
+            android:padding="14dp"
+            android:background="@drawable/rounded_gray_layout"/>
+    </RadioGroup>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Catatan Tambahan (Opsional)"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
+
+    <EditText
+        android:id="@+id/etDeliveryNote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minLines="2"
+        android:gravity="top|start"
+        android:hint="Misal: Kurir sedang berteduh karena hujan lebat..."
+        android:padding="12dp"
+        style="@style/body_md_bold"
+        android:background="@drawable/rounded_gray_layout"
+        android:layout_marginBottom="24dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSubmitDelivery"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Simpan Pembaruan"
+        style="@style/label_lg_bold"
+        android:textColor="@color/white"
+        app:cornerRadius="8dp"
+        android:backgroundTint="@color/main_color"/> </LinearLayout>
