@@ -32,6 +32,8 @@ public class OwnerDashboardViewModel extends ViewModel {
     private MutableLiveData<Integer> countRented = new MutableLiveData<>();
     private MutableLiveData<Integer> countMaintenance = new MutableLiveData<>();
     private MutableLiveData<Integer> countComplaint = new MutableLiveData<>();
+    private MutableLiveData<Integer> countUrgentComplaint = new MutableLiveData<>(0);
+
     private MutableLiveData<Shop> shopData = new MutableLiveData<>();
     private MutableLiveData<String> updateImageSuccess = new MutableLiveData<>();
     private MutableLiveData<Integer> totalProducts = new MutableLiveData<>();
@@ -52,6 +54,7 @@ public class OwnerDashboardViewModel extends ViewModel {
     public LiveData<Integer> getCountRented() {return countRented;}
     public LiveData<Integer> getCountMaintenance() {return countMaintenance;}
     public LiveData<Integer> getCountComplaint() {return countComplaint;}
+    public LiveData<Integer> getCountUrgentComplaint() {return countUrgentComplaint;}
     public LiveData<Shop> getShopData() {return shopData;}
     public LiveData<Integer> getTotalProducts() {return totalProducts;}
     public LiveData<String> getUpdateImageSuccess() {return updateImageSuccess;}
@@ -131,17 +134,17 @@ public class OwnerDashboardViewModel extends ViewModel {
         if (user == null) return;
 
         String currentSellerId = user.getUid();
-
         firestore.collection("orders")
                 .whereEqualTo("sellerId", currentSellerId)
-                .whereEqualTo("status", "Menunggu Konfirmasi")
+                .whereEqualTo("status", "MENUNGGU KONFIRMASI")
                 .count()
                 .get(AggregateSource.SERVER).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) countUnpaid.setValue((int) task.getResult().getCount());
                 });
+
         firestore.collection("orders")
                 .whereEqualTo("sellerId", currentSellerId)
-                .whereEqualTo("status", "Diproses")
+                .whereEqualTo("status", "DIPROSES")
                 .count()
                 .get(AggregateSource.SERVER).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) countProcessing.setValue((int) task.getResult().getCount());
@@ -149,7 +152,7 @@ public class OwnerDashboardViewModel extends ViewModel {
 
         firestore.collection("orders")
                 .whereEqualTo("sellerId", currentSellerId)
-                .whereEqualTo("status", "Dikirim")
+                .whereEqualTo("status", "DIKIRIM")
                 .count()
                 .get(AggregateSource.SERVER).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) countShipped.setValue((int) task.getResult().getCount());
@@ -157,89 +160,94 @@ public class OwnerDashboardViewModel extends ViewModel {
 
         firestore.collection("orders")
                 .whereEqualTo("sellerId", currentSellerId)
-                .whereEqualTo("status", "Selesai")
+                .whereEqualTo("status", "SELESAI")
                 .count()
                 .get(AggregateSource.SERVER).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) countRented.setValue((int) task.getResult().getCount());
                 });
 
-        firestore.collection("rentals")
+        firestore.collection("complaints")
                 .whereEqualTo("sellerId", currentSellerId)
-                .whereEqualTo("status", "Dalam Perawatan")
-                .count()
-                .get(AggregateSource.SERVER).addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) countMaintenance.setValue((int) task.getResult().getCount());
-                });
-
-        firestore.collection("rentals")
-                .whereEqualTo("sellerId", currentSellerId)
-                .whereIn("status", Arrays.asList("Komplain", "PROSES PERBAIKAN"))
+                .whereIn("status", Arrays.asList("MENUNGGU RESPON", "PROSES PERBAIKAN"))
                 .count()
                 .get(AggregateSource.SERVER).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) countComplaint.setValue((int) task.getResult().getCount());
                 });
-
     }
-
     public void fetchMaintenanceAlerts() {
+        FirebaseUser user = authRepository.getCurrentUser();
+        if (user == null) return;
+
+        String currentSellerId = user.getUid();
+
         firestore.collection("rentals")
-                .whereEqualTo("status", "Sewa Aktif")
+                .whereEqualTo("sellerId", currentSellerId)
+                .whereEqualTo("status", "SEWA AKTIF")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     int todayCount = 0;
                     int overdueCount = 0;
 
-                    Calendar todayCal = java.util.Calendar.getInstance();
-                    todayCal.set(java.util.Calendar.HOUR_OF_DAY, 0);
-                    todayCal.set(java.util.Calendar.MINUTE, 0);
-                    todayCal.set(java.util.Calendar.SECOND, 0);
-                    todayCal.set(java.util.Calendar.MILLISECOND, 0);
+                    Calendar todayCal = Calendar.getInstance();
+                    todayCal.set(Calendar.HOUR_OF_DAY, 0); todayCal.set(Calendar.MINUTE, 0); todayCal.set(Calendar.SECOND, 0); todayCal.set(Calendar.MILLISECOND, 0);
                     long todayMidnight = todayCal.getTimeInMillis();
 
                     for (DocumentSnapshot doc : queryDocumentSnapshots) {
                         Timestamp startStamp = doc.getTimestamp("startDate");
+                        Timestamp endStamp = doc.getTimestamp("endDate"); // AMBIL END DATE
                         Timestamp lastMaintStamp = doc.getTimestamp("lastMaintenanceDate");
 
                         if (startStamp != null) {
-                            Calendar startCal = java.util.Calendar.getInstance();
+                            // Hitung Batas Akhir Sewa
+                            long endMillis = Long.MAX_VALUE;
+                            if (endStamp != null) {
+                                Calendar endCal = Calendar.getInstance();
+                                endCal.setTimeInMillis(endStamp.toDate().getTime());
+                                endCal.set(Calendar.HOUR_OF_DAY, 23); endCal.set(Calendar.MINUTE, 59); endCal.set(Calendar.SECOND, 59);
+                                endMillis = endCal.getTimeInMillis();
+                            }
+
+                            // ENTERPRISE LOGIC: JIKA MASA SEWA SUDAH HABIS, HENTIKAN SEMUA PERINTAH PERAWATAN!
+                            if (todayMidnight > endMillis) {
+                                continue; // Lompati pesanan ini. Jangan ditambahkan ke Overdue/Today!
+                            }
+
+                            Calendar startCal = Calendar.getInstance();
                             startCal.setTimeInMillis(startStamp.toDate().getTime());
-                            startCal.set(java.util.Calendar.HOUR_OF_DAY, 0);
-                            startCal.set(java.util.Calendar.MINUTE, 0);
-                            startCal.set(java.util.Calendar.SECOND, 0);
-                            startCal.set(java.util.Calendar.MILLISECOND, 0);
+                            startCal.set(Calendar.HOUR_OF_DAY, 0); startCal.set(Calendar.MINUTE, 0); startCal.set(Calendar.SECOND, 0); startCal.set(Calendar.MILLISECOND, 0);
 
                             long diffMillis = todayMidnight - startCal.getTimeInMillis();
                             long diffDays = diffMillis / (1000 * 60 * 60 * 24);
-
-                            boolean isDueToday = (diffDays > 0 && diffDays % 3 == 0);
 
                             long lastMaintMillis = 0;
                             if (lastMaintStamp != null) {
                                 Calendar lastCal = Calendar.getInstance();
                                 lastCal.setTimeInMillis(lastMaintStamp.toDate().getTime());
-                                lastCal.set(Calendar.HOUR_OF_DAY, 0);
-                                lastCal.set(Calendar.MINUTE, 0);
-                                lastCal.set(Calendar.SECOND, 0);
-                                lastCal.set(Calendar.MILLISECOND, 0);
+                                lastCal.set(Calendar.HOUR_OF_DAY, 0); lastCal.set(Calendar.MINUTE, 0); lastCal.set(Calendar.SECOND, 0); lastCal.set(Calendar.MILLISECOND, 0);
                                 lastMaintMillis = lastCal.getTimeInMillis();
                             }
 
-                            if (isDueToday) {
-                                if (lastMaintMillis < todayMidnight) todayCount++;
-                            } else if (diffDays > 0) {
-                                long lastTargetDay = diffDays - (diffDays % 3);
-                                long lastTargetMillis = startCal.getTimeInMillis() + (lastTargetDay * 24 * 60 * 60 * 1000L);
+                            // MATEMATIKA JADWAL PERAWATAN
+                            long targetDays = diffDays - (diffDays % 3);
 
-                                if (lastMaintMillis < lastTargetMillis) overdueCount++;
+                            if (targetDays > 0) {
+                                long targetMillis = startCal.getTimeInMillis() + (targetDays * 24 * 60 * 60 * 1000L);
+
+                                if (lastMaintMillis < targetMillis) {
+                                    if (diffDays % 3 == 0) {
+                                        todayCount++;
+                                    } else {
+                                        overdueCount++;
+                                    }
+                                }
                             }
                         }
                     }
 
                     todayMaintenanceCount.setValue(todayCount);
                     overdueMaintenanceCount.setValue(overdueCount);
+                    countMaintenance.setValue(todayCount + overdueCount);
                 })
-                .addOnFailureListener(e -> {
-                    errorMessage.setValue("Gagal memuat jadwal perawatan: " + e);
-                });
+                .addOnFailureListener(e -> errorMessage.setValue("Gagal memuat jadwal perawatan: " + e.getMessage()));
     }
 }

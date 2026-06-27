@@ -1,6 +1,7 @@
 package com.example.florist.views.homepage;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -14,6 +15,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -23,6 +25,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.florist.R;
 import com.example.florist.adapter.BuyerProductAdapter;
 import com.example.florist.adapter.ShopSuggestionAdapter;
 import com.example.florist.databinding.FragmentHomeBinding;
@@ -36,6 +39,7 @@ import com.example.florist.viewmodels.ProductViewModel;
 import com.example.florist.views.buyer.BuyerDetailActivity;
 import com.example.florist.views.buyer.CartActivity;
 import com.example.florist.views.chat.InboxActivity;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -54,6 +58,7 @@ public class HomeFragment extends Fragment {
     private BuyerProductAdapter mainAdapter;
     private BuyerProductAdapter categoryAdapter;
     private ShopSuggestionAdapter shopSuggestionAdapter;
+    private Dialog exitDialog;
 
     private final HashMap<String, ProductRepository.ShopData>  shopDataMap = new HashMap<>();
     private List<Product> allActiveProducts = new ArrayList<>();
@@ -87,6 +92,13 @@ public class HomeFragment extends Fragment {
                 ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
             }
         }
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                showExitConfirmationDialog();
+            }
+        });
 
         setupRecyclerView();
         setupSearch();
@@ -149,6 +161,12 @@ public class HomeFragment extends Fragment {
 
         productViewModel.fetchAllProducts();
         productViewModel.fetchShopNames();
+        chatViewModel.loadTotalUnreadCount();
+        chatViewModel.getTotalUnreadCount().observe(getViewLifecycleOwner(), count -> {
+            if (count != null) {
+                updateInboxBadgeUI(count);
+            }
+        });
     }
 
     private void setupUI() {
@@ -344,6 +362,23 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    private void showExitConfirmationDialog() {
+        if (exitDialog != null && exitDialog.isShowing()) {
+            return;
+        }
+
+
+        exitDialog = com.example.florist.utils.DialogHelper.createCustomDialog(requireContext(), R.layout.dialog_exit_confirmation);
+        exitDialog.setCancelable(false);
+
+        MaterialButton btnCancel = exitDialog.findViewById(R.id.btnCancelExit);
+        MaterialButton btnConfirm = exitDialog.findViewById(R.id.btnConfirmExit);
+
+        btnCancel.setOnClickListener(v -> exitDialog.dismiss());
+        btnConfirm.setOnClickListener(v -> requireActivity().finishAffinity());
+
+        exitDialog.show();
+    }
     private void updateNotifBadgeUI(int unreadCount) {
         if (unreadCount > 0) {
             binding.tvNotifBadgeCount.setVisibility(View.VISIBLE);

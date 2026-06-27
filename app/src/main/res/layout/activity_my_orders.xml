@@ -40,10 +40,11 @@
         android:layout_height="wrap_content"
         android:background="@color/white"
         app:tabMode="scrollable"
+        app:tabTextAppearance="@style/CustomTabTextStyle"
         app:tabIndicatorColor="@color/olive_500"
         app:tabSelectedTextColor="@color/olive_500"
         app:tabTextColor="@color/gray_500"
-        android:elevation="4dp"/>
+        android:elevation="4dp" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPagerOrders"

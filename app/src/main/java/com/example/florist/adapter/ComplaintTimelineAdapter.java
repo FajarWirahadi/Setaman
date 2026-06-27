@@ -161,6 +161,12 @@ public class ComplaintTimelineAdapter extends RecyclerView.Adapter<ComplaintTime
             holder.btnQuoteComplaint1.setVisibility(View.GONE);
         }
 
+        holder.itemView.setOnClickListener(v -> {
+            if (quoteListener != null) {
+                quoteListener.onQuoteClicked(complaint);
+            }
+        });
+
         holder.btnQuoteComplaint.setOnClickListener(v -> {
             if (quoteListener != null) {
                 quoteListener.onQuoteClicked(complaint);

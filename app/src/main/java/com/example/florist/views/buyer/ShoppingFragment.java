@@ -16,7 +16,6 @@ import com.example.florist.R;
 import com.example.florist.adapter.BuyerOrderAdapter;
 import com.example.florist.databinding.FragmentShoppingBinding;
 import com.example.florist.viewmodels.ShoppingViewModel;
-import com.example.florist.views.homepage.TransactionFragment;
 
 public class ShoppingFragment extends Fragment {
 
@@ -100,12 +99,6 @@ public class ShoppingFragment extends Fragment {
         viewModel.getActionSuccessMessage().observe(getViewLifecycleOwner(), successMsg -> {
             if (successMsg != null && !successMsg.isEmpty()) {
                 Toast.makeText(requireContext(), successMsg, Toast.LENGTH_SHORT).show();
-
-                // Cek apakah fragment induknya adalah TransactionFragment
-                if (getParentFragment() instanceof TransactionFragment) {
-                    // Perintahkan pindah ke tab "Sewa & Perawatan" otomatis
-                    ((TransactionFragment) getParentFragment()).switchToRentalTab();
-                }
             }
         });
 

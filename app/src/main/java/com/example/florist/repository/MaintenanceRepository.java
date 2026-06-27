@@ -42,7 +42,7 @@ public class MaintenanceRepository {
 
         firestore.collection("rentals")
                 .whereEqualTo("sellerId", sellerId)
-                .whereIn("status", Arrays.asList(status, "PROSES PERBAIKAN", "Komplain", "Menunggu Konfirmasi"))
+                .whereIn("status", Arrays.asList(status,"SEWA AKTIF", "PROSES PERBAIKAN", "KOMPLAIN", "MENUNGGU KONFIRMASI", "KUNJUNGAN WAJIB"))
                 .orderBy("startDate", Query.Direction.DESCENDING)
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
@@ -64,7 +64,7 @@ public class MaintenanceRepository {
                 });
     }
 
-    public void submitMaintenanceLog(Rental rental, Uri imageUri, String description, ActionCallback callback) {
+    public void submitMaintenanceLog(Rental rental, Uri imageUri, String description, String complaintId, ActionCallback callback) {
         if (imageUri == null) {
             callback.onError("Foto laporan tidak boleh kosong!");
             return;
@@ -75,7 +75,7 @@ public class MaintenanceRepository {
             @Override public void onProgress(String requestId, long bytes, long totalBytes) {}
             @Override public void onSuccess(String requestId, Map resultData) {
                 String imageUrl = (String) resultData.get("secure_url");
-                saveLogToFirestore(rental, imageUrl, description, callback);
+                saveLogToFirestore(rental, imageUrl, description, complaintId, callback);
             }
             @Override public void onError(String requestId, com.cloudinary.android.callback.ErrorInfo error) {
                 callback.onError("Gagal unggah foto: " + error.getDescription());
@@ -84,60 +84,40 @@ public class MaintenanceRepository {
         }).dispatch();
     }
 
-    private void saveLogToFirestore(Rental rental, String imageUrl, String description, ActionCallback callback) {
-        if ("PROSES PERBAIKAN".equalsIgnoreCase(rental.getStatus()) || "Komplain".equalsIgnoreCase(rental.getStatus())) {
+    private void saveLogToFirestore(Rental rental, String imageUrl, String description, String complaintId, ActionCallback callback) {
+        WriteBatch batch = firestore.batch();
 
-            firestore.collection("rentals").document(rental.getRentalId())
-                    .collection("complaints")
-                    .whereIn("status", Arrays.asList("Pending", "PROSES PERBAIKAN"))
-                    .get()
-                    .addOnSuccessListener(queryDocumentSnapshots -> {
-                        WriteBatch batch = firestore.batch();
-                        DocumentReference logRef = firestore.collection("rentals").document(rental.getRentalId()).collection("maintenance_logs").document();
-                        Map<String, Object> logData = new HashMap<>();
-                        logData.put("logId", logRef.getId());
-                        logData.put("description", "RESOLUSI KOMPLAIN: " + description);
-                        logData.put("imageUrl", imageUrl);
-                        logData.put("createdAt", FieldValue.serverTimestamp());
-                        batch.set(logRef, logData);
+        DocumentReference logRef = firestore.collection("rentals").document(rental.getRentalId()).collection("maintenance_logs").document();
+        Map<String, Object> logData = new HashMap<>();
+        logData.put("logId", logRef.getId());
+        logData.put("imageUrl", imageUrl);
+        logData.put("createdAt", FieldValue.serverTimestamp());
 
-                        // B. Update status Rental
-                        DocumentReference rentalRef = firestore.collection("rentals").document(rental.getRentalId());
-                        batch.update(rentalRef, "lastMaintenanceDate", FieldValue.serverTimestamp(), "status", "Menunggu Konfirmasi");
+        DocumentReference rentalRef = firestore.collection("rentals").document(rental.getRentalId());
 
-                        // C. Update Komplain (Selesaikan tiket)
-                        for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                            batch.update(doc.getReference(),
-                                    "status", "Menunggu Konfirmasi",
-                                    "sellerResponseText",
-                                    "Florist telah melakukan perbaikan di lokasi. Laporan: " + description,
-                                    "sellerImageUrl", imageUrl,
-                                    "respondedAt", FieldValue.serverTimestamp());
-                        }
+        if (complaintId != null && !complaintId.isEmpty()) {
+            logData.put("description", "RESOLUSI KOMPLAIN: " + description);
 
-                        batch.commit()
-                                .addOnSuccessListener(aVoid -> callback.onSuccess())
-                                .addOnFailureListener(e -> callback.onError("Gagal menyimpan perbaikan: " + e.getMessage()));
-                    })
-                    .addOnFailureListener(e -> callback.onError(e.getMessage()));
+            DocumentReference complaintRef = firestore.collection("complaints").document(complaintId);
 
+            batch.update(complaintRef,
+                    "status", "MENUNGGU KONFIRMASI",
+                    "sellerResponseText", "Florist telah melakukan perbaikan di lokasi. Laporan: " + description,
+                    "sellerImageUrl", imageUrl,
+                    "respondedAt", FieldValue.serverTimestamp());
+
+            batch.update(rentalRef,
+                    "lastMaintenanceDate", FieldValue.serverTimestamp(),
+                    "status", "MENUNGGU KONFIRMASI");
         } else {
-            WriteBatch batch = firestore.batch();
-            DocumentReference logRef = firestore.collection("rentals").document(rental.getRentalId()).collection("maintenance_logs").document();
-            Map<String, Object> logData = new HashMap<>();
-            logData.put("logId", logRef.getId());
             logData.put("description", description);
-            logData.put("imageUrl", imageUrl);
-            logData.put("createdAt", FieldValue.serverTimestamp());
-
-            batch.set(logRef, logData);
-
-            DocumentReference rentalRef = firestore.collection("rentals").document(rental.getRentalId());
             batch.update(rentalRef, "lastMaintenanceDate", FieldValue.serverTimestamp());
-
-            batch.commit()
-                    .addOnSuccessListener(aVoid -> callback.onSuccess())
-                    .addOnFailureListener(e -> callback.onError("Gagal menyimpan laporan: " + e.getMessage()));
         }
+
+        batch.set(logRef, logData);
+
+        batch.commit()
+                .addOnSuccessListener(aVoid -> callback.onSuccess())
+                .addOnFailureListener(e -> callback.onError("Gagal menyimpan data: " + e.getMessage()));
     }
 }

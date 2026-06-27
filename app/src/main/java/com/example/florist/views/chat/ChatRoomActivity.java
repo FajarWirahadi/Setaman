@@ -69,7 +69,9 @@ public class ChatRoomActivity extends AppCompatActivity {
     }
 
     private void setupUI() {
-        binding.tvChatUserName.setText(targetUserName != null ? targetUserName : "Penjual Setaman");
+        binding.tvChatUserName.setText("Memuat...");
+
+        chatViewModel.loadTargetName(targetUserId, targetUserName);
         Glide.with(this)
                 .load(targetUserImage)
                 .placeholder(R.drawable.building)
@@ -82,19 +84,10 @@ public class ChatRoomActivity extends AppCompatActivity {
         messageAdapter.setQuoteClickListener((refId, refType, rentalId) -> {
             Intent intent = new Intent(ChatRoomActivity.this, RentalDetailActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
             intent.putExtra("SCROLL_TO_REF_ID", refId);
             intent.putExtra("SCROLL_TO_REF_TYPE", refType);
-
             intent.putExtra("RENTAL_ID", rentalId);
-            intent.putExtra("ORDER_ID", "DARI_CHAT");
-
-            if (chatViewModel.getCurrentRoom().getValue() != null) {
-                String roomSellerId = chatViewModel.getCurrentRoom().getValue().getSellerId();
-                String role = currentUserId.equals(roomSellerId) ? "SELLER" : "BUYER";
-                intent.putExtra("ROLE", role);
-            } else {
-                intent.putExtra("ROLE", "BUYER");
-            }
 
             startActivity(intent);
         });
@@ -157,6 +150,12 @@ public class ChatRoomActivity extends AppCompatActivity {
         chatViewModel.getCurrentRoom().observe(this, room -> {
             if (room != null) {
                 currentRoomId = room.getRoomId();
+            }
+        });
+
+        chatViewModel.getDynamicTargetName().observe(this, name -> {
+            if (name != null) {
+                binding.tvChatUserName.setText(name);
             }
         });
 

@@ -1,17 +1,12 @@
 package com.example.florist.repository;
 
 import android.app.Activity;
-import android.content.Context;
 import android.net.Uri;
 import android.util.Patterns;
 
 import androidx.annotation.NonNull;
 
-import com.example.florist.R;
 import com.example.florist.model.User;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
@@ -37,7 +32,7 @@ public class AuthRepository {
     private static AuthRepository instance;
 
     public interface OtpCallback {
-        void onCondSent(String verificationId, PhoneAuthProvider.ForceResendingToken token);
+        void onCodeSent(String verificationId, PhoneAuthProvider.ForceResendingToken token);
         void onVerificationCompleted(PhoneAuthCredential credential);
         void onError(String errorMessage);
     }
@@ -61,7 +56,7 @@ public class AuthRepository {
         void onNewUser(FirebaseUser user);
         void onError(String message);
     }
-    public interface CheckEmailAvailabitiy {
+    public interface CheckEmailAvailability {
         void onResult(boolean isAvailable);
         void onError(String message);
     }
@@ -111,7 +106,7 @@ public class AuthRepository {
                 });
     }
 
-    public void checkEmailAvailability(String email, CheckEmailAvailabitiy callback) {
+    public void checkEmailAvailability(String email, CheckEmailAvailability callback) {
         firestore.collection("users")
                 .whereEqualTo("email", email)
                 .get()
@@ -250,7 +245,7 @@ public class AuthRepository {
 
                     @Override
                     public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
-                        otpCallback.onCondSent(s, forceResendingToken);
+                        otpCallback.onCodeSent(s, forceResendingToken);
                     }
                 };
         // Request ke Firebase
@@ -459,19 +454,8 @@ public class AuthRepository {
                 .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
 
-    public void logout(Context context, AuthCallback callback) {
-
+    public void logout(AuthCallback callback) {
         firebaseAuth.signOut();
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(context.getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-
-        GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(context, gso);
-
-        googleSignInClient.signOut().addOnCompleteListener(task -> {
-            callback.onSuccess(null);
-        });
+        callback.onSuccess(null);
     }
 }

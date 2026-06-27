@@ -42,7 +42,7 @@ public class OrderListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         if (getArguments() != null) {
-            currentStatus = getArguments().getString("ORDER_STATUS", "Menunggu Konfirmasi");
+            currentStatus = getArguments().getString("ORDER_STATUS", com.example.florist.utils.Constants.ORDER_WAITING);
         }
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -62,7 +62,6 @@ public class OrderListFragment extends Fragment {
         adapter = new BuyerOrderAdapter(requireContext(), new BuyerOrderAdapter.OnOrderActionListener() {
             @Override
             public void onAcceptOrder(Order order) {
-                // Fragment meneruskan perintah ke ViewModel
                 if (viewModel != null) {
                     viewModel.acceptOrder(order);
                 }

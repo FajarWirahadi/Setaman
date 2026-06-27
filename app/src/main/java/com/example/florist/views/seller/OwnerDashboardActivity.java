@@ -85,6 +85,7 @@ public class OwnerDashboardActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        viewModel.fetchMaintenanceAlerts();
         viewModel.loadDashboardData();
         viewModel.loadTotalProducts();
         viewModel.loadSellerOrderCounts();
@@ -153,35 +154,25 @@ public class OwnerDashboardActivity extends AppCompatActivity {
             }
         });
 
-        viewModel.getCountMaintenance().observe(this, count -> {
-            if (count != null && count > 0) {
-                binding.tvMaintenanceAlert.setText("Ada " + count + " Tanaman menunggu perawatan!");
-                binding.tvMaintenanceAlert.setTextColor(getResources().getColor(R.color.text_error));
-            } else {
-                binding.tvMaintenanceAlert.setText("Tidak ada jadwal perawatan saat ini");
-                binding.tvMaintenanceAlert.setTextColor(getResources().getColor(R.color.text_success));
-            }
+//        viewModel.getCountMaintenance().observe(this, count -> {
+//            if (count != null && count > 0) {
+//                binding.tvMaintenanceAlert.setText("Ada " + count + " Tanaman menunggu perawatan!");
+//                binding.tvMaintenanceAlert.setTextColor(getResources().getColor(R.color.text_error));
+//            } else {
+//                binding.tvMaintenanceAlert.setText("Tidak ada jadwal perawatan saat ini");
+//                binding.tvMaintenanceAlert.setTextColor(getResources().getColor(R.color.text_success));
+//            }
+//        });
+
+        viewModel.getCountUrgentComplaint().observe(this, urgentCount -> {
+            Integer normalCount = viewModel.getCountComplaint().getValue();
+            updateComplaintAlertUI(normalCount != null ? normalCount : 0, urgentCount != null ? urgentCount : 0);
         });
 
-        viewModel.getCountComplaint().observe(this, count -> {
-            if (count != null && count > 0) {
-                binding.tvComplaintCountText.setText("Terdapat " + count + " komplain menunggu tanggapan");
-                binding.tvComplaintCountText.setTextColor(ContextCompat.getColor(this, R.color.red_600));
-
-                binding.cvComplaintAlert.setCardBackgroundColor(ContextCompat.getColor(this, R.color.red_50));
-
-                binding.cvComplaintAlert.setStrokeColor(ContextCompat.getColor(this, R.color.red_200));
-                binding.icComplaintDash.setColorFilter(ContextCompat.getColor(this, R.color.red_500));
-            } else {
-                binding.tvComplaintTitle.setTextColor(ContextCompat.getColor(this, R.color.green_700));
-                binding.tvComplaintCountText.setText("Tidak ada komplain saat ini");
-                binding.tvComplaintCountText.setTextColor(ContextCompat.getColor(this, R.color.green_700));
-
-                binding.cvComplaintAlert.setCardBackgroundColor(ContextCompat.getColor(this, R.color.green_50));
-
-                binding.cvComplaintAlert.setStrokeColor(ContextCompat.getColor(this, R.color.green_200));
-                binding.icComplaintDash.setColorFilter(ContextCompat.getColor(this, R.color.green_500));
-            }
+        // Amati Komplain Biasa
+        viewModel.getCountComplaint().observe(this, normalCount -> {
+            Integer urgentCount = viewModel.getCountUrgentComplaint().getValue();
+            updateComplaintAlertUI(normalCount != null ? normalCount : 0, urgentCount != null ? urgentCount : 0);
         });
 
         viewModel.getTodayMaintenanceCount().observe(this, todayCount-> {
@@ -228,6 +219,42 @@ public class OwnerDashboardActivity extends AppCompatActivity {
 
             binding.tvMaintenanceAlert.setText("Tidak ada jadwal perawatan hari ini.");
             binding.tvMaintenanceAlert.setTextColor(ContextCompat.getColor(this, R.color.gray_600));
+        }
+    }
+
+    private void updateComplaintAlertUI(int normalCount, int urgentCount) {
+        if (urgentCount > 0) {
+            // UI GENTING (Merah Gelap / Peringatan Keras)
+            binding.tvComplaintTitle.setTextColor(ContextCompat.getColor(this, R.color.red_700));
+            binding.tvComplaintCountText.setText("URGENT: " + urgentCount + " komplain butuh KUNJUNGAN FISIK!");
+            binding.tvComplaintCountText.setTextColor(ContextCompat.getColor(this, R.color.red_700));
+
+            binding.cvComplaintAlert.setCardBackgroundColor(ContextCompat.getColor(this, R.color.red_100));
+            binding.cvComplaintAlert.setStrokeColor(ContextCompat.getColor(this, R.color.red_700));
+            binding.cvComplaintAlert.setStrokeWidth(5); // Border ditebalkan sebagai peringatan
+            binding.icComplaintDash.setColorFilter(ContextCompat.getColor(this, R.color.red_700));
+
+        } else if (normalCount > 0) {
+            // UI Komplain Normal (Kuning/Oranye atau Merah Standar)
+            binding.tvComplaintTitle.setTextColor(ContextCompat.getColor(this, R.color.yellow_600));
+            binding.tvComplaintCountText.setText("Terdapat " + normalCount + " komplain menunggu tanggapan");
+            binding.tvComplaintCountText.setTextColor(ContextCompat.getColor(this, R.color.yellow_600));
+
+            binding.cvComplaintAlert.setCardBackgroundColor(ContextCompat.getColor(this, R.color.yellow_50));
+            binding.cvComplaintAlert.setStrokeColor(ContextCompat.getColor(this, R.color.yellow_200));
+            binding.cvComplaintAlert.setStrokeWidth(0);
+            binding.icComplaintDash.setColorFilter(ContextCompat.getColor(this, R.color.yellow_500));
+
+        } else {
+            // UI Aman (Hijau)
+            binding.tvComplaintTitle.setTextColor(ContextCompat.getColor(this, R.color.green_700));
+            binding.tvComplaintCountText.setText("Tidak ada komplain saat ini");
+            binding.tvComplaintCountText.setTextColor(ContextCompat.getColor(this, R.color.green_700));
+
+            binding.cvComplaintAlert.setCardBackgroundColor(ContextCompat.getColor(this, R.color.green_50));
+            binding.cvComplaintAlert.setStrokeColor(ContextCompat.getColor(this, R.color.green_200));
+            binding.cvComplaintAlert.setStrokeWidth(0);
+            binding.icComplaintDash.setColorFilter(ContextCompat.getColor(this, R.color.green_500));
         }
     }
 

@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:id="@+id/nav_trans" android:icon="@drawable/ic_receipt" android:title="@string/transaksi"/>
+    <item android:id="@+id/nav_trans" android:icon="@drawable/ic_status_active" android:title="Tanaman Saya"/>
     <item android:id="@+id/nav_home" android:icon="@drawable/ic_home" android:title="@string/beranda"/>
     <item android:id="@+id/nav_profile" android:icon="@drawable/ic_person" android:title="@string/profil"/>
 </menu>

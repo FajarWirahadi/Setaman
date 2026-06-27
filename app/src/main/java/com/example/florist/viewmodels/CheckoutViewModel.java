@@ -7,16 +7,16 @@ import androidx.lifecycle.ViewModel;
 import com.example.florist.model.CartItem;
 import com.example.florist.model.DeliveryAddress;
 import com.example.florist.model.User;
+import com.example.florist.repository.AuthRepository;
 import com.example.florist.repository.CheckoutRepository;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CheckoutViewModel extends ViewModel {
     private final CheckoutRepository repo = new CheckoutRepository();
-
+    private ListenerRegistration tokenListener;
     private final MutableLiveData<List<CartItem>> checkoutList = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<DeliveryAddress> selectedAddress = new MutableLiveData<>();
     private final MutableLiveData<String> currentBuyerName = new MutableLiveData<>("Hamba Allah");
@@ -56,9 +56,8 @@ public class CheckoutViewModel extends ViewModel {
         selectedAddress.setValue(address);
     }
 
-    // --- Load Data dari Repo ---
     public void loadInitialData() {
-        String userId = FirebaseAuth.getInstance().getUid();
+        String userId = AuthRepository.getInstance().getCurrentUserId();
         if (userId == null) return;
 
         isLoading.setValue(true);
@@ -101,7 +100,17 @@ public class CheckoutViewModel extends ViewModel {
         long tempSubTotal = 0;
         for (CartItem item : items) {
             long duration = item.getDurationValue() > 0 ? item.getDurationValue() : 1;
-            tempSubTotal += (long) item.getPrice() * item.getQuantity() * duration;
+            long itemBasePrice = (long) item.getPrice();
+
+            String type = item.getDurationType() != null ? item.getDurationType() : "";
+
+            if (type.equalsIgnoreCase("Mingguan") || type.equalsIgnoreCase("Minggu")) {
+                itemBasePrice *= 7;
+            } else if (type.equalsIgnoreCase("Bulanan") || type.equalsIgnoreCase("Bulan")) {
+                itemBasePrice *= 30;
+            }
+
+            tempSubTotal += itemBasePrice * item.getQuantity() * duration;
         }
         subTotal.setValue(tempSubTotal);
 
@@ -110,7 +119,8 @@ public class CheckoutViewModel extends ViewModel {
     }
 
     public void processOrder(String paymentMethod) {
-        String userId = FirebaseAuth.getInstance().getUid();
+        String userId = AuthRepository.getInstance().getCurrentUserId();
+        if (Boolean.TRUE.equals(isLoading.getValue())) return;
         List<CartItem> items = checkoutList.getValue();
         DeliveryAddress address = selectedAddress.getValue();
 
@@ -125,9 +135,11 @@ public class CheckoutViewModel extends ViewModel {
             return;
         }
 
+        long ongkir = shippingCost.getValue() != null ? shippingCost.getValue() : 15000L;
+
         isLoading.setValue(true);
 
-        repo.processCheckout(items, userId, buyerName, address, paymentMethod, isDirectBuy, new CheckoutRepository.ActionCallback() {
+        repo.processCheckout(items, userId, buyerName, address, paymentMethod, ongkir, isDirectBuy, new CheckoutRepository.ActionCallback() {
             @Override
             public void onSuccess(String orderId) {
                 if (paymentMethod.equals("COD")) {
@@ -147,27 +159,33 @@ public class CheckoutViewModel extends ViewModel {
     }
 
     private void listenForMidTransToken(String orderId) {
-        FirebaseFirestore.getInstance().collection("orders").document(orderId)
-                .addSnapshotListener((doc, e) -> {
-                    if (e != null) {
-                        isLoading.setValue(false);
-                        errorMessage.setValue("Gagal memantau pembayaran: " + e.getMessage());
-                        return;
-                    }
+        if (tokenListener != null) tokenListener.remove();
 
-                    if (doc != null && doc.exists()) {
-                        String token = doc.getString("snapToken");
+        tokenListener = repo.listenForPaymentToken(orderId, new CheckoutRepository.TokenCallback() {
+            @Override
+            public void onTokenReceived(String token) {
+                isLoading.setValue(false);
 
-                        if (token != null && !token.isEmpty()) {
-                            isLoading.setValue(false);
+                if ("ERROR_DARI_SERVER".equals(token)) {
+                    errorMessage.setValue("Server gagal memproses pembayaran ke Midtrans.");
+                } else {
+                    midtransToken.setValue(token);
+                }
 
-                            if (token.equals("ERROR_DARI_SERVER")) {
-                                errorMessage.setValue("Server gagal memproses pembayaran ke Midtrans.");
-                            } else {
-                                midtransToken.setValue(token);
-                            }
-                        }
-                    }
-                });
+                if (tokenListener != null) tokenListener.remove();
+            }
+
+            @Override
+            public void onError(String error) {
+                isLoading.setValue(false);
+                errorMessage.setValue("Gagal memantau pembayaran: " + error);
+            }
+        });
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        if (tokenListener != null) tokenListener.remove();
     }
 }

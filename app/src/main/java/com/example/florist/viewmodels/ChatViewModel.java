@@ -9,17 +9,22 @@ import com.example.florist.model.ChatRoom;
 import com.example.florist.repository.ChatRepository;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.List;
 
 public class ChatViewModel extends ViewModel {
 
     private final ChatRepository repository;
-
+    private ListenerRegistration unreadListener;
     private final MutableLiveData<ChatRoom> currentRoom = new MutableLiveData<>();
     private final MutableLiveData<List<ChatMessage>> messagesList = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private final MutableLiveData<String> dynamicTargetName = new MutableLiveData<>();
+    private final MutableLiveData<Integer> totalUnreadCount = new MutableLiveData<>(0);
+
+
 
     public ChatViewModel() {
         repository = new ChatRepository();
@@ -29,6 +34,9 @@ public class ChatViewModel extends ViewModel {
     public LiveData<List<ChatMessage>> getMessagesList() { return messagesList; }
     public LiveData<Boolean> getIsLoading() { return isLoading; }
     public LiveData<String> getErrorMessage() { return errorMessage; }
+    public LiveData<String> getDynamicTargetName() { return dynamicTargetName; }
+    public LiveData<Integer> getTotalUnreadCount() { return totalUnreadCount; }
+
 
     public void startChat(String targetUserId, String targetUserName, String targetUserImage) {
         FirebaseUser currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
@@ -106,5 +114,41 @@ public class ChatViewModel extends ViewModel {
         if (currentUser != null && roomId != null) {
             repository.resetUnreadCount(roomId, currentUser.getUid());
         }
+    }
+
+    public void loadTargetName(String targetId, String fallbackName) {
+        repository.checkShopName(targetId, shopName -> {
+            if (shopName != null) {
+                dynamicTargetName.setValue(shopName);
+            } else {
+                dynamicTargetName.setValue(fallbackName != null ? fallbackName : "Pengguna Setaman");
+            }
+        });
+    }
+
+    public void loadTotalUnreadCount() {
+        FirebaseUser currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            // Cegah duplikasi listener
+            if (unreadListener != null) unreadListener.remove();
+
+            unreadListener = repository.listenForTotalUnread(currentUser.getUid(), new ChatRepository.UnreadCountCallback() {
+                @Override
+                public void onCountUpdated(int totalUnread) {
+                    totalUnreadCount.setValue(totalUnread);
+                }
+
+                @Override
+                public void onError(String message) {
+                    errorMessage.setValue(message);
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        if (unreadListener != null) unreadListener.remove();
     }
 }

@@ -46,12 +46,9 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:background="@drawable/rounded_gray_layout"
-                android:backgroundTint="#FFF3E0"
                 android:paddingHorizontal="8dp"
                 android:paddingVertical="4dp"
                 android:text="Diproses"
-                android:textColor="#F57C00"
                 android:textSize="12sp"
                 android:textStyle="bold" />
         </RelativeLayout>

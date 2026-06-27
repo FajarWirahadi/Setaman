@@ -3,108 +3,112 @@ package com.example.florist.model;
 import com.google.firebase.Timestamp;
 
 public class Complaint {
+    // Data Dasar
     private String complaintId;
+    private String rentalId;
+    private String orderId;
+    private String rentalDuration;
+    private String buyerId;
+    private String sellerId;
+
+    // Data Tampilan
+    private String plantName;
+    private String buyerName;
+    private String buyerImageUrl;
     private String reason;
     private String description;
     private String evidenceImageUrl;
-    private String sellerImageUrl;
+
+    // ELEMEN STATE MACHINE & ESKALASI (ENTERPRISE LOGIC)
     private String status;
+    private String resolutionType;       // "CHAT_EDUCATION", "PHYSICAL_VISIT", "REPLACEMENT"
+    private int rejectionCount;          // Menghitung berapa kali pembeli menolak
+    private String rejectionReason;      // Alasan spesifik penolakan terakhir
+
+    // Data Penjual
+    private String sellerResponseText;
+    private String sellerImageUrl;
+
+    // AUDIT TRAIL TIMESTAMPS (SLA TRACKING)
     private Timestamp createdAt;
-    private String sellerResponseText = null;
-    private String buyerResponseText = null;
-    private Timestamp resolvedAt = null;
+    private Timestamp respondedAt;
+    private Timestamp visitScheduledAt;
+    private Timestamp visitCompletedAt;
+    private Timestamp resolvedAt;
 
-    public Complaint(){
+    public Complaint() {} // Wajib untuk Firestore
 
-    }
+    // --- GETTER & SETTER DATA DASAR ---
+    public String getComplaintId() { return complaintId; }
+    public void setComplaintId(String complaintId) { this.complaintId = complaintId; }
 
-    public Complaint(String complaintId, String reason, String description, String evidenceImageUrl,
-                           String status, Timestamp createdAt){
-        this.complaintId = complaintId;
-        this.reason = reason;
-        this.description = description;
-        this.evidenceImageUrl = evidenceImageUrl;
-        this.status = status;
-        this.createdAt = createdAt;
-    }
+    public String getRentalId() { return rentalId; }
+    public void setRentalId(String rentalId) { this.rentalId = rentalId; }
 
-    public String getComplaintId() {
-        return complaintId;
-    }
+    public String getOrderId() { return orderId; }
+    public void setOrderId(String orderId) { this.orderId = orderId; }
 
-    public void setComplaintId(String privateId) {
-        this.complaintId = privateId;
-    }
+    public String getRentalDuration() { return rentalDuration; }
+    public void setRentalDuration(String rentalDuration) { this.rentalDuration = rentalDuration; }
 
-    public String getReason() {
-        return reason;
-    }
+    public String getBuyerId() { return buyerId; }
+    public void setBuyerId(String buyerId) { this.buyerId = buyerId; }
 
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
+    public String getSellerId() { return sellerId; }
+    public void setSellerId(String sellerId) { this.sellerId = sellerId; }
 
-    public String getDescription() {
-        return description;
-    }
+    // --- GETTER & SETTER DATA TAMPILAN ---
+    public String getPlantName() { return plantName; }
+    public void setPlantName(String plantName) { this.plantName = plantName; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public String getBuyerName() { return buyerName; }
+    public void setBuyerName(String buyerName) { this.buyerName = buyerName; }
 
-    public String getEvidenceImageUrl() {
-        return evidenceImageUrl;
-    }
+    public String getBuyerImageUrl() { return buyerImageUrl; }
+    public void setBuyerImageUrl(String buyerImageUrl) { this.buyerImageUrl = buyerImageUrl; }
 
-    public void setEvidenceImageUrl(String evidenceImageUrl) {
-        this.evidenceImageUrl = evidenceImageUrl;
-    }
+    public String getReason() { return reason; }
+    public void setReason(String reason) { this.reason = reason; }
 
-    public String getSellerImageUrl() {
-        return sellerImageUrl;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public void setSellerImageUrl(String sellerImageUrl) {
-        this.sellerImageUrl = sellerImageUrl;
-    }
+    public String getEvidenceImageUrl() { return evidenceImageUrl; }
+    public void setEvidenceImageUrl(String evidenceImageUrl) { this.evidenceImageUrl = evidenceImageUrl; }
 
-    public String getStatus() {
-        return status;
-    }
+    // --- GETTER & SETTER STATE MACHINE ---
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    public String getResolutionType() { return resolutionType; }
+    public void setResolutionType(String resolutionType) { this.resolutionType = resolutionType; }
 
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
+    public int getRejectionCount() { return rejectionCount; }
+    public void setRejectionCount(int rejectionCount) { this.rejectionCount = rejectionCount; }
 
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
+    public String getRejectionReason() { return rejectionReason; }
+    public void setRejectionReason(String rejectionReason) { this.rejectionReason = rejectionReason; }
 
-    public String getSellerResponseText() {
-        return sellerResponseText;
-    }
+    // --- GETTER & SETTER DATA PENJUAL ---
+    public String getSellerResponseText() { return sellerResponseText; }
+    public void setSellerResponseText(String sellerResponseText) { this.sellerResponseText = sellerResponseText; }
 
-    public void setSellerResponseText(String sellerResponseText) {
-        this.sellerResponseText = sellerResponseText;
-    }
+    public String getSellerImageUrl() { return sellerImageUrl; }
+    public void setSellerImageUrl(String sellerImageUrl) { this.sellerImageUrl = sellerImageUrl; }
 
-    public String getBuyerResponseText() {
-        return buyerResponseText;
-    }
+    // --- GETTER & SETTER TIMESTAMPS ---
+    public Timestamp getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
 
-    public void setBuyerResponseText(String buyerResponseText) {
-        this.buyerResponseText = buyerResponseText;
-    }
+    public Timestamp getRespondedAt() { return respondedAt; }
+    public void setRespondedAt(Timestamp respondedAt) { this.respondedAt = respondedAt; }
 
-    public Timestamp getResolvedAt() {
-        return resolvedAt;
-    }
+    public Timestamp getVisitScheduledAt() { return visitScheduledAt; }
+    public void setVisitScheduledAt(Timestamp visitScheduledAt) { this.visitScheduledAt = visitScheduledAt; }
 
-    public void setResolvedAt(Timestamp resolvedAt) {
-        this.resolvedAt = resolvedAt;
-    }
+    public Timestamp getVisitCompletedAt() { return visitCompletedAt; }
+    public void setVisitCompletedAt(Timestamp visitCompletedAt) { this.visitCompletedAt = visitCompletedAt; }
+
+    public Timestamp getResolvedAt() { return resolvedAt; }
+    public void setResolvedAt(Timestamp resolvedAt) { this.resolvedAt = resolvedAt; }
 }

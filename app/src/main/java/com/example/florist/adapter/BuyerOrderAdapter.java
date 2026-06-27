@@ -2,8 +2,6 @@ package com.example.florist.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +14,8 @@ import com.example.florist.R;
 import com.example.florist.databinding.ItemBuyerOrderBinding;
 import com.example.florist.model.CartItem;
 import com.example.florist.model.Order;
+import com.example.florist.utils.Constants;
+import com.example.florist.utils.StatusBadgeHelper;
 import com.example.florist.views.buyer.BuyerOrderDetailActivity;
 
 import java.text.NumberFormat;
@@ -95,95 +95,62 @@ public class BuyerOrderAdapter extends RecyclerView.Adapter<BuyerOrderAdapter.Or
         holder.binding.tvOrderGrandTotal.setText(formatRupiah.format(order.getTotalAmount()));
         }
 
-
-
-
-
         holder.binding.btnReviewAction.setVisibility(View.GONE);
         holder.binding.btnOrderAction.setEnabled(true);
         holder.binding.btnOrderAction.setAlpha(1.0f);
 
-        String status = order.getStatus();
+        String status = order.getStatus() != null ? order.getStatus().toUpperCase() : "";
 
-        if ("PENDING".equalsIgnoreCase(status)) {
+        StatusBadgeHelper.applyStatus(context, holder.binding.tvOrderStatus, status);
+
+        if (Constants.ORDER_PENDING.equals(status)) {
             long waktuDibuat = order.getCreatedAt() != null ? order.getCreatedAt().toDate().getTime() : 0;
-            long waktuSekarang = System.currentTimeMillis();
             long batasDuaPuluhEmpatJam = 24 * 60 * 60 * 1000;
 
-            if (waktuSekarang - waktuDibuat > batasDuaPuluhEmpatJam) {
-                holder.binding.tvOrderStatus.setText("⚠️ Batas Waktu Habis");
-                holder.binding.tvOrderStatus.setTextColor(Color.parseColor("#757575"));
-                holder.binding.tvOrderStatus.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#EEEEEE")));
-
+            if (System.currentTimeMillis() - waktuDibuat > batasDuaPuluhEmpatJam) {
+                holder.binding.tvOrderStatus.setText("⚠️ KEDALUWARSA"); // Timpa teks khusus untuk expired
                 holder.binding.btnOrderAction.setText("Pembayaran Kadaluarsa");
                 holder.binding.btnOrderAction.setEnabled(false);
                 holder.binding.btnOrderAction.setAlpha(0.5f);
-                holder.binding.btnOrderAction.setOnClickListener(null);
-
             } else {
-                holder.binding.tvOrderStatus.setText("Belum Bayar");
-                holder.binding.tvOrderStatus.setTextColor(Color.parseColor("#D32F2F"));
-                holder.binding.tvOrderStatus.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FFEBEE")));
-
                 holder.binding.btnOrderAction.setText("Bayar Sekarang");
                 holder.binding.btnOrderAction.setOnClickListener(v -> {
                     String token = order.getSnapToken();
                     if (token != null && !token.isEmpty() && !token.equals("ERROR_DARI_SERVER")) {
                         String snapUrl = "https://app.sandbox.midtrans.com/snap/v2/vtweb/" + token;
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(snapUrl));
-                        context.startActivity(browserIntent);
+                        context.startActivity(new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(snapUrl)));
                     } else {
-                        android.widget.Toast.makeText(context, "Sistem gagal memuat token pembayaran.", android.widget.Toast.LENGTH_SHORT).show();
+                        android.widget.Toast.makeText(context, "Gagal memuat token.", android.widget.Toast.LENGTH_SHORT).show();
                     }
                 });
             }
-
-        } else if ("PROCESSING".equalsIgnoreCase(status) || "Diproses".equalsIgnoreCase(status)) {
-            holder.binding.tvOrderStatus.setText("Diproses");
-            holder.binding.tvOrderStatus.setTextColor(Color.parseColor("#F57C00"));
-            holder.binding.tvOrderStatus.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FFF3E0")));
-
+        } else if (Constants.ORDER_WAITING.equals(status) || com.example.florist.utils.Constants.ORDER_PROCESSING.equals(status)) {
             holder.binding.btnOrderAction.setText("Lihat Detail");
             holder.binding.btnOrderAction.setOnClickListener(v -> goToDetail(order.getOrderId()));
 
-        } else if ("SHIPPED".equalsIgnoreCase(status) || "Dikirim".equalsIgnoreCase(status)) {
-            holder.binding.tvOrderStatus.setText("Dikirim");
-
+        } else if (Constants.ORDER_SHIPPED.equals(status)) {
             holder.binding.btnOrderAction.setText("Terima Pesanan");
             holder.binding.btnOrderAction.setOnClickListener(v -> {
-                holder.binding.btnOrderAction.setEnabled(false);
-                holder.binding.btnOrderAction.setText("Memproses...");
-                if (actionListener != null) {
-                    actionListener.onAcceptOrder(order);
-                }
+                v.setEnabled(false);
+                ((android.widget.Button) v).setText("Memproses...");
+                if (actionListener != null) actionListener.onAcceptOrder(order);
+                v.postDelayed(() -> { if (v != null) { v.setEnabled(true); ((android.widget.Button) v).setText("Terima Pesanan"); } }, 3000);
             });
 
-        } else if ("RENTED".equalsIgnoreCase(status) || "Disewa".equalsIgnoreCase(status)) {
-            holder.binding.tvOrderStatus.setText("Dalam Perawatan");
-
+        } else if (Constants.RENTAL_ACTIVE.equals(status)) {
             holder.binding.btnOrderAction.setText("Akhiri Masa Sewa");
             holder.binding.btnOrderAction.setOnClickListener(v -> {
                 holder.binding.btnOrderAction.setEnabled(false);
                 holder.binding.btnOrderAction.setText("Mengakhiri...");
-                if (actionListener != null) {
-                    actionListener.onEndRental(order);
-                }
+                if (actionListener != null) actionListener.onEndRental(order);
             });
 
-        } else if ("Dibatalkan".equalsIgnoreCase(status)) {
-            holder.binding.tvOrderStatus.setText("Dibatalkan");
-            holder.binding.tvOrderStatus.setTextColor(Color.parseColor("#757575"));
-            holder.binding.tvOrderStatus.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#EEEEEE")));
-
+        } else if (Constants.ORDER_CANCELED.equals(status)) {
             holder.binding.btnOrderAction.setText("Pesanan Dibatalkan");
             holder.binding.btnOrderAction.setEnabled(false);
             holder.binding.btnOrderAction.setAlpha(0.5f);
 
-        } else if ("COMPLETED".equalsIgnoreCase(status) || "Selesai".equalsIgnoreCase(status)) {
-            holder.binding.tvOrderStatus.setText("Selesai");
-            holder.binding.tvOrderStatus.setTextColor(Color.parseColor("#388E3C"));
-            holder.binding.tvOrderStatus.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#E8F5E9")));
-
+        } else if (Constants.ORDER_COMPLETED.equals(status)) {
             holder.binding.btnOrderAction.setText("Lihat Detail");
             holder.binding.btnOrderAction.setOnClickListener(v -> goToDetail(order.getOrderId()));
 

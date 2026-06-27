@@ -1,9 +1,10 @@
 package com.example.florist.views;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.text.InputType;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.widget.Toast;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.florist.R;
@@ -24,7 +26,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
-
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -46,7 +47,8 @@ public class LoginActivity extends AppCompatActivity {
         setupObservers();
         setupListeners();
 
-
+        // Paksa validasi awal agar tombol langsung mati (abu-abu) saat layar pertama kali dibuka
+        authViewModel.loginDataChanged(binding.etEmail.getText().toString(), binding.etPassword.getText().toString());
     }
 
     private void setupGoogleSignIn() {
@@ -66,11 +68,8 @@ public class LoginActivity extends AppCompatActivity {
                     Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
                     try {
                         GoogleSignInAccount account = task.getResult(ApiException.class);
-
                         String idToken = account.getIdToken();
-
                         authViewModel.loginWithGoogle(idToken);
-
                     } catch (ApiException e) {
                         Toast.makeText(this, "Google Sign In Gagal: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -78,6 +77,16 @@ public class LoginActivity extends AppCompatActivity {
             });
 
     private void setupObservers() {
+        // Observasi Validitas Form Login
+        authViewModel.getIsLoginFormValid().observe(this, isValid -> {
+            binding.btnLogin.setEnabled(isValid);
+            if (isValid) {
+                binding.btnLogin.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.main_color)));
+            } else {
+                binding.btnLogin.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.gray_500)));
+            }
+        });
+
         authViewModel.getUserLiveData().observe(this, firebaseUser -> {
             if (firebaseUser != null) {
                 Toast.makeText(this, "Selamat datang, " + firebaseUser.getEmail(), Toast.LENGTH_SHORT).show();
@@ -90,9 +99,11 @@ public class LoginActivity extends AppCompatActivity {
         authViewModel.getIsLoading().observe(this, isLoading -> {
             if (isLoading) {
                 binding.btnLogin.setEnabled(false);
-                binding.btnLogin.setText("Loading");
+                binding.btnLogin.setText("Loading...");
             } else {
-                binding.btnLogin.setEnabled(true);
+                // Kembalikan state tombol sesuai validitas form
+                Boolean isValid = authViewModel.getIsLoginFormValid().getValue();
+                binding.btnLogin.setEnabled(isValid != null && isValid);
                 binding.btnLogin.setText("Masuk");
             }
         });
@@ -119,16 +130,31 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
     private void setupListeners() {
+        // Pemantau perubahan teks pada Email dan Password
+        TextWatcher afterTextChangedListener = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                authViewModel.loginDataChanged(
+                        binding.etEmail.getText().toString(),
+                        binding.etPassword.getText().toString()
+                );
+            }
+        };
+
+        binding.etEmail.addTextChangedListener(afterTextChangedListener);
+        binding.etPassword.addTextChangedListener(afterTextChangedListener);
 
         binding.btnLogin.setOnClickListener(v -> {
             String input = binding.etEmail.getText().toString().trim();
             String password = binding.etPassword.getText().toString().trim();
-
-            if (input.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Email/No HP atau password tidak boleh kosong", Toast.LENGTH_SHORT).show();
-                return;
-            }
             authViewModel.login(input, password);
         });
 
@@ -143,30 +169,19 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         binding.tvShowPassword.setOnClickListener(v -> {
-            if(isPasswordVisible) {
-                String pass = binding.etPassword.getText().toString();
+            int cursorPosition = binding.etPassword.getSelectionEnd();
+
+            if (isPasswordVisible) {
                 binding.etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                binding.etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                binding.etPassword.setText(pass);
-                binding.etPassword.setSelection(pass.length());
-            }else {
-                String pass = binding.etPassword.getText().toString();
+                binding.tvShowPassword.setText("Lihat");
+            } else {
                 binding.etPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-                binding.etPassword.setInputType(InputType.TYPE_CLASS_TEXT);
-                binding.etPassword.setText(pass);
-                binding.etPassword.setSelection(pass.length());
+                binding.tvShowPassword.setText("Tutup");
             }
+            binding.etPassword.setSelection(cursorPosition);
+
             isPasswordVisible = !isPasswordVisible;
         });
-
-
-
-        ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("Mohon tunggu");
-        progressDialog.setMessage("Masuk ke akun anda");
-        progressDialog.setCancelable(false);
-
-
     }
 
     private void showRegisterSnackbar() {
@@ -175,7 +190,7 @@ public class LoginActivity extends AppCompatActivity {
                     Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
                     startActivity(intent);
                 })
-                .setActionTextColor(getResources().getColor(android.R.color.holo_green_light))
+                .setActionTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light))
                 .show();
     }
 

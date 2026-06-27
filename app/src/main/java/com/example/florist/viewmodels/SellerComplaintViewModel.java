@@ -5,10 +5,11 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.florist.repository.AuthRepository;
-import com.example.florist.model.Rental; // KITA PAKAI RENTAL SEKARANG
+import com.example.florist.model.Complaint; // KITA PAKAI COMPLAINT SEKARANG
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,14 +18,16 @@ public class SellerComplaintViewModel extends ViewModel {
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final AuthRepository authRepository = AuthRepository.getInstance();
-    private final MutableLiveData<List<Rental>> complaintRentals = new MutableLiveData<>();
+
+    // GANTI TIPE LIST MENJADI COMPLAINT
+    private final MutableLiveData<List<Complaint>> complaintList = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isSessionExpired = new MutableLiveData<>();
 
     private ListenerRegistration listenerRegistration;
 
-    public LiveData<List<Rental>> getComplaintRentals() { return complaintRentals; }
+    public LiveData<List<Complaint>> getComplaintList() { return complaintList; }
     public LiveData<Boolean> getIsLoading() { return isLoading; }
     public LiveData<String> getErrorMessage() { return errorMessage; }
     public LiveData<Boolean> getIsSessionExpired() { return isSessionExpired; }
@@ -43,27 +46,29 @@ public class SellerComplaintViewModel extends ViewModel {
             listenerRegistration.remove();
         }
 
-        // BACA DARI KOLEKSI RENTALS, BUKAN ORDERS!
-        listenerRegistration = db.collection("rentals")
+        // QUERY LANGSUNG KE TIKET KOMPLAIN YANG STATUSNYA BUKAN SELESAI
+        listenerRegistration = db.collection("complaints")
                 .whereEqualTo("sellerId", sellerId)
-                .whereEqualTo("hasComplaint", true)
+                .whereNotEqualTo("status", "SELESAI")
+                .orderBy("status")
+                .orderBy("createdAt", Query.Direction.DESCENDING)
                 .addSnapshotListener((value, error) -> {
                     isLoading.setValue(false);
 
                     if (error != null) {
-                        errorMessage.setValue("Gagal memuat komplain: " + error.getMessage());
+                        errorMessage.setValue("Gagal memuat tiket komplain: " + error.getMessage());
                         return;
                     }
 
                     if (value != null) {
-                        List<Rental> rentals = new ArrayList<>();
+                        List<Complaint> complaints = new ArrayList<>();
                         for (com.google.firebase.firestore.DocumentSnapshot doc : value) {
-                            Rental rental = doc.toObject(Rental.class);
-                            if (rental != null) {
-                                rentals.add(rental);
+                            Complaint complaint = doc.toObject(Complaint.class);
+                            if (complaint != null) {
+                                complaints.add(complaint);
                             }
                         }
-                        complaintRentals.setValue(rentals);
+                        complaintList.setValue(complaints);
                     }
                 });
     }

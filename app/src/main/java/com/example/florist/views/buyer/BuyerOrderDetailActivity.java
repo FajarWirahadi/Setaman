@@ -14,6 +14,7 @@ import com.example.florist.databinding.ActivityBuyerOrderDetailBinding;
 import com.example.florist.databinding.DialogBuyerTrackingBinding;
 import com.example.florist.model.CartItem;
 import com.example.florist.model.Order;
+import com.example.florist.utils.Constants;
 import com.example.florist.viewmodels.BuyerOrderDetailViewModel;
 import com.example.florist.viewmodels.BuyerTrackingViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -81,10 +82,12 @@ public class BuyerOrderDetailActivity extends AppCompatActivity {
     }
 
     private void populateUI(Order order) {
-        String status = order.getStatus();
-        binding.tvDetailStatus.setText(status);
+        String status = order.getStatus() != null ? order.getStatus().toUpperCase() : "";
 
-        if ("Diproses".equalsIgnoreCase(status) || "Dikirim".equalsIgnoreCase(status)) {
+        com.example.florist.utils.StatusBadgeHelper.applyStatus(this, binding.tvDetailStatus, status);
+
+        if (com.example.florist.utils.Constants.ORDER_PROCESSING.equals(status) ||
+                com.example.florist.utils.Constants.ORDER_SHIPPED.equals(status)) {
             binding.btnTrackOrder.setVisibility(View.VISIBLE);
         } else {
             binding.btnTrackOrder.setVisibility(View.GONE);
@@ -103,10 +106,10 @@ public class BuyerOrderDetailActivity extends AppCompatActivity {
             binding.rvOrderItems.setAdapter(adapter);
         }
 
-        if ("PENDING".equalsIgnoreCase(status)) {
+        if (Constants.ORDER_PENDING.equals(status)) {
             binding.btnPrimaryAction.setVisibility(View.VISIBLE);
             binding.btnPrimaryAction.setText("Bayar Sekarang");
-        } else if ("Dikirim".equalsIgnoreCase(status)) {
+        } else if (Constants.ORDER_SHIPPED.equals(status)) {
             binding.btnPrimaryAction.setVisibility(View.VISIBLE);
             binding.btnPrimaryAction.setText("Konfirmasi Pesanan Diterima");
         } else {

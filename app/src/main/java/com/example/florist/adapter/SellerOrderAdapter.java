@@ -1,8 +1,10 @@
 package com.example.florist.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,7 @@ import com.example.florist.R;
 import com.example.florist.databinding.ItemSellerOrderBinding;
 import com.example.florist.model.CartItem;
 import com.example.florist.model.Order;
+import com.example.florist.utils.StatusBadgeHelper;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -55,8 +58,37 @@ public class SellerOrderAdapter extends RecyclerView.Adapter<SellerOrderAdapter.
     public void onBindViewHolder(@NonNull SellerOrderViewHolder holder, int position) {
         Order order = orderList.get(position);
 
+        // 1. SETUP LOGIKA ALAMAT & GOOGLE MAPS
+        if (order.getDeliveryAddress() != null) {
+            holder.binding.layoutAddress.setVisibility(View.VISIBLE);
+            holder.binding.tvAddress.setText(order.getDeliveryAddress().getFullAddress());
+
+            // Aksi Buka Google Maps
+            holder.binding.layoutAddress.setOnClickListener(v -> {
+                double lat = order.getDeliveryAddress().getLatitude();
+                double lng = order.getDeliveryAddress().getLongitude();
+                String label = order.getDeliveryAddress().getReceiverName();
+
+                // Format URI untuk membuka navigasi rute langsung
+                Uri gmmIntentUri = Uri.parse("google.navigation:q=" + lat + "," + lng);
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+
+                if (mapIntent.resolveActivity(context.getPackageManager()) != null) {
+                    context.startActivity(mapIntent);
+                } else {
+                    // Fallback jika Google Maps tidak terinstal
+                    Uri browserUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=" + lat + "," + lng);
+                    context.startActivity(new Intent(Intent.ACTION_VIEW, browserUri));
+                }
+            });
+        } else {
+            holder.binding.layoutAddress.setVisibility(View.GONE);
+        }
+
         holder.binding.tvOrderId.setText(order.getOrderId());
-        holder.binding.tvOrderStatus.setText(order.getStatus());
+        String status = order.getStatus() != null ? order.getStatus() : "";
+        StatusBadgeHelper.applyStatus(context, holder.binding.tvOrderStatus, status);
 
         if (order.getDeliveryAddress() != null && order.getDeliveryAddress() != null) {
             holder.binding.tvBuyerName.setText(order.getReceiverName());
@@ -95,6 +127,29 @@ public class SellerOrderAdapter extends RecyclerView.Adapter<SellerOrderAdapter.
 
         holder.binding.tvOrderGrandTotal.setText(formatRupiah.format(order.getTotalAmount()));
 
+        // 2. SETUP LOGIKA COUNTDOWN SLA (DUMB UI)
+        if ("MENUNGGU KONFIRMASI".equals(order.getStatus()) && order.getSlaText() != null) {
+            holder.binding.layoutAccessTime.setVisibility(View.VISIBLE);
+            holder.binding.tvResponseDeadline.setText(order.getSlaText());
+
+            // Tahan bentuk aslinya (radius sudut) agar tidak hilang menjadi block kotak
+            holder.binding.layoutAccessTime.setBackgroundResource(R.drawable.bg_warning_text);
+
+            if (order.isSlaUrgent()) {
+                // Urgent: Background Merah Muda (#FFEBEE), Teks & Ikon Merah Tua (#D32F2F)
+                holder.binding.layoutAccessTime.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FFEBEE")));
+                holder.binding.tvResponseDeadline.setTextColor(Color.parseColor("#D32F2F"));
+                holder.binding.icAccessTime.setColorFilter(Color.parseColor("#D32F2F"));
+            } else {
+                // Warning: Background Kuning Muda (#FFF3E0), Teks & Ikon Orange (#F57C00)
+                holder.binding.layoutAccessTime.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FFF3E0")));
+                holder.binding.tvResponseDeadline.setTextColor(Color.parseColor("#F57C00"));
+                holder.binding.icAccessTime.setColorFilter(Color.parseColor("#F57C00"));
+            }
+        } else {
+            holder.binding.layoutAccessTime.setVisibility(View.GONE);
+        }
+
         setupDynamicButton(holder, order);
     }
 
@@ -103,7 +158,7 @@ public class SellerOrderAdapter extends RecyclerView.Adapter<SellerOrderAdapter.
         holder.binding.btnReject.setVisibility(View.GONE);
 
         switch (order.getStatus()) {
-            case "Menunggu Konfirmasi":
+            case "MENUNGGU KONFIRMASI":
                 holder.binding.btnOrderAction.setVisibility(View.VISIBLE);
                 holder.binding.btnReject.setVisibility(View.VISIBLE);
                 holder.binding.btnOrderAction.setText("Terima Pesanan");
@@ -112,30 +167,16 @@ public class SellerOrderAdapter extends RecyclerView.Adapter<SellerOrderAdapter.
                 holder.binding.btnReject.setOnClickListener(v -> actionListener.onRejectClicked(order));
                 break;
 
-            case "Diproses":
+            case "DIPROSES":
                 holder.binding.btnOrderAction.setVisibility(View.VISIBLE);
                 holder.binding.btnOrderAction.setText("Kirim Pesanan");
                 holder.binding.btnOrderAction.setBackgroundTintList(context.getResources().getColorStateList(R.color.gray_900));
-                holder.binding.tvOrderStatus.setText("Diproses");
-                holder.binding.tvOrderStatus.setTextColor(Color.parseColor("#F57C00"));
-                holder.binding.tvOrderStatus.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FFF3E0")));
                 holder.binding.btnOrderAction.setOnClickListener(v -> actionListener.onAcceptClicked(order));
                 break;
 
-            case "Dikirim":
-                holder.binding.btnOrderAction.setVisibility(View.GONE);
-                break;
-
-            case "Selesai":
-            case "Dibatalkan":
-                String reason = order.getCancellationReason();
-                if (reason != null && !reason.isEmpty()) {
-                    holder.binding.tvOrderStatus.setText("Dibatalkan: " + reason);
-                } else {
-                    holder.binding.tvOrderStatus.setText("Dibatalkan");
-                }
-                holder.binding.tvOrderStatus.setTextColor(context.getResources().getColor(R.color.text_error));
-                break;
+            case "DIKIRIM":
+            case "SELESAI":
+            case "DIBATALKAN":
             default:
                 holder.binding.btnOrderAction.setVisibility(View.GONE);
                 break;

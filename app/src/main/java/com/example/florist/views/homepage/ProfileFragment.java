@@ -1,10 +1,19 @@
 package com.example.florist.views.homepage;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,17 +24,24 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.florist.R;
 import com.example.florist.databinding.FragmentProfileBinding;
 import com.example.florist.model.User;
+import com.example.florist.utils.DialogHelper;
 import com.example.florist.viewmodels.ProfileViewModel;
 import com.example.florist.views.LoginActivity;
 import com.example.florist.views.buyer.MyOrdersActivity;
+import com.example.florist.views.buyer.RentalFragment;
 import com.example.florist.views.seller.OwnerDashboardActivity;
 import com.example.florist.views.seller.createshop.ShopIntroActivity;
 import com.example.florist.views.splashscreen.OnboardingActivity;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.material.button.MaterialButton;
 
 public class ProfileFragment extends Fragment {
 
     private FragmentProfileBinding binding;
     private ProfileViewModel viewModel;
+    private GoogleSignInClient googleSignInClient;
+    private Dialog logoutDialog;
 
     private final androidx.activity.result.ActivityResultLauncher<androidx.activity.result.PickVisualMediaRequest> pickProfileImage =
             registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia(), uri -> {
@@ -47,13 +63,49 @@ public class ProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
 
+        GoogleSignInOptions gso =
+                new GoogleSignInOptions.Builder(com.google.android.gms.auth.api.signin.GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestIdToken(getString(R.string.default_web_client_id))
+                        .requestEmail()
+                        .build();
+        googleSignInClient = com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(requireContext(), gso);
+
         binding.toolbarTitle.setText("Akun Saya");
 
+        setupUI();
         setupObservers();
         setupListeners();
 
         viewModel.loadUserProfile();
         viewModel.loadOrderCounts();
+    }
+
+    private void setupUI() {
+        if (binding.menuUnpaid != null) {
+            binding.menuUnpaid.setOnClickListener(v -> openMyOrdersWithTab(0)); // Tab "Menunggu"
+        }
+
+        if (binding.menuProcessing != null) {
+            binding.menuProcessing.setOnClickListener(v -> openMyOrdersWithTab(1)); // Tab "Diproses"
+        }
+
+        if (binding.menuShipped != null) {
+            binding.menuShipped.setOnClickListener(v -> openMyOrdersWithTab(2)); // Tab "Dikirim"
+        }
+
+        if (binding.menuRented != null) {
+            binding.menuRented.setOnClickListener(v -> {
+                requireActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, new RentalFragment())
+                        .addToBackStack(null)
+                        .commit();
+            });
+        }
+
+        if (binding.btnMyOrders != null) {
+            binding.btnMyOrders.setOnClickListener(v -> openMyOrdersWithTab(0));
+        }
     }
 
     private void setupObservers() {
@@ -141,10 +193,7 @@ public class ProfileFragment extends Fragment {
 
     private void setupListeners() {
         binding.btnLogout.setOnClickListener(v -> {
-            viewModel.logout(requireContext());
-            Intent intent = new Intent(requireContext(), LoginActivity.class);
-            startActivity(intent);
-            requireActivity().finish();
+            showCustomLogoutDialog();
         });
 
         binding.btnMyOrders.setOnClickListener(v -> {
@@ -162,13 +211,6 @@ public class ProfileFragment extends Fragment {
             intent.putExtra("EXTRA_USERNAME", binding.tvUsername.getText().toString());
             startActivity(intent);
         });
-
-        binding.menuUnpaid.setOnClickListener(v -> openMyOrdersAtTab(0));
-        binding.menuProcessing.setOnClickListener(v -> openMyOrdersAtTab(0));
-        binding.menuShipped.setOnClickListener(v -> openMyOrdersAtTab(0));
-        binding.menuRented.setOnClickListener(v -> openMyOrdersAtTab(0));
-
-
     }
 
     private void openMyOrdersAtTab(int tabIndex) {
@@ -214,7 +256,11 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-
+    private void openMyOrdersWithTab(int tabIndex) {
+        Intent intent = new Intent(requireContext(), MyOrdersActivity.class);
+        intent.putExtra("TAB_INDEX", tabIndex);
+        startActivity(intent);
+    }
 
     private void logoutAndRedirect() {
         Intent intent = new Intent(requireContext(), OnboardingActivity.class);
@@ -223,7 +269,71 @@ public class ProfileFragment extends Fragment {
         requireActivity().finish();
     }
 
+    private void showCustomLogoutDialog() {
+        if (logoutDialog != null && logoutDialog.isShowing()) {
+            return;
+        }
 
+        logoutDialog = DialogHelper.createCustomDialog(requireContext(), R.layout.dialog_logout_confirmation);
+
+        ImageButton btnClose = logoutDialog.findViewById(R.id.btnCloseDialog);
+        MaterialButton btnCancel = logoutDialog.findViewById(R.id.btnCancelLogout);
+        MaterialButton btnLogout = logoutDialog.findViewById(R.id.btnConfirmLogout);
+        TextView tvDescription = logoutDialog.findViewById(R.id.tvLogoutDescription);
+
+        String fullText = "Banyak koleksi tanaman baru yang siap bikin sudut ruanganmu lebih estetik. " +
+                "Sampai jumpa lagi! Jika ingin berganti akun, Anda dapat login menggunakan akun lain.";
+        String clickableText = "login menggunakan akun lain.";
+
+        SpannableString spannableString = new SpannableString(fullText);
+        int startIndex = fullText.indexOf(clickableText);
+        int endIndex = startIndex + clickableText.length();
+
+        ClickableSpan clickableSpan = new ClickableSpan() {
+            @Override
+            public void onClick(@NonNull View widget) {
+                logoutDialog.dismiss(); // [PERBAIKAN]
+
+                viewModel.logout();
+                if (googleSignInClient != null) {
+                    googleSignInClient.signOut().addOnCompleteListener(task -> {});
+                }
+
+                Intent intent = new Intent(requireContext(), LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+            }
+
+            @Override
+            public void updateDrawState(@NonNull TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setUnderlineText(true);
+                ds.setColor(Color.BLACK);
+                ds.setFakeBoldText(true);
+            }
+        };
+
+        if (startIndex != -1) {
+            spannableString.setSpan(clickableSpan, startIndex, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+
+        tvDescription.setText(spannableString);
+        tvDescription.setMovementMethod(LinkMovementMethod.getInstance());
+
+        btnClose.setOnClickListener(v -> logoutDialog.dismiss());
+        btnCancel.setOnClickListener(v -> logoutDialog.dismiss());
+
+        btnLogout.setOnClickListener(v -> {
+            logoutDialog.dismiss();
+            viewModel.logout();
+
+            if (googleSignInClient != null) {
+                googleSignInClient.signOut().addOnCompleteListener(task -> {});
+            }
+        });
+
+        logoutDialog.show();
+    }
 
     @Override
     public void onDestroyView() {

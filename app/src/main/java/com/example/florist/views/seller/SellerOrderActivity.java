@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.example.florist.databinding.ActivitySellerOrderBinding;
+import com.example.florist.utils.Constants;
 import com.example.florist.viewmodels.SellerOrderViewModel;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -22,7 +23,13 @@ public class SellerOrderActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
     private final String[] tabTitles = new String[]{"Pesanan Baru", "Diproses", "Dikirim", "Selesai", "Dibatalkan"};
-    private final String[] orderStatuses = new String[]{"Menunggu Konfirmasi", "Diproses", "Dikirim", "Selesai", "Dibatalkan"};
+    private final String[] orderStatuses = new String[]{
+            Constants.ORDER_WAITING,
+            Constants.ORDER_PROCESSING,
+            Constants.ORDER_SHIPPED,
+            Constants.ORDER_COMPLETED,
+            Constants.ORDER_CANCELED
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

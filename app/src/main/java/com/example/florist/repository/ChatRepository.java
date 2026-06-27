@@ -10,6 +10,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -38,7 +39,26 @@ public class ChatRepository {
         void onSuccess();
         void onError(String message);
     }
+    public interface ShopNameCallback {
+        void onResult(String shopName);
+    }
 
+    public interface UnreadCountCallback {
+        void onCountUpdated(int totalUnread);
+        void onError(String message);
+    }
+
+    public void checkShopName(String targetUserId, ShopNameCallback callback) {
+        db.collection("shops").document(targetUserId).get()
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists() && doc.getString("shopName") != null) {
+                        callback.onResult(doc.getString("shopName"));
+                    } else {
+                        callback.onResult(null); // Bukan toko
+                    }
+                })
+                .addOnFailureListener(e -> callback.onResult(null));
+    }
     public void createOrGetChatRoom(String buyerId, String sellerId, String buyerName, String sellerName, String sellerImageUrl, RoomCallback callback) {
 
         String roomIdOption1 = buyerId + "_" + sellerId;
@@ -139,4 +159,32 @@ public class ChatRepository {
                 .addOnFailureListener(e -> {
                 });
     }
+    public ListenerRegistration listenForTotalUnread(String currentUserId, UnreadCountCallback callback) {
+        return chatRoomsRef.whereArrayContains("participantIds", currentUserId)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        callback.onError(error.getMessage());
+                        return;
+                    }
+
+                    int totalUnread = 0;
+                    if (value != null) {
+                        for (com.google.firebase.firestore.QueryDocumentSnapshot doc : value) {
+                            String buyerId = doc.getString("buyerId");
+                            String sellerId = doc.getString("sellerId");
+
+                            // Hitung badge sesuai dengan peran pengguna di room tersebut
+                            if (currentUserId.equals(buyerId)) {
+                                Long unread = doc.getLong("unreadBuyer");
+                                if (unread != null) totalUnread += unread.intValue();
+                            } else if (currentUserId.equals(sellerId)) {
+                                Long unread = doc.getLong("unreadSeller");
+                                if (unread != null) totalUnread += unread.intValue();
+                            }
+                        }
+                    }
+                    callback.onCountUpdated(totalUnread);
+                });
+    }
+
 }

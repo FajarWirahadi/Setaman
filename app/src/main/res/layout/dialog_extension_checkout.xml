@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/bg_bottom_sheet">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pilih Durasi Perpanjangan"
+        style="@style/title_md_bold"
+        android:textColor="@color/black"
+        android:layout_marginBottom="16dp"/>
+
+    <RadioGroup
+        android:id="@+id/rgExtensionPackage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/rbDaily"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Harian (1 Hari) - Rp 5.000"
+            style="@style/body_sm_regular"
+            android:layout_marginBottom="12dp"/>
+
+        <RadioButton
+            android:id="@+id/rbWeekly"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Mingguan (7 Hari) - Rp 30.000"
+            style="@style/body_sm_regular"
+            android:layout_marginBottom="12dp"/>
+
+        <RadioButton
+            android:id="@+id/rbMonthly"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Bulanan (30 Hari) - Rp 100.000"
+            style="@style/body_sm_regular"
+            android:checked="true"
+            android:layout_marginBottom="24dp"/>
+    </RadioGroup>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E0E0E0"
+        android:layout_marginBottom="16dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="24dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Total Tagihan:"
+            style="@style/body_sm_regular"/>
+
+        <TextView
+            android:id="@+id/tvTotalExtensionPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rp 100.000"
+            style="@style/title_md_bold"
+            android:textColor="@color/main_color"/>
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnCheckoutExtension"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:text="Bayar dengan Midtrans"
+        app:backgroundTint="@color/main_color"
+        android:textColor="@color/white"
+        style="@style/title_sm_bold"
+        app:cornerRadius="12dp"
+        android:textAllCaps="false"/>
+</LinearLayout>

@@ -25,8 +25,6 @@ import com.example.florist.views.chat.ChatRoomActivity;
 import com.example.florist.views.homepage.ShopProfileActivity;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.tabs.TabLayoutMediator;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -264,15 +262,19 @@ public class BuyerDetailActivity extends AppCompatActivity {
             dialogBinding.btnTypeBulanan.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.white));
             dialogBinding.btnTypeBulanan.setTextColor(ContextCompat.getColor(this, R.color.gray_700));
 
+            // Warnai tombol yang aktif & Ubah Label Harga Dinamis
             if ("Harian".equals(type)) {
                 dialogBinding.btnTypeHarian.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.olive_500));
                 dialogBinding.btnTypeHarian.setTextColor(ContextCompat.getColor(this, R.color.white));
+                dialogBinding.tvDialogPrice.setText(formatRupiah.format(product.getPrice()) + " /hari");
             } else if ("Mingguan".equals(type)) {
                 dialogBinding.btnTypeMingguan.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.olive_500));
                 dialogBinding.btnTypeMingguan.setTextColor(ContextCompat.getColor(this, R.color.white));
+                dialogBinding.tvDialogPrice.setText(formatRupiah.format(product.getPrice() * 7) + " /minggu");
             } else if ("Bulanan".equals(type)) {
                 dialogBinding.btnTypeBulanan.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.olive_500));
                 dialogBinding.btnTypeBulanan.setTextColor(ContextCompat.getColor(this, R.color.white));
+                dialogBinding.tvDialogPrice.setText(formatRupiah.format(product.getPrice() * 30) + " /bulan");
             }
         });
 
@@ -369,36 +371,6 @@ public class BuyerDetailActivity extends AppCompatActivity {
                                 binding.btnCart.animate().scaleX(1f).scaleY(1f).setDuration(150).start();
                             }).start();
                 }).start();
-    }
-    private void executeDirectBuy(int selectedQty, String selectedDurType, int selectedDurValue) {
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser == null) {
-            Toast.makeText(this, "Silahkan login terlebih dahulu!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        String cartImageUrl = product.getImageUrl();
-        if (product.getGallery() != null && !product.getGallery().isEmpty()){
-            cartImageUrl = product.getGallery().get(0);
-        }
-
-        // Kita bungkus data produk menjadi objek CartItem palsu untuk dikirim via Intent
-        CartItem directBuyItem = new CartItem(
-                product.getProductId(),
-                product.getName(),
-                product.getPrice(),
-                cartImageUrl,
-                product.getOwnerId(),
-                binding.tvShopName.getText().toString(), // Ambil nama toko dari UI
-                selectedQty,
-                selectedDurType,
-                selectedDurValue,
-                new java.util.Date()
-        );
-
-        Intent intent = new Intent(this, CheckoutActivity.class);
-        intent.putExtra("EXTRA_DIRECT_BUY_ITEM", directBuyItem);
-        startActivity(intent);
     }
 
 }

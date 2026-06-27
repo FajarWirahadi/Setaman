@@ -5,12 +5,16 @@ import com.example.florist.model.DeliveryAddress;
 import com.example.florist.model.Order;
 import com.example.florist.model.Rental;
 import com.example.florist.model.User;
+import com.google.firebase.Timestamp; // [ENTERPRISE FIX]: Import Timestamp
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
+import java.util.Calendar; // [ENTERPRISE FIX]: Import Calendar
+import java.util.Date;     // [ENTERPRISE FIX]: Import Date
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,13 +24,16 @@ public class CheckoutRepository {
 
     public interface DataCallback<T> {
         void onSuccess(T data);
-
         void onError(String error);
     }
 
     public interface ActionCallback {
         void onSuccess(String orderId);
+        void onError(String error);
+    }
 
+    public interface TokenCallback {
+        void onTokenReceived(String token);
         void onError(String error);
     }
 
@@ -68,7 +75,9 @@ public class CheckoutRepository {
                 .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
 
-    public void processCheckout(List<CartItem> cartItems, String buyerId, String buyerName, DeliveryAddress deliveryAddress, String paymentMethod, boolean isDirectBuy, ActionCallback callback) {
+    public void processCheckout(List<CartItem> cartItems, String buyerId, String buyerName,
+                                DeliveryAddress deliveryAddress, String paymentMethod,
+                                double deliveryFee, boolean isDirectBuy, ActionCallback callback) {
 
         Map<String, List<CartItem>> groupedOrders = new HashMap<>();
 
@@ -81,17 +90,35 @@ public class CheckoutRepository {
         }
 
         WriteBatch batch = db.batch();
-        DocumentReference orderRef = db.collection("orders").document();
+        String firstOrderId = null;
 
         for (Map.Entry<String, List<CartItem>> entry : groupedOrders.entrySet()) {
             String sellerId = entry.getKey();
             List<CartItem> itemsForThisSeller = entry.getValue();
 
+            DocumentReference orderRef = db.collection("orders").document();
+
+            if (firstOrderId == null) {
+                firstOrderId = orderRef.getId();
+            }
+
             double totalAmount = 0;
             for (CartItem item : itemsForThisSeller) {
                 long duration = item.getDurationValue() > 0 ? item.getDurationValue() : 1;
-                totalAmount += (item.getPrice() * item.getQuantity() * duration);
+                long itemBasePrice = (long) item.getPrice();
+
+                String type = item.getDurationType() != null ? item.getDurationType() : "";
+                int multiplier = 1;
+                if (type.equalsIgnoreCase("Mingguan") || type.equalsIgnoreCase("Minggu")) {
+                    multiplier = 7;
+                } else if (type.equalsIgnoreCase("Bulanan") || type.equalsIgnoreCase("Bulan")) {
+                    multiplier = 30;
+                }
+
+                totalAmount += (itemBasePrice * item.getQuantity() * duration * multiplier);
             }
+
+            totalAmount += deliveryFee;
 
             Order newOrder = new Order(orderRef.getId(), buyerId, sellerId, itemsForThisSeller, totalAmount, deliveryAddress, paymentMethod);
             batch.set(orderRef, newOrder);
@@ -105,55 +132,81 @@ public class CheckoutRepository {
                 newRental.setBuyerId(buyerId);
                 newRental.setSellerId(sellerId);
                 newRental.setSellerName(item.getShopName());
-
                 newRental.setBuyerName(buyerName);
                 newRental.setReceiverName(deliveryAddress != null ? deliveryAddress.getReceiverName() : buyerName);
                 newRental.setDeliveryAddress(deliveryAddress);
                 newRental.setPlantName(item.getName());
                 newRental.setPlantImageUrl(item.getImageUrl());
+
                 long durationVal = item.getDurationValue() > 0 ? item.getDurationValue() : 1;
-                newRental.setTotalAmount(item.getPrice() * item.getQuantity() * durationVal);
-                newRental.setStatus("Pending");
+                long rentalBasePrice = (long) item.getPrice();
 
-                long days = 0;
-                String durType = item.getDurationType();
-                if (durType != null) {
-                    if (durType.toLowerCase().contains("hari")) {
-                        days = item.getDurationValue();
-                    } else if (durType.toLowerCase().contains("minggu")) {
-                        days = item.getDurationValue() * 7L;
-                    } else if (durType.toLowerCase().contains("bulan")) {
-                        days = item.getDurationValue() * 30L;
-                    }
+                String type = item.getDurationType() != null ? item.getDurationType() : "";
+                int multiplier = 1;
+                if (type.equalsIgnoreCase("Mingguan") || type.equalsIgnoreCase("Minggu")) {
+                    multiplier = 7;
+                } else if (type.equalsIgnoreCase("Bulanan") || type.equalsIgnoreCase("Bulan")) {
+                    multiplier = 30;
                 }
 
-                long durationInMillis = days * 24L * 60L * 60L * 1000L;
-                long now = System.currentTimeMillis();
+                newRental.setTotalAmount(rentalBasePrice * item.getQuantity() * durationVal * multiplier);
+                newRental.setStatus("BELUM BAYAR"); // Status awal
 
-                newRental.setStartDate(new com.google.firebase.Timestamp(new java.util.Date(now)));
+                // ==============================================================
+                // [ENTERPRISE FIX]: Injeksi Waktu dan Kalkulasi Otomatis
+                // ==============================================================
+                Calendar calendar = Calendar.getInstance();
+                Date startDate = calendar.getTime(); // Hari ini saat checkout
 
-                if (durationInMillis > 0) {
-                    newRental.setEndDate(new com.google.firebase.Timestamp(new java.util.Date(now + durationInMillis)));
+                // Kalkulasi tanggal selesai berdasarkan durasi dan tipe
+                if (type.equalsIgnoreCase("Mingguan") || type.equalsIgnoreCase("Minggu")) {
+                    calendar.add(Calendar.WEEK_OF_YEAR, (int) durationVal);
+                } else if (type.equalsIgnoreCase("Bulanan") || type.equalsIgnoreCase("Bulan")) {
+                    calendar.add(Calendar.MONTH, (int) durationVal);
                 } else {
-                    newRental.setEndDate(new com.google.firebase.Timestamp(new java.util.Date(now)));
+                    // Default Harian
+                    calendar.add(Calendar.DAY_OF_YEAR, (int) durationVal);
                 }
+                Date endDate = calendar.getTime();
+
+                // Assign Timestamp ke Model Rental
+                newRental.setCreatedAt(new Timestamp(startDate));
+                newRental.setStartDate(new Timestamp(startDate));
+                newRental.setEndDate(new Timestamp(endDate));
+                // ==============================================================
 
                 batch.set(rentalRef, newRental);
             }
         }
 
-        // HAPUS KERANJANG
         if (!isDirectBuy) {
             for (CartItem item : cartItems) {
                 DocumentReference cartRef = db.collection("users").document(buyerId).collection("cart").document(item.getProductId());
                 batch.delete(cartRef);
             }
         }
+        final String finalOrderId = firstOrderId;
 
-        String finalOrderId = orderRef.getId();
-
+        // COMMIT BATCH HANYA DILAKUKAN 1 KALI DI PALING AKHIR
         batch.commit()
                 .addOnSuccessListener(aVoid -> callback.onSuccess(finalOrderId))
                 .addOnFailureListener(e -> callback.onError("Gagal checkout: " + e.getMessage()));
+    }
+
+    public ListenerRegistration listenForPaymentToken(String orderId, TokenCallback callback) {
+        return db.collection("orders").document(orderId)
+                .addSnapshotListener((doc, e) -> {
+                    if (e != null) {
+                        callback.onError(e.getMessage());
+                        return;
+                    }
+
+                    if (doc != null && doc.exists()) {
+                        String token = doc.getString("snapToken");
+                        if (token != null && !token.isEmpty()) {
+                            callback.onTokenReceived(token);
+                        }
+                    }
+                });
     }
 }

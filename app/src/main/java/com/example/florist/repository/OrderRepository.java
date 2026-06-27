@@ -93,7 +93,7 @@ public class OrderRepository {
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     WriteBatch batch = firestore.batch();
                     DocumentReference orderRef = firestore.collection("orders").document(order.getOrderId());
-                    batch.update(orderRef, "status", "Disewa");
+                    batch.update(orderRef, "status", "MENUNGGU KONFIRMASI");
                     batch.update(orderRef, "orderType", "SEWA");
 
                     long now = System.currentTimeMillis();
@@ -107,7 +107,7 @@ public class OrderRepository {
                             batch.update(doc.getReference(), "endDate", new Timestamp(new java.util.Date(now + originalDuration)));
                         }
 
-                        batch.update(doc.getReference(), "status", "AKTIF");
+                        batch.update(doc.getReference(), "status", "SEWA AKTIF");
                     }
 
                     batch.commit()

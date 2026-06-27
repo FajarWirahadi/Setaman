@@ -5,11 +5,20 @@ import com.google.firebase.Timestamp;
 import java.io.Serializable;
 
 public class Rental implements Serializable {
-    // Info Transaksi Dasar
     private String rentalId;
     private String buyerId;
     private String orderId;
     private String buyerName;
+    private String activeComplaintId;
+
+    public String getActiveComplaintId() {
+        return activeComplaintId;
+    }
+
+    public void setActiveComplaintId(String activeComplaintId) {
+        this.activeComplaintId = activeComplaintId;
+    }
+
     private String receiverName;
     private String sellerId;
     private String sellerName;
@@ -22,10 +31,9 @@ public class Rental implements Serializable {
     // Info Waktu Penyewaan & Status
     private Timestamp startDate;
     private Timestamp endDate;
-    private String status; // "Pending", "Berjalan", "Komplain", "Menunggu Konfirmasi", "Selesai"
+    private String status; // "SEWA AKTIF", "MENUNGGU PENARIKAN", "SELESAI"
     private Timestamp createdAt;
     private Timestamp lastMaintenanceDate;
-    private boolean hasComplaint = false;
     private boolean isReviewed = false;
     private DeliveryAddress deliveryAddress;
     private String paymentMethod;
@@ -167,15 +175,6 @@ public class Rental implements Serializable {
     public void setLastMaintenanceDate(Timestamp lastMaintenanceDate) {
         this.lastMaintenanceDate = lastMaintenanceDate;
     }
-
-    public boolean isHasComplaint() {
-        return hasComplaint;
-    }
-
-    public void setHasComplaint(boolean hasComplaint) {
-        this.hasComplaint = hasComplaint;
-    }
-
     public boolean isReviewed() {
         return isReviewed;
     }

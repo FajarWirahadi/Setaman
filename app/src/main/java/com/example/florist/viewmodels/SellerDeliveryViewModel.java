@@ -39,7 +39,7 @@ public class SellerDeliveryViewModel extends ViewModel {
         batch.set(newLogRef, newLog);
 
         if (statusTitle.contains("Pesanan Diterima Pembeli")) {
-            batch.update(orderRef, "status", "Dalam Perawatan");
+            batch.update(orderRef, "status", "SEWA AKTIF");
         }
 
         batch.commit().addOnCompleteListener(task -> {

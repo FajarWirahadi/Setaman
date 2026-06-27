@@ -17,7 +17,6 @@ import com.example.florist.adapter.RentalAdapter;
 import com.example.florist.databinding.FragmentRentalBinding;
 import com.example.florist.viewmodels.RentalViewModel;
 import com.example.florist.views.homepage.HomepageActivity;
-import com.example.florist.views.homepage.TransactionFragment;
 
 public class RentalFragment extends Fragment {
 
@@ -72,10 +71,6 @@ public class RentalFragment extends Fragment {
         viewModel.getActionSuccessMessage().observe(getViewLifecycleOwner(), successMsg -> {
             if (successMsg != null && !successMsg.isEmpty()) {
                 Toast.makeText(requireContext(), successMsg, Toast.LENGTH_SHORT).show();
-
-                if (getParentFragment() instanceof TransactionFragment) {
-                    ((TransactionFragment) getParentFragment()).switchToRentalTab();
-                }
             }
         });
 

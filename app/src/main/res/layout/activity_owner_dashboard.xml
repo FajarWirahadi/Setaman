@@ -241,7 +241,7 @@
                             <ImageView
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
-                                android:src="@drawable/dikirim"
+                                android:src="@drawable/ic_status_shipped"
                                 android:layout_margin="4dp"/>
                             <TextView
                                 android:id="@+id/badgeShipped"

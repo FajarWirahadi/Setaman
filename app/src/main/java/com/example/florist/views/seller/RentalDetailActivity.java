@@ -1,5 +1,6 @@
 package com.example.florist.views.seller;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -15,23 +17,25 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
 import com.example.florist.R;
-import com.example.florist.adapter.BuyerMaintenanceAdapter;
-import com.example.florist.adapter.ChatResolutionAdapter;
-import com.example.florist.adapter.ComplaintTimelineAdapter;
+import com.example.florist.adapter.UnifiedTimelineAdapter;
 import com.example.florist.databinding.ActivityRentalDetailBinding;
 import com.example.florist.databinding.DialogBuyerComplaintBinding;
 import com.example.florist.model.Complaint;
+import com.example.florist.model.TimelineEvent;
+import com.example.florist.utils.Constants;
 import com.example.florist.utils.NetworkUtils;
-import com.example.florist.viewmodels.BuyerMaintenanceViewModel;
 import com.example.florist.viewmodels.ComplaintViewModel;
 import com.example.florist.viewmodels.RentalDetailViewModel;
 import com.example.florist.views.chat.ChatRoomActivity;
+import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -42,27 +46,30 @@ import java.util.Locale;
 public class RentalDetailActivity extends AppCompatActivity {
 
     private ActivityRentalDetailBinding binding;
-    private String role;
 
     private String rentalId, orderId, storeName, receiverName;
+    private String activeRentalDuration = "-";
+    private String activeBuyerImageUrl = "";
+    private String activePlantImageUrl = "";
+    private String activePlantName = "Tanaman";
+    private String pendingScrollId = null;
+    private String activeComplaintImageUrl = null;
     private String buyerId, sellerId;
-    private BuyerMaintenanceViewModel buyerViewModel;
-    private ComplaintViewModel buyerComplaintViewModel;
-    private RentalDetailViewModel sellerViewModel;
+    private String currentUid;
 
-    private BuyerMaintenanceAdapter timelineAdapter;
-    private ComplaintTimelineAdapter complaintAdapter;
-    private ChatResolutionAdapter chatAdapter;
+    private ComplaintViewModel complaintViewModel;
+    private RentalDetailViewModel rentalViewModel;
+
+    private UnifiedTimelineAdapter unifiedTimelineAdapter;
 
     private String activeComplaintId = null;
     private BottomSheetDialog complaintDialog;
     private DialogBuyerComplaintBinding complaintBinding;
     private Uri complaintImageUri = null;
     private Uri cameraUri;
+    private boolean isBuyerSpecificsSetup = false;
+    private boolean isSellerSpecificsSetup = false;
 
-    // ==========================================
-    // LAUNCHER KAMERA & GALERI
-    // ==========================================
     private final ActivityResultLauncher<Uri> takePicture = registerForActivityResult(new ActivityResultContracts.TakePicture(), isSuccess -> {
         if (isSuccess && cameraUri != null) {
             complaintImageUri = cameraUri;
@@ -85,17 +92,15 @@ public class RentalDetailActivity extends AppCompatActivity {
         binding = ActivityRentalDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        buyerComplaintViewModel = new ViewModelProvider(this).get(ComplaintViewModel.class);
-
-        role = getIntent().getStringExtra("ROLE");
-        if (role == null) role = "BUYER";
+        currentUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        complaintViewModel = new ViewModelProvider(this).get(ComplaintViewModel.class);
+        rentalViewModel = new ViewModelProvider(this).get(RentalDetailViewModel.class);
 
         rentalId = getIntent().getStringExtra("RENTAL_ID");
         orderId = getIntent().getStringExtra("ORDER_ID");
-        storeName = getIntent().getStringExtra("STORE_NAME");
-        if (storeName == null) storeName = "Toko Florist";
+        pendingScrollId = getIntent().getStringExtra("SCROLL_TO_REF_ID");
 
-        if (rentalId == null || orderId == null) {
+        if (rentalId == null) {
             Toast.makeText(this, "Data pesanan tidak lengkap.", Toast.LENGTH_SHORT).show();
             finish();
             return;
@@ -103,19 +108,12 @@ public class RentalDetailActivity extends AppCompatActivity {
 
         setupCommonUI();
         setupChatButton();
+        setupMainObservers();
 
-        if ("BUYER".equals(role)) {
-            setupBuyerLogic();
-        } else if ("SELLER".equals(role)) {
-            setupSellerLogic();
-        }
-
-        handleAutoScroll(getIntent());
+        rentalViewModel.fetchRentalAndTimeline(rentalId);
+        rentalViewModel.fetchUnifiedTimeline(rentalId);
     }
 
-    // ==========================================
-    // SETUP UI BERSAMA (COMMON UI)
-    // ==========================================
     private void setupCommonUI() {
         setSupportActionBar(binding.toolbar);
         if (getSupportActionBar() != null) {
@@ -123,6 +121,12 @@ public class RentalDetailActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
         binding.toolbar.setNavigationOnClickListener(v -> finish());
+
+//        getWindow().getDecorView().setSystemUiVisibility(
+//                View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+//                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//        );
+//        getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
 
         binding.appBarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
             if (Math.abs(verticalOffset) - appBarLayout.getTotalScrollRange() == 0) {
@@ -134,116 +138,125 @@ public class RentalDetailActivity extends AppCompatActivity {
             }
         });
 
-        complaintAdapter = new ComplaintTimelineAdapter();
-        complaintAdapter.setStoreName(storeName);
-        complaintAdapter.setQuoteListener(complaint -> {
-            String dateStr = new SimpleDateFormat("dd MMM yyyy", new Locale("id", "ID")).format(complaint.getCreatedAt().toDate());
-            String title = "Komplain (" + dateStr + "): " + complaint.getReason();
-
-            openChatRoomWithQuote(title, complaint.getDescription(), complaint.getEvidenceImageUrl(), complaint.getComplaintId(), "COMPLAINT");
-        });
-        binding.rvComplaintTimeline.setLayoutManager(new LinearLayoutManager(this));
-        binding.rvComplaintTimeline.setAdapter(complaintAdapter);
-
-        timelineAdapter = new BuyerMaintenanceAdapter(log -> {
-            String dateStr = new SimpleDateFormat("dd MMM yyyy", new Locale("id", "ID")).format(log.getCreatedAt().toDate());
-            String title = "Laporan Perawatan (" + dateStr + ")";
-
-            openChatRoomWithQuote(title, log.getDescription(), log.getImageUrl(), log.getLogId(), "MAINTENANCE");
+        unifiedTimelineAdapter = new UnifiedTimelineAdapter(new UnifiedTimelineAdapter.OnTimelineActionListener() {
+            @Override
+            public void onQuoteClicked(TimelineEvent event) {
+                String dateStr = new SimpleDateFormat("dd MMM yyyy", new Locale("id", "ID")).format(event.getTimestamp().toDate());
+                String title = (event.getEventType() == TimelineEvent.TYPE_COMPLAINT) ? "Komplain (" + dateStr + ")" : "Laporan Perawatan (" + dateStr + ")";
+                String refType = (event.getEventType() == TimelineEvent.TYPE_COMPLAINT) ? "COMPLAINT" : "MAINTENANCE";
+                openChatRoomWithQuote(title, event.getDescription(), event.getImageUrl(), event.getEventId(), refType);
+            }
+            @Override
+            public void onImageZoomClicked(String imageUrl) {
+                showZoomableImageDialog(imageUrl);
+            }
         });
 
-        timelineAdapter.setSellerMode("SELLER".equals(role));
-        timelineAdapter.setStoreName(storeName);
-        binding.rvMaintenanceTimeline.setLayoutManager(new LinearLayoutManager(this));
-        binding.rvMaintenanceTimeline.setAdapter(timelineAdapter);
+        binding.rvUnifiedTimeline.setLayoutManager(new LinearLayoutManager(this));
+        binding.rvUnifiedTimeline.setAdapter(unifiedTimelineAdapter);
+        binding.rvUnifiedTimeline.setItemAnimator(null);
     }
 
-    // ==========================================
-    // LOGIKA TOMBOL CHAT PINTAR (BISA KOMPLAIN / CHAT UMUM)
-    // ==========================================
     private void setupChatButton() {
         binding.btnSendChat.setOnClickListener(v -> {
             String text = binding.etChatMessage.getText().toString().trim();
             if (text.isEmpty()) return;
-
-            buyerComplaintViewModel.sendChatMessage(
-                    rentalId,
-                    role.equals("SELLER") ? "Penjual" : "Pembeli",
-                    role.equals("SELLER") ? storeName : receiverName,
-                    "",
-                    text
-            );
-
+            boolean isSeller = currentUid.equals(sellerId);
+            complaintViewModel.sendChatMessage(rentalId, isSeller ? "Penjual" : "Pembeli", isSeller ? storeName : receiverName, "", text);
             binding.etChatMessage.setText("");
-
         });
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        setIntent(intent);
-        handleAutoScroll(intent);
-    }
-
-    private void handleAutoScroll(Intent intent) {
-        String scrollToId = intent.getStringExtra("SCROLL_TO_REF_ID");
-        String scrollToType = intent.getStringExtra("SCROLL_TO_REF_TYPE");
-
-        if (scrollToId != null && scrollToType != null) {
-            if (scrollToType.equals("COMPLAINT")) {
-                binding.nestedScrollView.postDelayed(() -> {
-                    binding.nestedScrollView.smoothScrollTo(0, binding.rvComplaintTimeline.getTop());
-                }, 500);
-                Toast.makeText(this, "Menampilkan referensi komplain...", Toast.LENGTH_SHORT).show();
-            }
-            else if (scrollToType.equals("MAINTENANCE")) {
-                binding.nestedScrollView.postDelayed(() -> {
-                    binding.nestedScrollView.smoothScrollTo(0, binding.rvMaintenanceTimeline.getTop());
-                }, 500);
-                Toast.makeText(this, "Menampilkan referensi perawatan...", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    // ==========================================
-    // LOGIKA PEMBELI (BUYER)
-    // ==========================================
-    private void setupBuyerLogic() {
-        buyerViewModel = new ViewModelProvider(this).get(BuyerMaintenanceViewModel.class);
-        RentalDetailViewModel rentalViewModel = new ViewModelProvider(this).get(RentalDetailViewModel.class);
+    private void setupMainObservers() {
+        binding.progressBar.setVisibility(View.VISIBLE);
 
         rentalViewModel.getActiveRental().observe(this, rental -> {
             if (rental != null) {
+                binding.progressBar.setVisibility(View.GONE);
+
                 storeName = rental.getSellerName();
                 receiverName = rental.getBuyerName();
-
                 buyerId = rental.getBuyerId();
                 sellerId = rental.getSellerId();
+                activePlantName = rental.getPlantName();
 
-                timelineAdapter.setStoreName(storeName);
-
-                complaintAdapter.setStoreName(storeName);
-                complaintAdapter.setBuyerName(receiverName);
-                complaintAdapter.setSellerMode(false);
+                if (rental.getStartDate() != null && rental.getEndDate() != null) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", new Locale("id", "ID"));
+                    activeRentalDuration = sdf.format(rental.getStartDate().toDate()) + " - " + sdf.format(rental.getEndDate().toDate());
+                }
 
                 if (rental.getPlantImageUrl() != null && !rental.getPlantImageUrl().isEmpty()) {
+                    activePlantImageUrl = rental.getPlantImageUrl();
                     Glide.with(this).load(rental.getPlantImageUrl()).into(binding.imgOriginalPlant);
+                }
+
+                boolean isSeller = currentUid.equals(sellerId);
+                unifiedTimelineAdapter.setStoreName(storeName);
+                unifiedTimelineAdapter.setBuyerName(receiverName);
+                unifiedTimelineAdapter.setSellerMode(isSeller);
+
+                if (isSeller) {
+                    if (!isSellerSpecificsSetup) {
+                        setupSellerSpecifics();
+                        isSellerSpecificsSetup = true;
+                    }
+                } else {
+                    if (!isBuyerSpecificsSetup) {
+                        setupBuyerSpecifics();
+                        isBuyerSpecificsSetup = true;
+                    }
                 }
             }
         });
-        rentalViewModel.fetchRentalAndTimeline(rentalId);
 
+        rentalViewModel.getUnifiedTimeline().observe(this, events -> {
+            if (events != null) unifiedTimelineAdapter.setEvents(events);
+            if (pendingScrollId != null) {
+                scrollToTargetEvent(pendingScrollId);
+                pendingScrollId = null;
+            }
+        });
+
+        rentalViewModel.getShowExtensionBanner().observe(this, show -> {
+            // Tampilkan UI Banner Oranye (Pastikan Anda sudah menempelkan kode XML nya dari respon sebelumnya)
+            if (binding.layoutExtensionBanner != null) {
+                binding.layoutExtensionBanner.setVisibility((show != null && show) ? View.VISIBLE : View.GONE);
+            }
+        });
+
+        rentalViewModel.getExtensionDaysText().observe(this, text -> {
+            if (text != null && binding.tvExtensionTitle != null) {
+                binding.tvExtensionTitle.setText(text);
+            }
+        });
+
+        rentalViewModel.getMidtransRedirectUrl().observe(this, url -> {
+            if (url != null && !url.isEmpty()) {
+                Toast.makeText(this, "Membuka halaman pembayaran...", Toast.LENGTH_SHORT).show();
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(browserIntent);
+            }
+        });
+
+        if (binding.btnExtendRental != null) {
+            binding.btnExtendRental.setOnClickListener(v -> {
+                showExtensionCheckoutDialog(); // Buka Kasir BottomSheet
+            });
+        }
+
+        rentalViewModel.getIsLoading().observe(this, isLoading -> {
+            binding.progressBar.setVisibility((isLoading != null && isLoading) ? View.VISIBLE : View.GONE);
+        });
+    }
+
+    private void setupBuyerSpecifics() {
         binding.btnSubmitComplaint.setOnClickListener(v -> showComplaintDialog());
+
         if (binding.btnAcceptResolution != null) {
             binding.btnAcceptResolution.setOnClickListener(v -> {
-                if (!NetworkUtils.isNetworkAvailable(this)) {
-                    Toast.makeText(this, "Koneksi terputus!", Toast.LENGTH_LONG).show();
-                    return;
-                }
+                if (!NetworkUtils.isNetworkAvailable(this)) return;
                 if (activeComplaintId != null) {
-                    buyerComplaintViewModel.acceptResolution(rentalId, activeComplaintId);
-
+                    complaintViewModel.acceptResolution(activeComplaintId);
                     binding.btnAcceptResolution.setText("Memproses...");
                     binding.btnAcceptResolution.setEnabled(false);
                     if (binding.btnRejectResolution != null) binding.btnRejectResolution.setEnabled(false);
@@ -253,51 +266,57 @@ public class RentalDetailActivity extends AppCompatActivity {
 
         if (binding.btnRejectResolution != null) {
             binding.btnRejectResolution.setOnClickListener(v -> {
+                android.widget.FrameLayout container = new android.widget.FrameLayout(this);
+                android.widget.FrameLayout.LayoutParams params = new android.widget.FrameLayout.LayoutParams(
+                        android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.leftMargin = 50; params.rightMargin = 50;
+                android.widget.EditText inputReason = new android.widget.EditText(this);
+                inputReason.setHint("Ketik alasan penolakan di sini...");
+                inputReason.setLayoutParams(params);
+                container.addView(inputReason);
 
-                new AlertDialog.Builder(this)
-                        .setTitle("Konfirmasi Penolakan")
-                        .setMessage("Yakin ingin menolak perbaikan ini? Komplain akan dikembalikan ke penjual untuk diperbaiki ulang.")
+                AlertDialog alertDialog = new AlertDialog.Builder(this)
+                        .setTitle("Tolak Resolusi")
+                        .setMessage("Yakin ingin menolak resolusi ini?")
+                        .setView(container)
                         .setPositiveButton("Ya, Tolak", (dialog, which) -> {
-
-                            if (!NetworkUtils.isNetworkAvailable(this)) {
-                                Toast.makeText(this, "Koneksi terputus!", Toast.LENGTH_LONG).show();
-                                return;
-                            }
-
+                            if (!NetworkUtils.isNetworkAvailable(this)) return;
                             if (activeComplaintId != null) {
-                                buyerComplaintViewModel.rejectResolution(rentalId, activeComplaintId);
-
+                                String typedReason = inputReason.getText().toString().trim();
+                                if (typedReason.isEmpty()) typedReason = "Pembeli menolak tanpa memberikan alasan spesifik.";
+                                complaintViewModel.rejectResolution(activeComplaintId, typedReason);
                                 binding.btnRejectResolution.setText("Memproses...");
                                 binding.btnRejectResolution.setEnabled(false);
                                 binding.btnAcceptResolution.setEnabled(false);
                             }
                         })
                         .setNegativeButton("Batal", null)
-                        .show();
+                        .create();
+
+                        if (alertDialog.getWindow() != null) {
+                            alertDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+                            }
+                        alertDialog.show();
             });
         }
 
-        buyerViewModel.getMaintenanceLogs().observe(this, logs -> {
-            binding.progressBar.setVisibility(View.GONE);
-            if (logs != null && !logs.isEmpty()) timelineAdapter.setLogs(logs);
-        });
-
-        buyerComplaintViewModel.getComplaintList().observe(this, complaints -> {
+        complaintViewModel.getComplaintList().observe(this, complaints -> {
             if (complaints != null && !complaints.isEmpty()) {
-                complaintAdapter.setComplaints(complaints);
                 Complaint latest = complaints.get(complaints.size() - 1);
-                String status = latest.getStatus();
+                String rawStatus = latest.getStatus();
+                if (rawStatus == null) return;
+
+                String status = rawStatus.toUpperCase();
                 activeComplaintId = latest.getComplaintId();
 
-                if ("Pending".equalsIgnoreCase(status) || "Responded".equalsIgnoreCase(status) || "Menunggu Konfirmasi".equalsIgnoreCase(status)) {
+                if (status.equals(Constants.ORDER_PENDING) ||
+                        status.equals(Constants.COMPLAINT_WAITING_RESPONSE) ||
+                        status.equals(Constants.COMPLAINT_WAITING_CONFIRM) ||
+                        status.equals(Constants.COMPLAINT_PROCESSING) ||
+                        status.equals(Constants.COMPLAINT_MANDATORY_VISIT)) {
 
                     binding.layoutSubmitComplaint.setVisibility(View.GONE);
-
-                    if ("Responded".equalsIgnoreCase(status) || "Menunggu Konfirmasi".equalsIgnoreCase(status)) {
-                        binding.layoutConfirmResolution.setVisibility(View.VISIBLE);
-                    } else {
-                        binding.layoutConfirmResolution.setVisibility(View.GONE);
-                    }
+                    binding.layoutConfirmResolution.setVisibility(status.equals(Constants.COMPLAINT_WAITING_CONFIRM) ? View.VISIBLE : View.GONE);
                 } else {
                     binding.layoutSubmitComplaint.setVisibility(View.VISIBLE);
                     binding.layoutConfirmResolution.setVisibility(View.GONE);
@@ -308,132 +327,98 @@ public class RentalDetailActivity extends AppCompatActivity {
             }
         });
 
-        buyerComplaintViewModel.getIsSuccess().observe(this, isSuccess -> {
-            if (isSuccess != null && isSuccess) {
-                if(complaintDialog != null && complaintDialog.isShowing()) complaintDialog.dismiss();
-                Toast.makeText(this, "Tindakan berhasil!", Toast.LENGTH_SHORT).show();
+        complaintViewModel.getIsSuccess().observe(this, success -> {
+            if (Boolean.TRUE.equals(success)) {
+                ((MutableLiveData<Boolean>) complaintViewModel.getIsSuccess()).setValue(false);
 
-                if (binding.btnAcceptResolution != null) {
-                    binding.btnAcceptResolution.setEnabled(true);
+                if (complaintDialog != null && complaintDialog.isShowing()) {
+                    complaintDialog.dismiss();
                 }
-            }
-        });
 
-        buyerComplaintViewModel.getIsLoading().observe(this, isLoading -> {
-            binding.progressBar.setVisibility((isLoading != null && isLoading) ? View.VISIBLE : View.GONE);
+                Toast.makeText(this, "Aksi berhasil diproses!", Toast.LENGTH_SHORT).show();
 
-            if (complaintBinding != null) {
-                if (isLoading != null && isLoading) {
-                    complaintBinding.btnSubmitComplaint.setText("Mengirim...");
-                    complaintBinding.btnSubmitComplaint.setEnabled(false);
-                } else {
+                if (complaintBinding != null) {
+                    complaintBinding.btnSubmitComplaint.setEnabled(true);
                     complaintBinding.btnSubmitComplaint.setText("Kirim Komplain");
-                    checkComplaintValidation();
+                }
+                if (binding.btnAcceptResolution != null) {
+                    binding.btnAcceptResolution.setEnabled(true);
+                    binding.btnAcceptResolution.setText("Terima Resolusi");
+                }
+                if (binding.btnRejectResolution != null) {
+                    binding.btnRejectResolution.setEnabled(true);
+                    binding.btnRejectResolution.setText("Tolak");
+                }
+
+                if (rentalViewModel != null && rentalId != null) {
+                    rentalViewModel.fetchRentalAndTimeline(rentalId);
+                    rentalViewModel.fetchUnifiedTimeline(rentalId);
                 }
             }
         });
-
-        buyerComplaintViewModel.getErrorMessage().observe(this, error -> {
+        complaintViewModel.getErrorMessage().observe(this, error -> {
             if (error != null) {
-                Toast.makeText(this, "GAGAL: " + error, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+
+                if (complaintBinding != null) {
+                    complaintBinding.btnSubmitComplaint.setEnabled(true);
+                    complaintBinding.btnSubmitComplaint.setText("Kirim Komplain");
+                }
 
                 if (binding.btnAcceptResolution != null) {
-                    binding.btnAcceptResolution.setText("Terima Resolusi & Selesaikan");
                     binding.btnAcceptResolution.setEnabled(true);
+                    binding.btnAcceptResolution.setText("Terima Resolusi");
+                }
+                if (binding.btnRejectResolution != null) {
+                    binding.btnRejectResolution.setEnabled(true);
+                    binding.btnRejectResolution.setText("Tolak");
                 }
             }
         });
-        buyerComplaintViewModel.fetchComplaints(rentalId);
-        buyerComplaintViewModel.listenToDiscussion(rentalId);
-        buyerViewModel.startListening(rentalId);
+
+        complaintViewModel.fetchComplaints(rentalId);
     }
-
-    // ==========================================
-    // LOGIKA PENJUAL (SELLER)
-    // ==========================================
-    private void setupSellerLogic() {
-        sellerViewModel = new ViewModelProvider(this).get(RentalDetailViewModel.class);
-
-        sellerViewModel.getIsLoading().observe(this, isLoading -> {
-            binding.progressBar.setVisibility((isLoading != null && isLoading) ? View.VISIBLE : View.GONE);
-        });
-
-        sellerViewModel.getActiveRental().observe(this, rental -> {
-            if (rental != null) {
-                storeName = rental.getSellerName();
-                receiverName = rental.getBuyerName();
-
-                buyerId = rental.getBuyerId();
-                sellerId = rental.getSellerId();
-
-                timelineAdapter.setStoreName(storeName);
-
-                complaintAdapter.setStoreName(storeName);
-                complaintAdapter.setBuyerName(receiverName);
-                complaintAdapter.setSellerMode(true);
-
-                if (rental.getPlantImageUrl() != null && !rental.getPlantImageUrl().isEmpty()) {
-                    Glide.with(this).load(rental.getPlantImageUrl()).into(binding.imgOriginalPlant);
-                }
-            }
-        });
-
-        sellerViewModel.getMaintenanceLogs().observe(this, logs -> {
-            if (logs != null) timelineAdapter.setLogs(logs);
-        });
-
-        sellerViewModel.getComplaintList().observe(this, complaints -> {
+    private void setupSellerSpecifics() {
+        rentalViewModel.getComplaintList().observe(this, complaints -> {
             if (complaints != null && !complaints.isEmpty()) {
-                complaintAdapter.setComplaints(complaints);
                 Complaint latest = complaints.get(complaints.size() - 1);
-                String status = latest.getStatus();
+                String rawStatus = latest.getStatus();
+                if (rawStatus == null) return;
 
-                if ("Pending".equalsIgnoreCase(status) || "Komplain".equalsIgnoreCase(status)) {
-                    activeComplaintId = latest.getComplaintId();
+                String status = rawStatus.toUpperCase();
 
-                    // ---> TOMBOL JADWALKAN PERBAIKAN <---
+                activeComplaintId = latest.getComplaintId();
+                activeComplaintImageUrl = latest.getEvidenceImageUrl();
+
+                if (status.equals(com.example.florist.utils.Constants.COMPLAINT_WAITING_RESPONSE) ||
+                        status.equals("KOMPLAIN") || // Fallback jika ada data lama di Firebase
+                        status.equals(com.example.florist.utils.Constants.ORDER_PENDING) ||
+                        status.equals(com.example.florist.utils.Constants.COMPLAINT_MANDATORY_VISIT)) {
+
                     if (binding.layoutReply != null) {
                         binding.layoutReply.setVisibility(View.VISIBLE);
-
-                        // Sembunyikan kolom input ketik, karena kita hanya butuh klik tombolnya
-                        if (binding.etSellerResponse != null) binding.etSellerResponse.setVisibility(View.GONE);
-
-                        binding.btnSubmitResolution.setText("Jadwalkan Perbaikan Lapangan");
-                        binding.btnSubmitResolution.setBackgroundColor(getResources().getColor(R.color.red_300));
-
-                        binding.btnSubmitResolution.setOnClickListener(v -> {
-                            // Ubah status ke PROSES PERBAIKAN (Otomatis masuk ke To-Do List Tukang Kebun)
-                            sellerViewModel.updateComplaintStatus(rentalId, activeComplaintId, "PROSES PERBAIKAN");
-                            Toast.makeText(this, "Jadwal diteruskan ke Tukang Kebun!", Toast.LENGTH_LONG).show();
-                        });
+                        if (status.equals(com.example.florist.utils.Constants.COMPLAINT_MANDATORY_VISIT)) {
+                            binding.btnActionRespond.setText("Jadwalkan Kunjungan (Wajib)");
+                            binding.btnActionRespond.setBackgroundColor(getResources().getColor(R.color.red_500));
+                        } else {
+                            binding.btnActionRespond.setText("Tanggapi Komplain");
+                            binding.btnActionRespond.setBackgroundColor(getResources().getColor(R.color.main_color));
+                        }
+                        binding.btnActionRespond.setOnClickListener(v -> showSellerResolutionDialog(status));
                     }
-                    // ------------------------------------
-
-                } else if ("PROSES PERBAIKAN".equalsIgnoreCase(status)) {
+                } else if (status.equals(com.example.florist.utils.Constants.COMPLAINT_PROCESSING)) {
                     activeComplaintId = latest.getComplaintId();
-//                    sellerViewModel.listenToDiscussion(rentalId);
-
                     if (binding.layoutReply != null) binding.layoutReply.setVisibility(View.GONE);
-                    Toast.makeText(this, "Tukang kebun sedang dijadwalkan ke lokasi.", Toast.LENGTH_SHORT).show();
-
+                    Toast.makeText(this, "Florist sedang dijadwalkan ke lokasi.", Toast.LENGTH_SHORT).show();
                 } else {
                     activeComplaintId = null;
-//                    if (binding.layoutReply != null) binding.layoutReply.setVisibility(View.GONE);
+                    if (binding.layoutReply != null) binding.layoutReply.setVisibility(View.GONE);
                 }
             }
         });
 
-        sellerViewModel.getChatMessages().observe(this, messages -> {
-        });
-
-        sellerViewModel.listenToDiscussion(rentalId);
-        sellerViewModel.fetchComplaintDetail(rentalId);
-        sellerViewModel.fetchRentalAndTimeline(rentalId);
+        rentalViewModel.fetchComplaintDetail(rentalId);
     }
-
-    // ==========================================
-    // FUNGSI PENDUKUNG DIALOG KOMPLAIN
-    // ==========================================
     private void showComplaintDialog() {
         complaintDialog = new BottomSheetDialog(this);
         complaintBinding = DialogBuyerComplaintBinding.inflate(getLayoutInflater());
@@ -462,11 +447,7 @@ public class RentalDetailActivity extends AppCompatActivity {
         });
 
         complaintBinding.btnSubmitComplaint.setOnClickListener(v -> {
-            if (!NetworkUtils.isNetworkAvailable(this)) {
-                Toast.makeText(this, "Tidak ada koneksi internet!", Toast.LENGTH_LONG).show();
-                return;
-            }
-
+            if (!NetworkUtils.isNetworkAvailable(this)) return;
             complaintBinding.btnSubmitComplaint.setEnabled(false);
             complaintBinding.btnSubmitComplaint.setText("Memproses...");
 
@@ -475,11 +456,10 @@ public class RentalDetailActivity extends AppCompatActivity {
             File safeImageFile = getFileFromUri(complaintImageUri);
 
             if (safeImageFile != null) {
-                buyerComplaintViewModel.submitComplaint(rentalId, reason, desc, Uri.fromFile(safeImageFile));
+                complaintViewModel.submitComplaint(rentalId, orderId, activeRentalDuration, buyerId, activeBuyerImageUrl, sellerId, activePlantName, receiverName, reason, desc, Uri.fromFile(safeImageFile));
             } else {
                 complaintBinding.btnSubmitComplaint.setEnabled(true);
                 complaintBinding.btnSubmitComplaint.setText("Kirim Komplain");
-                Toast.makeText(this, "Gagal memproses gambar.", Toast.LENGTH_SHORT).show();
             }
         });
         complaintDialog.show();
@@ -510,47 +490,185 @@ public class RentalDetailActivity extends AppCompatActivity {
     }
 
     private void openChatRoomWithQuote(String title, String desc, String imageUrl, String refId, String refType) {
-        if (buyerId == null || sellerId == null) {
-            Toast.makeText(this, "Data pengguna belum dimuat, tunggu sebentar...", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
+        if (buyerId == null || sellerId == null) return;
         Intent intent = new Intent(RentalDetailActivity.this, ChatRoomActivity.class);
-
-        String targetId = role.equals("SELLER") ? buyerId : sellerId;
-        String targetName = role.equals("SELLER") ? receiverName : storeName;
-
-        intent.putExtra("EXTRA_TARGET_ID", targetId);
-        intent.putExtra("EXTRA_TARGET_NAME", targetName);
-
-        String quoteText = "🌿 *" + title + "*\n\"" + desc + "\"\n";
-        intent.putExtra("EXTRA_DRAFT_MESSAGE", quoteText);
-
-        if (imageUrl != null && !imageUrl.isEmpty()) {
-            intent.putExtra("EXTRA_DRAFT_IMAGE", imageUrl);
-        }
-
+        boolean isSeller = currentUid.equals(sellerId);
+        intent.putExtra("EXTRA_TARGET_ID", isSeller ? buyerId : sellerId);
+        intent.putExtra("EXTRA_TARGET_NAME", isSeller ? receiverName : storeName);
+        intent.putExtra("EXTRA_DRAFT_MESSAGE", "🌿 *" + title + "*\n\"" + desc + "\"\n");
+        if (imageUrl != null && !imageUrl.isEmpty()) intent.putExtra("EXTRA_DRAFT_IMAGE", imageUrl);
         intent.putExtra("EXTRA_DRAFT_REF_ID", refId);
         intent.putExtra("EXTRA_DRAFT_REF_TYPE", refType);
         intent.putExtra("EXTRA_DRAFT_RENTAL_ID", rentalId);
-
-        Toast.makeText(this, "Membuka obrolan...", Toast.LENGTH_SHORT).show();
         startActivity(intent);
     }
 
+    private void showSellerResolutionDialog(String currentStatus) {
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View view = getLayoutInflater().inflate(R.layout.dialog_seller_resolution, null);
+        dialog.setContentView(view);
+        View btnOptChat = view.findViewById(R.id.btnOptChat);
+        View btnOptVisit = view.findViewById(R.id.btnOptVisit);
+
+        if (Constants.COMPLAINT_MANDATORY_VISIT.equals(currentStatus)) {
+            btnOptChat.setVisibility(View.GONE);
+        }
+
+        btnOptChat.setOnClickListener(v -> {
+            dialog.dismiss();
+            new AlertDialog.Builder(this)
+                    .setTitle("Beri Panduan via Chat")
+                    .setMessage("Status Komplain akan diubah menjadi 'MENUNGGU KONFIRMASI'. Lanjutkan?")
+                    .setPositiveButton("Ya", (d, which) -> {
+                        rentalViewModel.updateComplaintStatus(rentalId, activeComplaintId, Constants.COMPLAINT_WAITING_CONFIRM, "CHAT_EDUCATION");
+                        openChatRoomWithQuote("Panduan Penanganan Tanaman", "Halo kak, ikuti langkah berikut: ", activeComplaintImageUrl, activeComplaintId, "COMPLAINT");
+                    }).setNegativeButton("Batal", null).show();
+        });
+
+        btnOptVisit.setOnClickListener(v -> {
+            dialog.dismiss();
+            Intent intent = new Intent(this, MaintenanceScheduleActivity.class);
+            intent.putExtra("EXTRA_RENTAL_ID", rentalId);
+            intent.putExtra("EXTRA_COMPLAINT_ID", activeComplaintId);
+            intent.putExtra("EXTRA_IS_COMPLAINT_VISIT", true);
+            startActivity(intent);
+        });
+        dialog.show();
+    }
+
     private void showZoomableImageDialog(String imageUrl) {
-        android.app.Dialog dialog = new android.app.Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        Dialog dialog = new android.app.Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
         dialog.setContentView(R.layout.dialog_zoom_layout);
+        PhotoView photoView = dialog.findViewById(R.id.photoView);
+        ImageButton btnClose = dialog.findViewById(R.id.btnCloseZoom);
+        Glide.with(this).load(imageUrl).into(photoView);
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
+    }
 
-        com.github.chrisbanes.photoview.PhotoView photoView = dialog.findViewById(R.id.photoView);
-        android.widget.ImageButton btnClose = dialog.findViewById(R.id.btnCloseZoom);
+    private void scrollToTargetEvent(String eventId) {
+        int position = unifiedTimelineAdapter.getPositionByEventId(eventId);
+        if (position == -1) return;
+        if (binding.appBarLayout != null) binding.appBarLayout.setExpanded(false, true);
 
-        com.bumptech.glide.Glide.with(this)
-                .load(imageUrl)
-                .into(photoView);
+        binding.rvUnifiedTimeline.postDelayed(() -> {
+            View targetView = binding.rvUnifiedTimeline.getLayoutManager().findViewByPosition(position);
+            if (targetView != null) {
+                int rvTop = binding.rvUnifiedTimeline.getTop();
+                int viewY = (int) targetView.getY();
+                int screenCenter = binding.nestedScrollView.getHeight() / 2;
+                int viewCenter = targetView.getHeight() / 2;
+                int scrollY = Math.max(0, rvTop + viewY - screenCenter + viewCenter);
+                binding.nestedScrollView.smoothScrollTo(0, scrollY);
+                targetView.setPressed(true);
+                targetView.postDelayed(() -> targetView.setPressed(false), 1500);
+            } else {
+                ((LinearLayoutManager) binding.rvUnifiedTimeline.getLayoutManager()).scrollToPositionWithOffset(position, binding.rvUnifiedTimeline.getHeight() / 2);
+            }
+        }, 350);
+    }
+    private void showExtensionCheckoutDialog() {
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View view = getLayoutInflater().inflate(R.layout.dialog_add_to_cart, null);
+        dialog.setContentView(view);
+
+        android.widget.ImageButton btnClose = view.findViewById(R.id.btnClose);
+        android.widget.ImageView imgDialogProduct = view.findViewById(R.id.imgDialogProduct);
+        android.widget.TextView tvDialogName = view.findViewById(R.id.tvDialogName);
+        android.widget.TextView tvDialogPrice = view.findViewById(R.id.tvDialogPrice);
+        android.widget.TextView tvDialogStock = view.findViewById(R.id.tvDialogStock);
+
+        android.widget.Button btnTypeHarian = view.findViewById(R.id.btnTypeHarian);
+        android.widget.Button btnTypeMingguan = view.findViewById(R.id.btnTypeMingguan);
+        android.widget.Button btnTypeBulanan = view.findViewById(R.id.btnTypeBulanan);
+
+        com.google.android.material.button.MaterialButton btnMinDuration = view.findViewById(R.id.btnMinDuration);
+        com.google.android.material.button.MaterialButton btnAddDuration = view.findViewById(R.id.btnAddDuration);
+        android.widget.TextView tvDurationValue = view.findViewById(R.id.tvDurationValue);
+        android.widget.TextView tvDialogTotalPrice = view.findViewById(R.id.tvDialogTotalPrice);
+        android.widget.Button btnSubmitCart = view.findViewById(R.id.btnSubmitCart);
+
+        // 1. MANIPULASI UI (Sembunyikan elemen yang tidak perlu)
+        tvDialogStock.setVisibility(View.GONE);
+        btnSubmitCart.setText("Bayar Perpanjangan via Midtrans");
+
+        view.findViewById(R.id.btnMinQty).setOnClickListener(v -> Toast.makeText(this, "Jumlah tanaman tetap 1 untuk perpanjangan.", Toast.LENGTH_SHORT).show());
+        view.findViewById(R.id.btnAddQty).setOnClickListener(v -> Toast.makeText(this, "Jumlah tanaman tetap 1 untuk perpanjangan.", Toast.LENGTH_SHORT).show());
+
+        tvDialogName.setText(activePlantName);
+        if (!activePlantImageUrl.isEmpty()) {
+            Glide.with(this).load(activePlantImageUrl).into(imgDialogProduct);
+        }
+
+        // 3. VARIABEL HARGA
+        final int[] baseDays = {30};
+        final double[] basePrice = {100000.0};
+        final int[] durationMultiplier = {1};
+
+        java.text.NumberFormat formatter = java.text.NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
+
+        Runnable updateUI = () -> {
+            tvDurationValue.setText(String.valueOf(durationMultiplier[0]));
+            double total = basePrice[0] * durationMultiplier[0];
+            tvDialogTotalPrice.setText(formatter.format(total));
+            String labelDurasi = (baseDays[0] == 1) ? "/hari" : (baseDays[0] == 7) ? "/minggu" : "/bulan";
+            tvDialogPrice.setText(formatter.format(basePrice[0]) + " " + labelDurasi);
+        };
+
+        // 4. LOGIKA TOMBOL PILIHAN PAKET
+        View.OnClickListener typeListener = v -> {
+            btnTypeHarian.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.white)));
+            btnTypeHarian.setTextColor(getResources().getColor(R.color.gray_700));
+            btnTypeMingguan.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.white)));
+            btnTypeMingguan.setTextColor(getResources().getColor(R.color.gray_700));
+            btnTypeBulanan.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.white)));
+            btnTypeBulanan.setTextColor(getResources().getColor(R.color.gray_700));
+
+            v.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.olive_500)));
+            ((android.widget.Button)v).setTextColor(getResources().getColor(R.color.white));
+
+            if (v.getId() == R.id.btnTypeHarian) {
+                baseDays[0] = 1; basePrice[0] = 5000.0;
+            } else if (v.getId() == R.id.btnTypeMingguan) {
+                baseDays[0] = 7; basePrice[0] = 30000.0;
+            } else if (v.getId() == R.id.btnTypeBulanan) {
+                baseDays[0] = 30; basePrice[0] = 100000.0;
+            }
+
+            durationMultiplier[0] = 1;
+            updateUI.run();
+        };
+
+        btnTypeHarian.setOnClickListener(typeListener);
+        btnTypeMingguan.setOnClickListener(typeListener);
+        btnTypeBulanan.setOnClickListener(typeListener);
+
+        btnAddDuration.setOnClickListener(v -> { durationMultiplier[0]++; updateUI.run(); });
+        btnMinDuration.setOnClickListener(v -> {
+            if (durationMultiplier[0] > 1) { durationMultiplier[0]--; updateUI.run(); }
+        });
 
         btnClose.setOnClickListener(v -> dialog.dismiss());
 
+        // 6. EKSEKUSI PEMBAYARAN
+        btnSubmitCart.setOnClickListener(v -> {
+            dialog.dismiss();
+            com.example.florist.model.Rental currentRental = rentalViewModel.getActiveRental().getValue();
+            if (currentRental != null) {
+                int finalDays = baseDays[0] * durationMultiplier[0];
+                double finalPrice = basePrice[0] * durationMultiplier[0];
+                rentalViewModel.requestExtensionPayment(currentRental, finalPrice, finalDays);
+            }
+        });
+
+        btnTypeBulanan.performClick();
         dialog.show();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        pendingScrollId = intent.getStringExtra("SCROLL_TO_REF_ID");
     }
 }

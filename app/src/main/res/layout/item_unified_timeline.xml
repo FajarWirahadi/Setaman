@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <View
+        android:id="@+id/timelineLineTop"
+        android:layout_width="2dp"
+        android:layout_height="24dp"
+        android:background="#E0E0E0"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/timelineIndicator"
+        app:layout_constraintEnd_toEndOf="@+id/timelineIndicator" />
+
+    <ImageView
+        android:id="@+id/timelineIndicator"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="16dp"
+        android:src="@drawable/rounded_success_button"
+        app:layout_constraintTop_toBottomOf="@+id/timelineLineTop"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <View
+        android:id="@+id/timelineLineBottom"
+        android:layout_width="2dp"
+        android:layout_height="0dp"
+        android:background="#E0E0E0"
+        app:layout_constraintTop_toBottomOf="@+id/timelineIndicator"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/timelineIndicator"
+        app:layout_constraintEnd_toEndOf="@+id/timelineIndicator" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardContent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="1dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="#EEEEEE"
+        app:cardBackgroundColor="@color/white"
+        app:layout_constraintTop_toTopOf="@+id/timelineIndicator"
+        app:layout_constraintStart_toEndOf="@+id/timelineIndicator"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tvTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Perawatan Rutin"
+                    android:textColor="@color/black"
+                    style="@style/label_lg_regular"
+                    android:layout_toStartOf="@id/tvDate"
+                    android:layout_alignParentStart="true"/>
+
+                <TextView
+                    android:id="@+id/tvDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:text="12 Mei, 10:00"
+                    android:textColor="#757575"
+                    style="@style/body_sm_regular"/>
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/tvDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Deskripsi aktivitas akan muncul di sini."
+                android:textColor="#424242"
+                style="@style/body_md_regular"/>
+
+            <ImageView
+                android:id="@+id/imgEvidence"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:layout_marginTop="12dp"
+                android:scaleType="centerCrop"
+                android:background="#F5F5F5"
+                android:visibility="gone"
+                app:cornerRadius="8dp"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnQuote"
+                android:layout_width="match_parent"
+                android:layout_height="38dp"
+                android:layout_marginTop="12dp"
+                android:text="Kutip ke Chat"
+                android:textColor="@color/main_color"
+                android:background="@drawable/rounded_green_border_button"
+                android:textAllCaps="false"
+                style="@style/body_sm_bold"/>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -44,6 +44,8 @@ public class OrderViewModel extends ViewModel {
     }
 
     public void acceptOrder(Order order) {
+        if (Boolean.TRUE.equals(isLoading.getValue())) return;
+
         isLoading.setValue(true);
         repository.acceptDeliveredOrder(order, new OrderRepository.ActionCallback() {
             @Override
@@ -61,8 +63,10 @@ public class OrderViewModel extends ViewModel {
     }
 
     public void endRental(Order order) {
+        if (Boolean.TRUE.equals(isLoading.getValue())) return;
+
         isLoading.setValue(true);
-        repository.updateOrderStatus(order.getOrderId(), "Selesai", new OrderRepository.ActionCallback() {
+        repository.updateOrderStatus(order.getOrderId(), "SELESAI", new OrderRepository.ActionCallback() {
             @Override
             public void onSuccess() {
                 isLoading.setValue(false);

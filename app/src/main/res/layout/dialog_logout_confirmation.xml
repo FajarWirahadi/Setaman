@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="24dp"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="12dp"
+    app:cardBackgroundColor="@color/white">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp">
+
+        <ImageButton
+            android:id="@+id/btnCloseDialog"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_close"
+            app:tint="@color/gray_600"/> <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnCloseDialog"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginTop="8dp">
+
+        <ImageView
+            android:id="@+id/imgLogoutIllustration"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:src="@drawable/img_logout_illustration"
+            android:scaleType="fitCenter"
+            android:layout_marginBottom="12dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ruanganmu masih bisa lebih hijau!"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            style="@style/title_lg_bold"
+            android:layout_marginBottom="12dp"
+            android:paddingHorizontal="16dp"/>
+
+        <TextView
+            android:id="@+id/tvLogoutDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textColor="@color/gray_600"
+            style="@style/body_md_regular"
+            android:paddingHorizontal="16dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:layout_marginHorizontal="16dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancelLogout"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="54dp"
+                android:layout_weight="1"
+                android:text="Batal"
+                android:textColor="@color/black"
+                app:strokeColor="@color/gray_400"
+                app:cornerRadius="12dp"
+                android:layout_marginEnd="8dp"
+                android:textAllCaps="false"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnConfirmLogout"
+                android:layout_width="0dp"
+                android:layout_height="54dp"
+                android:layout_weight="1"
+                android:text="Keluar"
+                style="@style/body_md_bold"
+                android:textColor="@color/white"
+                app:backgroundTint="@color/black"
+                app:cornerRadius="12dp"
+                android:layout_marginStart="8dp"
+                android:textAllCaps="false"/>
+        </LinearLayout>
+    </LinearLayout>
+    </RelativeLayout>
+</com.google.android.material.card.MaterialCardView>

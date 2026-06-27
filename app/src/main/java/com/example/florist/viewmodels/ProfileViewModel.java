@@ -1,7 +1,5 @@
 package com.example.florist.viewmodels;
 
-import android.content.Context;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -120,7 +118,7 @@ public class ProfileViewModel extends ViewModel {
 
         firestore.collection("orders")
                 .whereEqualTo("buyerId", buyerId)
-                .whereEqualTo("status", "PENDING")
+                .whereEqualTo("status", "MENUNGGU KONFIRMASI")
                 .count()
                 .get(AggregateSource.SERVER).addOnCompleteListener(task -> {
                     if (task.isSuccessful()){
@@ -130,7 +128,7 @@ public class ProfileViewModel extends ViewModel {
 
         firestore.collection("orders")
                 .whereEqualTo("buyerId", buyerId)
-                .whereEqualTo("status","Diproses")
+                .whereEqualTo("status","DIPROSES")
                 .count()
                 .get(AggregateSource.SERVER).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -140,7 +138,7 @@ public class ProfileViewModel extends ViewModel {
 
         firestore.collection("orders")
                 .whereEqualTo("buyerId", buyerId)
-                .whereEqualTo("status", "Dikirim")
+                .whereEqualTo("status", "DIKIRIM")
                 .count()
                 .get(AggregateSource.SERVER).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -150,7 +148,7 @@ public class ProfileViewModel extends ViewModel {
 
         firestore.collection("orders")
                 .whereEqualTo("buyerId", buyerId)
-                .whereEqualTo("status", "Selesai")
+                .whereEqualTo("status", "SELESAI")
                 .count()
                 .get(AggregateSource.SERVER).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -237,8 +235,8 @@ public class ProfileViewModel extends ViewModel {
         isUpdateSuccess.setValue(false);
     }
 
-    public void logout(Context context){
-        authRepository.logout(context, new AuthRepository.AuthCallback() {
+    public void logout() {
+        authRepository.logout(new AuthRepository.AuthCallback() {
             @Override
             public void onSuccess(FirebaseUser user) {
                 navigateToOnboarding.setValue(true);

@@ -32,15 +32,15 @@
             android:textColor="@color/text_primary"/>
     </androidx.appcompat.widget.Toolbar>
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:max="100"
-            android:progress="25"
-            android:scaleY="0.75"
-            android:progressDrawable="@drawable/greenprogress"/>
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:max="100"
+        android:progress="25"
+        android:scaleY="0.75"
+        android:progressDrawable="@drawable/greenprogress"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

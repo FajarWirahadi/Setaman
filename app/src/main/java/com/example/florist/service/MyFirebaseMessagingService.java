@@ -30,12 +30,19 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         Map<String, String> data = remoteMessage.getData();
 
-        if (remoteMessage.getNotification() != null) {
-            String title = remoteMessage.getNotification().getTitle();
-            String body = remoteMessage.getNotification().getBody();
+        String title = "Notifikasi Setaman";
+        String body = "Anda memiliki pesan baru.";
 
-            showNotification(title, body, data);
+        if (remoteMessage.getNotification() != null) {
+            title = remoteMessage.getNotification().getTitle();
+            body = remoteMessage.getNotification().getBody();
         }
+        else if (data.containsKey("title") && data.containsKey("body")) {
+            title = data.get("title");
+            body = data.get("body");
+        }
+
+        showNotification(title, body, data);
     }
 
     @Override
@@ -76,7 +83,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 intent.putExtra("EXTRA_ORDER_ID", data.get("orderId"));
                 break;
 
-
+            case "rental_update":
+                intent = new Intent(this, com.example.florist.views.seller.RentalDetailActivity.class);
+                intent.putExtra("RENTAL_ID", data.get("rentalId"));
+                break;
             default:
                 intent = new Intent(this, HomepageActivity.class);
                 break;

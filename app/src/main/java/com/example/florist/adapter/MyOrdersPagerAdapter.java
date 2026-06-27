@@ -11,7 +11,7 @@ import com.example.florist.views.buyer.OrderListFragment;
 
 public class MyOrdersPagerAdapter extends FragmentStateAdapter {
 
-    private final String[] statuses = {"Menunggu Konfirmasi", "Diproses", "Dikirim", "Selesai", "Dibatalkan"};
+    private final String[] statuses = {"MENUNGGU KONFIRMASI", "DIPROSES", "DIKIRIM", "SELESAI", "DIBATALKAN"};
 
     public MyOrdersPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
         super(fragmentActivity);

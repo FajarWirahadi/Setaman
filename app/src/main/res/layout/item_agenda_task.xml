@@ -24,18 +24,18 @@
                 android:id="@+id/tvOrderId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sewa ID: ORD-XXX"
+                android:text="Sewa ID: ORD-X1234"
                 android:textColor="@color/gray_500"
-                style="@style/body_md_bold"/>
+                style="@style/body_md_bold"
+                android:layout_alignParentLeft="true"
+                android:layout_toStartOf="@id/tvTaskStatus"/>
             <TextView
                 android:id="@+id/tvTaskStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:background="@drawable/rounded_gray_layout"
-                android:backgroundTint="#E8F5E9"
-                android:paddingHorizontal="8dp"
+                android:paddingHorizontal="10dp"
                 android:paddingVertical="4dp"
                 android:text="Sewa Aktif"
                 android:textColor="@color/main_color"

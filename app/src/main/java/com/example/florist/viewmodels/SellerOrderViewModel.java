@@ -43,6 +43,26 @@ public class SellerOrderViewModel extends ViewModel {
             @Override
             public void onSuccess(List<Order> orders) {
                 isLoading.setValue(false);
+                long currentTime = System.currentTimeMillis();
+
+                for (Order order : orders) {
+                    if ("MENUNGGU KONFIRMASI".equals(order.getStatus()) && order.getCreatedAt() != null) {
+                        long createdAtTime = order.getCreatedAt().toDate().getTime();
+                        long deadlineTime = createdAtTime + (24L * 60L * 60L * 1000L); // SLA 24 Jam
+                        long remainingMillis = deadlineTime - currentTime;
+
+                        if (remainingMillis > 0) {
+                            long hours = remainingMillis / (1000 * 60 * 60);
+                            long minutes = (remainingMillis % (1000 * 60 * 60)) / (1000 * 60);
+
+                            order.setSlaText(String.format("Batas Respon: %dj %dm lagi", hours, minutes));
+                            order.setSlaUrgent(hours < 3); // True jika masa tinggal kurang dari 3 jam
+                        } else {
+                            order.setSlaText("Waktu Respon Habis!");
+                            order.setSlaUrgent(true);
+                        }
+                    }
+                }
                 allSellerOrders.setValue(orders);
             }
 
@@ -52,7 +72,6 @@ public class SellerOrderViewModel extends ViewModel {
                 errorMessage.setValue(message);
             }
         });
-
     }
 
     public void updateOrderStatus(Order order, String newStatus) {

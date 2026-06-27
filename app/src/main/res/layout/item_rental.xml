@@ -22,32 +22,35 @@
             android:layout_height="wrap_content">
 
             <TextView
+                android:id="@+id/tvRentalStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                style="@style/body_sm_bold"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:text="Sewa Aktif" />
+
+            <TextView
                 android:id="@+id/tvStoreName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Toko Setaman Floral"
                 style="@style/body_sm_bold"
                 android:textColor="@color/gray_900"
+                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:gravity="center"
+                android:layout_toStartOf="@id/tvRentalStatus"
+                android:gravity="center_vertical"
+                android:layout_marginEnd="12dp"
+                android:maxLines="1"
+                android:ellipsize="end"
                 app:drawableStartCompat="@drawable/building"
                 android:drawablePadding="4dp"/>
 
-            <TextView
-                android:id="@+id/tvRentalStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:background="@drawable/rounded_gray_layout"
-                android:backgroundTint="#E8F5E9"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="4dp"
-                android:text="Sewa Aktif"
-                android:textColor="@color/main_color"
-                style="@style/body_sm_bold" />
         </RelativeLayout>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

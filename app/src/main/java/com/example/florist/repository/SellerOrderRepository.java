@@ -61,9 +61,9 @@ public class SellerOrderRepository {
                     // 3. Konversi status order menjadi status rental
                     // Jika pesanan Diproses/Dikirim, maka perawatannya otomatis AKTIF
                     String rentalStatus = newStatus;
-                    if (newStatus.equals("Diproses") || newStatus.equals("Dikirim")) {
-                        rentalStatus = "AKTIF";
-                    } else if (newStatus.equals("Selesai")) {
+                    if (newStatus.equals("DIPROSES") || newStatus.equals("DIKIRIM")) {
+                        rentalStatus = "SEWA AKTIF";
+                    } else if (newStatus.equals("SELESAI")) {
                         rentalStatus = "SELESAI";
                     }
 
@@ -72,7 +72,6 @@ public class SellerOrderRepository {
                         batch.update(doc.getReference(), "status", rentalStatus);
                     }
 
-                    // 5. Eksekusi mati!
                     batch.commit()
                             .addOnSuccessListener(aVoid -> callback.onSuccess())
                             .addOnFailureListener(e -> callback.onError(e.getMessage()));
@@ -87,13 +86,13 @@ public class SellerOrderRepository {
 
                     DocumentReference orderRef = firestore.collection("orders").document(orderId);
                     batch.update(orderRef,
-                            "status", "Dibatalkan",
+                            "status", "DIBATALKAN",
                             "cancellationReason", reason
                     );
 
                     for (DocumentSnapshot doc : queryDocumentSnapshots) {
                         batch.update(doc.getReference(),
-                                "status", "Dibatalkan",
+                                "status", "DIBATALKAN",
                                 "cancellationReason", reason
                         );
                     }

@@ -1,6 +1,7 @@
 package com.example.florist.views;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,12 +14,14 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.florist.R;
 import com.example.florist.databinding.ActivityRegisterPhoneBinding;
 import com.example.florist.repository.AuthRepository;
 import com.example.florist.viewmodels.AuthViewModel;
+import com.example.florist.views.homepage.HomepageActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -88,6 +91,16 @@ public class RegisterPhoneActivity extends AppCompatActivity {
             });
 
         });
+        authViewModel.getIsPhoneValid().observe(this, isValid -> {
+            binding.btnRegister.setEnabled(isValid);
+            if (isValid) {
+                // Tombol aktif: warna hijau/main_color
+                binding.btnRegister.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.main_color)));
+            } else {
+                // Tombol mati: warna abu-abu
+                binding.btnRegister.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.gray_500)));
+            }
+        });
 
         authViewModel.getErrorMessage().observe(this, message -> {
             if (message != null) {
@@ -106,16 +119,26 @@ public class RegisterPhoneActivity extends AppCompatActivity {
 
         });
 
+        authViewModel.getUserLiveData().observe(this, firebaseUser -> {
+            if (firebaseUser != null) {
+                Intent intent = new Intent(RegisterPhoneActivity.this, HomepageActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            }
+        });
+
         binding.textViewLogin.setOnClickListener(v -> {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
             finish();
         });
-        // Tombol Login Google
+
         binding.btnLoginGoogle.setOnClickListener(v -> {
             Intent signInIntent = googleSignInClient.getSignInIntent();
             googleSignInLauncher.launch(signInIntent);
         });
+        authViewModel.phoneDataChanged(binding.etPhoneNumber.getText().toString());
     }
 
     private void setupGoogleSignIn() {
@@ -168,16 +191,7 @@ public class RegisterPhoneActivity extends AppCompatActivity {
 
         @Override
         public void afterTextChanged(Editable editable) {
-            String text = editable.toString();
-            if (view.getId() == R.id.etPhoneNumber) {
-                if (text.length() >= 10) {
-                    enableButton(true);
-                } else {
-                    enableButton(false);
-
-                }
-            }
-
+            authViewModel.phoneDataChanged(editable.toString());
         }
     }
 

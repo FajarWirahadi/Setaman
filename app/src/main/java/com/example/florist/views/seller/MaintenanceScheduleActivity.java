@@ -11,20 +11,25 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
+import com.example.florist.R;
 import com.example.florist.adapter.CalendarAdapter;
 import com.example.florist.adapter.MaintenanceScheduleAdapter;
 import com.example.florist.databinding.ActivityMaintenanceScheduleBinding;
 import com.example.florist.databinding.DialogAddMaintenanceLogBinding;
+import com.example.florist.model.MaintenanceTaskUIModel;
 import com.example.florist.model.Rental;
 import com.example.florist.viewmodels.MaintenanceViewModel;
 import com.example.florist.views.chat.ChatRoomActivity;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,6 +46,7 @@ public class MaintenanceScheduleActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
     private Uri selectedImageUri = null;
+    private Uri cameraUri = null;
     private BottomSheetDialog addLogDialog;
     private DialogAddMaintenanceLogBinding dialogBinding;
     private List<Date> dateList = new ArrayList<>();
@@ -51,6 +57,17 @@ public class MaintenanceScheduleActivity extends AppCompatActivity {
                     selectedImageUri = uri;
                     if (dialogBinding != null) {
                         Glide.with(this).load(uri).into(dialogBinding.imgPreview);
+                    }
+                    checkValidation();
+                }
+            });
+
+    private final ActivityResultLauncher<Uri> takePicture = registerForActivityResult(
+            new ActivityResultContracts.TakePicture(), isSuccess -> {
+                if (isSuccess && cameraUri != null) {
+                    selectedImageUri = cameraUri;
+                    if (dialogBinding != null) {
+                        Glide.with(this).load(selectedImageUri).into(dialogBinding.imgPreview);
                     }
                     checkValidation();
                 }
@@ -67,7 +84,7 @@ public class MaintenanceScheduleActivity extends AppCompatActivity {
         setupUI();
         setupObservers();
 
-        viewModel.fetchSellerRentals("AKTIF");
+        viewModel.fetchSellerRentals("SEWA AKTIF");
     }
 
     private void setupUI() {
@@ -79,8 +96,21 @@ public class MaintenanceScheduleActivity extends AppCompatActivity {
 
         adapter = new MaintenanceScheduleAdapter(this, new MaintenanceScheduleAdapter.OnMaintenanceListener() {
             @Override
-            public void onAddLogClicked(Rental rental) {
-                showAddDialog(rental);
+            public void onAddLogClicked(MaintenanceTaskUIModel task) {
+                if ("Tawarkan via Chat".equals(task.buttonText)) {
+                    Intent chatIntent = new Intent(MaintenanceScheduleActivity.this, ChatRoomActivity.class);
+                    chatIntent.putExtra("EXTRA_TARGET_ID", task.rental.getBuyerId());
+                    chatIntent.putExtra("EXTRA_TARGET_NAME", task.rental.getBuyerName());
+                    chatIntent.putExtra("EXTRA_TARGET_IMAGE", task.rental.getPlantImageUrl());
+                    String quoteText = "🌿 *Pemberitahuan Kontrak*\n\"Halo kak, masa sewa " + task.rental.getPlantName() + " tinggal sebentar lagi lho! Apakah ingin diperpanjang?\"\n";
+                    chatIntent.putExtra("EXTRA_DRAFT_MESSAGE", quoteText);
+                    chatIntent.putExtra("EXTRA_DRAFT_REF_ID", task.rental.getRentalId());
+                    chatIntent.putExtra("EXTRA_DRAFT_REF_TYPE", "RENTAL");
+                    chatIntent.putExtra("EXTRA_DRAFT_RENTAL_ID", task.rental.getRentalId());
+                    startActivity(chatIntent);
+                } else {
+                    showAddDialog(task); // Munculkan dialog unggah bukti
+                }
             }
 
             @Override
@@ -96,18 +126,15 @@ public class MaintenanceScheduleActivity extends AppCompatActivity {
             @Override
             public void onChatClicked(Rental rental) {
                 Intent chatIntent = new Intent(MaintenanceScheduleActivity.this, ChatRoomActivity.class);
-
                 chatIntent.putExtra("EXTRA_TARGET_ID", rental.getBuyerId());
                 chatIntent.putExtra("EXTRA_TARGET_NAME", rental.getBuyerName());
                 chatIntent.putExtra("EXTRA_TARGET_IMAGE", rental.getPlantImageUrl());
                 String quoteText = "🌿 *Jadwal Perawatan*\n\"Sewa ID: " + rental.getOrderId() + " - " + rental.getPlantName() + "\"\n";
                 chatIntent.putExtra("EXTRA_DRAFT_MESSAGE", quoteText);
                 chatIntent.putExtra("EXTRA_DRAFT_IMAGE", rental.getPlantImageUrl());
-
                 chatIntent.putExtra("EXTRA_DRAFT_REF_ID", rental.getRentalId());
                 chatIntent.putExtra("EXTRA_DRAFT_REF_TYPE", "MAINTENANCE");
                 chatIntent.putExtra("EXTRA_DRAFT_RENTAL_ID", rental.getRentalId());
-
                 startActivity(chatIntent);
             }
         });
@@ -120,7 +147,7 @@ public class MaintenanceScheduleActivity extends AppCompatActivity {
         // binding.btnTabHistory.setOnClickListener(v -> viewModel.fetchSellerRentals("SELESAI"));
     }
 
-    private void showAddDialog(Rental rental) {
+    private void showAddDialog(MaintenanceTaskUIModel task) {
         addLogDialog = new BottomSheetDialog(this);
 
         dialogBinding = DialogAddMaintenanceLogBinding.inflate(getLayoutInflater());
@@ -128,34 +155,54 @@ public class MaintenanceScheduleActivity extends AppCompatActivity {
 
         selectedImageUri = null;
         dialogBinding.imgPreview.setOnClickListener(v -> {
-            pickMedia.launch(new PickVisualMediaRequest.Builder()
-                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
-                    .build());
-        });
+            String[] options = {"Ambil dari Kamera", "Pilih dari Galeri"};
+            AlertDialog alertDialog = new  AlertDialog.Builder(this)
+                    .setTitle("Sumber Foto Bukti")
+                    .setItems(options, (dialog, which) -> {
+                        if (which == 0) {
+                            // Buka Kamera
+                            cameraUri = createImageUri();
+                            takePicture.launch(cameraUri);
+                        } else {
+                            pickMedia.launch(new PickVisualMediaRequest.Builder()
+                                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                                    .build());
+                        }
+                    }).create();
 
+                    if (alertDialog.getWindow() != null) {
+                        alertDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+                    }
+                    alertDialog.show();
+        });
         dialogBinding.etDescription.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                checkValidation();
-            }
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-            @Override
-            public void afterTextChanged(Editable editable) {}
+            @Override public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { checkValidation(); }
+            @Override public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            @Override public void afterTextChanged(Editable editable) {}
         });
 
         dialogBinding.btnSubmitLog.setOnClickListener(v -> {
             String description = dialogBinding.etDescription.getText().toString().trim();
-            // 3. LEMPAR OBJEK RENTAL KE VIEWMODEL
-            viewModel.AddMaintenance(rental, selectedImageUri, description);
+            viewModel.AddMaintenance(task.rental, selectedImageUri, description, task.activeComplaintId);
         });
         addLogDialog.show();
     }
 
+    private Uri createImageUri() {
+        File imageFile = new File(getCacheDir(), "perawatan_" + System.currentTimeMillis() + ".jpg");
+        return FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", imageFile);
+    }
+
     private void setupObservers() {
-        viewModel.getFilteredRentals().observe(this, rentals -> {
-            if (rentals != null) {
-                adapter.updateList(rentals);
+        viewModel.getFilteredTasks().observe(this, tasks -> {
+            if (tasks != null) {
+                adapter.updateList(tasks);
+            }
+        });
+
+        viewModel.getCalendarIndicators().observe(this, indicators -> {
+            if (indicators != null && calendarAdapter != null) {
+                calendarAdapter.setTaskIndicators(indicators.routineDates, indicators.complaintDates);
             }
         });
 

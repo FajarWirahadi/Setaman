@@ -7,12 +7,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.florist.adapter.SellerComplaintAdapter;
 import com.example.florist.databinding.ActivitySellerComplaintListBinding;
 import com.example.florist.viewmodels.SellerComplaintViewModel;
 import com.example.florist.views.LoginActivity;
-// IMPORT FIREBASE AUTH DIHAPUS!
 
 public class SellerComplaintListActivity extends AppCompatActivity {
 
@@ -36,13 +36,12 @@ public class SellerComplaintListActivity extends AppCompatActivity {
     private void setupUI() {
         binding.btnBack.setOnClickListener(v -> finish());
 
-        adapter = new SellerComplaintAdapter(this, rental -> {
+        binding.rvComplaints.setLayoutManager(new LinearLayoutManager(this));
+
+        adapter = new SellerComplaintAdapter(this, complaint -> {
             Intent intent = new Intent(this, RentalDetailActivity.class);
-            intent.putExtra("RENTAL_ID", rental.getRentalId());
-            intent.putExtra("ORDER_ID", rental.getOrderId());
+            intent.putExtra("RENTAL_ID", complaint.getRentalId());
             intent.putExtra("ROLE", "SELLER");
-            intent.putExtra("STORE_NAME", rental.getSellerName());
-            intent.putExtra("STORE_PHOTO_URL", "");
             startActivity(intent);
         });
         binding.rvComplaints.setAdapter(adapter);
@@ -53,6 +52,7 @@ public class SellerComplaintListActivity extends AppCompatActivity {
             if (isExpired != null && isExpired) {
                 Toast.makeText(this, "Sesi berakhir, silakan masuk ulang", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
                 finish();
             }
@@ -62,8 +62,15 @@ public class SellerComplaintListActivity extends AppCompatActivity {
             binding.progressBar.setVisibility((isLoading != null && isLoading) ? View.VISIBLE : View.GONE);
         });
 
-        viewModel.getComplaintRentals().observe(this, rentals -> {
-            if (rentals != null) adapter.updateList(rentals);
+        viewModel.getComplaintList().observe(this, complaints -> {
+            if (complaints != null && !complaints.isEmpty()) {
+                adapter.updateList(complaints);
+                binding.rvComplaints.setVisibility(View.VISIBLE);
+                binding.layoutEmpty.setVisibility(View.GONE);
+            } else {
+                binding.rvComplaints.setVisibility(View.GONE);
+                binding.layoutEmpty.setVisibility(View.VISIBLE);
+            }
         });
 
         viewModel.getErrorMessage().observe(this, error -> {

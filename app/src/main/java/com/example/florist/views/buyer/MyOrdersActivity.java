@@ -33,7 +33,16 @@ public class MyOrdersActivity extends AppCompatActivity {
                 (tab, position) -> tab.setText(tabTitles[position])
         ).attach();
 
+        // 1. TANGKAP DATA INTENT
         int targetTab = getIntent().getIntExtra("TAB_INDEX", 0);
-        binding.viewPagerOrders.setCurrentItem(targetTab, false);
+
+        // 2. ALAT DIAGNOSTIK: Munculkan pesan untuk mengecek angka yang diterima
+        android.widget.Toast.makeText(this, "Target Tab: " + targetTab, android.widget.Toast.LENGTH_SHORT).show();
+
+        // 3. BRUTE-FORCE DELAY: Paksa Android menunggu 150 milidetik
+        // sebelum memindahkan layar, memastikan ViewPager2 sudah 100% jadi.
+        binding.viewPagerOrders.postDelayed(() -> {
+            binding.viewPagerOrders.setCurrentItem(targetTab, false);
+        }, 150);
     }
 }

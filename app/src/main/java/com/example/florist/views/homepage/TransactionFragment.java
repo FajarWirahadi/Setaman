@@ -9,9 +9,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.florist.adapter.TransactionPagerAdapter;
 import com.example.florist.databinding.FragmentTransactionBinding;
-import com.google.android.material.tabs.TabLayoutMediator;
+import com.example.florist.views.buyer.RentalFragment;
+
+// PENTING: Import kelas Fragment Rental Anda di sini
+// Misalnya: import com.example.florist.views.buyer.RentalFragment;
 
 public class TransactionFragment extends Fragment {
 
@@ -28,21 +30,12 @@ public class TransactionFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        TransactionPagerAdapter pagerAdapter = new TransactionPagerAdapter(requireActivity());
-        binding.viewPager.setAdapter(pagerAdapter);
-
-        new TabLayoutMediator(binding.tabLayout, binding.viewPager, (tab, position) -> {
-            if (position == 0) {
-                tab.setText("Belanja");
-            } else {
-                tab.setText("Sewa & Perawatan");
-            }
-        }).attach();
-    }
-
-    public void switchToRentalTab() {
-        if (binding != null && binding.viewPager != null) {
-            binding.viewPager.setCurrentItem(1, true);
+        // [ENTERPRISE]: Langsung suntikkan Fragment Sewa & Perawatan tanpa ViewPager
+        if (savedInstanceState == null) {
+            getChildFragmentManager().beginTransaction()
+                    // GANTI 'new RentalFragment()' dengan nama kelas Fragment Sewa Anda yang sebenarnya
+                    .replace(binding.fragmentContainer.getId(), new RentalFragment())
+                    .commit();
         }
     }
 

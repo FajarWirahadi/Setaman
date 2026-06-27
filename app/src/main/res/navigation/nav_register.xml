@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_register"
+    app:startDestination="@id/registerPhoneFragment">
+
+    <fragment
+        android:id="@+id/registerPhoneFragment"
+        android:name="com.example.florist.views.register.RegisterPhoneFragment"
+        android:label="Register Phone"
+        tools:layout="@layout/fragment_register_phone">
+        <action
+            android:id="@+id/action_phone_to_profile"
+            app:destination="@id/registerProfileFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerProfileFragment"
+        android:name="com.example.florist.views.register.RegisterProfileFragment"
+        android:label="Register Profile"
+        tools:layout="@layout/fragment_register_profile">
+        <action
+            android:id="@+id/action_profile_to_verification"
+            app:destination="@id/registerVerificationFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerVerificationFragment"
+        android:name="com.example.florist.views.register.RegisterVerificationFragment"
+        android:label="Register Verification"
+        tools:layout="@layout/fragment_register_verification">
+    </fragment>
+
+</navigation>

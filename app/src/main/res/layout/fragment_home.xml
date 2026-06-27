@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_primary">
@@ -43,88 +44,92 @@
                     android:id="@+id/layoutInboxBadge"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:layout_marginEnd="4dp"
-                    android:gravity="center">
+                    android:layout_marginEnd="4dp">
 
                     <ImageView
                         android:id="@+id/btnInbox"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_envelope" />
+                        android:src="@drawable/ic_envelope"
+                        android:layout_centerInParent="true"/>
 
                     <TextView
                         android:id="@+id/tvInboxBadgeCount"
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentTop="true"
                         android:background="@drawable/circle_background"
-                        android:backgroundTint="#D32F2F" android:gravity="center"
+                        android:backgroundTint="@color/main_color"
+                        android:gravity="center"
                         android:text="2"
                         android:textColor="@color/white"
-                        android:textSize="10sp"
-                        android:textStyle="bold"
-                        android:layout_marginEnd="2dp"
+                        style="@style/body_sm_bold"
+                        android:textSize="9sp"
                         android:layout_marginTop="2dp"
-                        android:visibility="gone"/> </RelativeLayout>
+                        android:visibility="visible"
+                        tools:ignore="SmallSp" />
+                </RelativeLayout>
 
                 <RelativeLayout
                     android:id="@+id/layoutNotifBadge"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:layout_marginEnd="4dp"
-                    android:gravity="center">
+                    android:layout_marginEnd="4dp">
 
                     <ImageView
                         android:id="@+id/btnNotification"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_bell" />
+                        android:src="@drawable/ic_bell"
+                        android:layout_centerInParent="true"/>
 
                     <TextView
                         android:id="@+id/tvNotifBadgeCount"
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentTop="true"
                         android:background="@drawable/circle_background"
-                        android:backgroundTint="#D32F2F" android:gravity="center"
+                        android:backgroundTint="@color/main_color"
+                        android:gravity="center"
                         android:text="9+"
                         android:textColor="@color/white"
-                        android:textSize="10sp"
-                        android:textStyle="bold"
-                        android:layout_marginEnd="2dp"
+                        style="@style/body_sm_bold"
+                        android:textSize="9sp"
                         android:layout_marginTop="2dp"
-                        android:visibility="gone"/>
+                        android:visibility="visible"
+                        tools:ignore="SmallSp" />
                 </RelativeLayout>
 
                 <RelativeLayout
                     android:id="@+id/layoutCartBadge"
                     android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:gravity="center">
+                    android:layout_height="36dp">
 
                     <ImageView
                         android:id="@+id/btnCart"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_cart" />
+                        android:src="@drawable/ic_cart"
+                        android:layout_centerInParent="true"/>
 
                     <TextView
                         android:id="@+id/tvCartBadgeCount"
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentTop="true"
                         android:background="@drawable/circle_background"
-                        android:backgroundTint="#D32F2F" android:gravity="center"
+                        android:backgroundTint="@color/main_color"
+                        android:gravity="center"
                         android:text="6"
                         android:textColor="@color/white"
-                        android:textSize="10sp"
-                        android:textStyle="bold"
-                        android:layout_marginEnd="2dp"
+                        style="@style/body_sm_bold"
+                        android:textSize="9sp"
                         android:layout_marginTop="2dp"
-                        android:visibility="gone"/>
+                        android:visibility="visible"
+                        tools:ignore="SmallSp" />
                 </RelativeLayout>
             </LinearLayout>
             <EditText

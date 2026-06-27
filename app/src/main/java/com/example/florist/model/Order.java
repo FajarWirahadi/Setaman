@@ -1,5 +1,6 @@
 package com.example.florist.model;
 
+import com.example.florist.utils.Constants;
 import com.google.firebase.Timestamp;
 
 import java.io.Serializable;
@@ -22,6 +23,14 @@ public class Order implements Serializable {
     private Timestamp rentalStartDate;
     private Timestamp rentalEndDate;
     private boolean hasComplaint = false;
+
+    // Variabel khusus UI (Tidak akan masuk ke Firestore)
+    @com.google.firebase.firestore.Exclude
+    private String slaText;
+
+    @com.google.firebase.firestore.Exclude
+    private boolean isSlaUrgent;
+
 
 
     public Order() {
@@ -57,7 +66,7 @@ public class Order implements Serializable {
         this.sellerId = sellerId;
         this.items = items;
         this.totalAmount = totalAmount;
-        this.status = "PENDING";
+        this.status = Constants.ORDER_WAITING;
         this.createdAt = Timestamp.now();
         this.deliveryAddress = deliveryAddress;
         this.paymentMethod = paymentMethod;
@@ -137,6 +146,19 @@ public class Order implements Serializable {
     public void setHasComplaint(boolean hasComplaint) {
         this.hasComplaint = hasComplaint;
     }
+
+    @com.google.firebase.firestore.Exclude
+    public String getSlaText() { return slaText; }
+
+    @com.google.firebase.firestore.Exclude
+    public void setSlaText(String slaText) { this.slaText = slaText; }
+
+    @com.google.firebase.firestore.Exclude
+    public boolean isSlaUrgent() { return isSlaUrgent; }
+
+    @com.google.firebase.firestore.Exclude
+    public void setSlaUrgent(boolean slaUrgent) { this.isSlaUrgent = slaUrgent; }
+
 
     public String getReceiverName() {
         if (deliveryAddress != null) {

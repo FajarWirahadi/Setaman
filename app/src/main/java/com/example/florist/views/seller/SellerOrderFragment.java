@@ -20,6 +20,7 @@ import com.example.florist.adapter.SellerOrderAdapter;
 import com.example.florist.databinding.DialogUpdateDeliveryBinding;
 import com.example.florist.databinding.FragmentSellerOrderBinding;
 import com.example.florist.model.Order;
+import com.example.florist.utils.Constants;
 import com.example.florist.viewmodels.SellerDeliveryViewModel;
 import com.example.florist.viewmodels.SellerOrderViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -70,7 +71,9 @@ public class SellerOrderFragment extends Fragment {
         adapter = new SellerOrderAdapter(requireContext(), new SellerOrderAdapter.OnOrderActionListener() {
             @Override
             public void onAcceptClicked(Order order) {
-                String newStatus = order.getStatus().equals("Menunggu Konfirmasi") ? "Diproses" : "Dikirim";
+                String newStatus = order.getStatus().equals(Constants.ORDER_WAITING)
+                        ? Constants.ORDER_PROCESSING
+                        : Constants.ORDER_SHIPPED;
                 viewModel.updateOrderStatus(order, newStatus);
             }
 

@@ -123,7 +123,7 @@
             android:layout_gravity="center_vertical"/>
     </LinearLayout>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLoginGoogle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -134,7 +134,7 @@
         android:paddingRight="65dip"
         android:text="@string/daftar_menggunakan_google"
         android:textAllCaps="false"
-        android:textColor="@color/text_accent"
+        android:textColor="@color/white"
         android:maxLines="1"/>
 
     <RelativeLayout

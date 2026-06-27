@@ -2,7 +2,6 @@ package com.example.florist.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -14,6 +13,7 @@ import com.bumptech.glide.Glide;
 import com.example.florist.R;
 import com.example.florist.databinding.ItemRentalBinding;
 import com.example.florist.model.Rental;
+import com.example.florist.utils.StatusBadgeHelper;
 import com.example.florist.views.seller.RentalDetailActivity;
 
 import java.text.SimpleDateFormat;
@@ -59,40 +59,13 @@ public class RentalAdapter extends RecyclerView.Adapter<RentalAdapter.RentalView
                 .placeholder(R.drawable.building)
                 .into(holder.binding.imgPlant);
 
-        String status = rental.getStatus() != null ? rental.getStatus() : "AKTIF";
-        String statusUpper = status.toUpperCase();
-
-        if ("AKTIF".equals(statusUpper) || "DISEWA".equals(statusUpper)) {
-            holder.binding.tvRentalStatus.setText("Sewa Aktif");
-            holder.binding.tvRentalStatus.setTextColor(ContextCompat.getColor(context, R.color.green_600));
-            holder.binding.tvRentalStatus.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.green_50)));
-
-        } else if ("SELESAI".equals(statusUpper)) {
-            holder.binding.tvRentalStatus.setText("Selesai");
-            holder.binding.tvRentalStatus.setTextColor(ContextCompat.getColor(context, R.color.gray_600)); // Anggap Anda punya gray_600 di colors.xml
-            holder.binding.tvRentalStatus.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.gray_100)));
-
-        } else if ("KOMPLAIN".equals(statusUpper) || "PENDING".equals(statusUpper) || "PROSES PERBAIKAN".equals(statusUpper)) {
-            holder.binding.tvRentalStatus.setText(status);
-            holder.binding.tvRentalStatus.setTextColor(ContextCompat.getColor(context, R.color.red_500));
-            holder.binding.tvRentalStatus.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.red_50)));
-
-        } else if ("MENUNGGU KONFIRMASI".equals(statusUpper)) {
-            holder.binding.tvRentalStatus.setText(status);
-            holder.binding.tvRentalStatus.setTextColor(ContextCompat.getColor(context, R.color.yellow_600));
-            holder.binding.tvRentalStatus.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.yellow_50)));
-
-        } else {
-            // Fallback default
-            holder.binding.tvRentalStatus.setText(status);
-            holder.binding.tvRentalStatus.setTextColor(ContextCompat.getColor(context, R.color.black));
-            holder.binding.tvRentalStatus.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.gray_200)));
-        }
+        String status = rental.getStatus() != null ? rental.getStatus().toUpperCase() : com.example.florist.utils.Constants.RENTAL_ACTIVE;
+        StatusBadgeHelper.applyStatus(context, holder.binding.tvRentalStatus, status);
         
         String start = rental.getStartDate() != null ? dateFormat.format(rental.getStartDate().toDate()) : "-";
         String end = rental.getEndDate() != null ? dateFormat.format(rental.getEndDate().toDate()) : "-";
 
-        if (rental.getStartDate() != null && ("AKTIF".equals(statusUpper) || "DISEWA".equals(statusUpper))) {
+        if (rental.getStartDate() != null && com.example.florist.utils.Constants.RENTAL_ACTIVE.equals(status)) {
             Date nextDate = calculateNextMaintenanceDate(rental.getStartDate().toDate());
             
             Calendar todayCal =  Calendar.getInstance();
@@ -105,17 +78,17 @@ public class RentalAdapter extends RecyclerView.Adapter<RentalAdapter.RentalView
             if (isToday) {
                 holder.binding.tvRentalPeriod.setText("Jadwal Perawatan: HARI INI 💧");
                 holder.binding.tvRentalPeriod.setTextColor(ContextCompat.getColor(context, R.color.main_color));
-                holder.binding.tvRentalPeriod.setTypeface(null, android.graphics.Typeface.BOLD);
+//                holder.binding.tvRentalPeriod.setTypeface(null, android.graphics.Typeface.BOLD);
             } else {
                 holder.binding.tvRentalPeriod.setText("Perawatan Berikutnya: " + dateFormat.format(nextDate));
                 holder.binding.tvRentalPeriod.setTextColor(ContextCompat.getColor(context, R.color.gray_500));
-                holder.binding.tvRentalPeriod.setTypeface(null, android.graphics.Typeface.NORMAL);
+//                holder.binding.tvRentalPeriod.setTypeface(null, android.graphics.Typeface.NORMAL);
             }
         } else {
             // Jika sudah selesai atau komplain, tampilkan masa sewa biasa
             holder.binding.tvRentalPeriod.setText("Periode: " + start + " - " + end);
             holder.binding.tvRentalPeriod.setTextColor(ContextCompat.getColor(context, R.color.gray_500));
-            holder.binding.tvRentalPeriod.setTypeface(null, android.graphics.Typeface.NORMAL);
+//            holder.binding.tvRentalPeriod.setTypeface(null, android.graphics.Typeface.NORMAL);
         }
 
         holder.binding.btnViewMaintenance.setOnClickListener(v -> {
